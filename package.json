@@ -1,0 +1,12 @@
+{
+  "name": "dafa",
+  "version": "0.1.0",
+  "description": "Backend side of the DAFA App",
+  "main": "server.js",
+  "scripts": {
+    "test": "test server.js",
+    "start": "node server.js"
+  },
+  "author": "mvfavila@gmail.com",
+  "license": "ISC"
+}
