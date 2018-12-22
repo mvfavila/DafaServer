@@ -6,6 +6,7 @@ var LogEntrySchema = new mongoose.Schema({
   message: { type: String, lowercase: true, required: [true, "can't be blank"] },
   level: { type: String, lowercase: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'] },
   user: { type: mongoose.Schema.Types.ObjectId },
+  payload: { type: String },
   createdAt: { type: mongoose.Schema.Types.Date },
 }, {timestamps: false});
 
@@ -17,6 +18,7 @@ LogEntrySchema.methods.toAuthJSON = function(){
     message: this.message,
     level: this.level,
     user: this.user,
+    payload: this.payload,
     createdAt: this.createdAt,
   };
 };

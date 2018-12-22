@@ -62,9 +62,27 @@ var addMiddlewareLoggerEntry = function(req, res, next) {
     logEntry.level = "INFO";
     logEntry.user = token != null ? token.id : null;
     logEntry.createdAt = new Date();
+    logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
     logEntry.save().catch(next);
     next();
 }
+function isLoggable(req){
+    var methods = ["post", "put", "patch"];
+    var isDangerousMethod = methods.indexOf(req.method.toLowerCase()) > -1;
+
+    var isDangerousRoute = req.originalUrl.toLowerCase().indexOf("user") > -1;
+
+    return !isDangerousMethod || !isDangerousRoute;
+}
+function getPayload(raw){
+    if(isEmptyObject(raw))
+        return null;
+    return JSON.stringify(req.body);
+}
+function isEmptyObject(obj){
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
+
 app.use(addMiddlewareLoggerEntry);
 
 // require models
