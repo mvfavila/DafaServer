@@ -8,8 +8,6 @@ router.get('/fields/healthcheck', function(req, res, next){
 });
 
 router.get('/fields/:fieldId', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-    
     Field.findById(req.params.fieldId).then(function(field){
         if(!field){ return res.sendStatus(401); }
 
@@ -18,8 +16,6 @@ router.get('/fields/:fieldId', auth.required, function(req, res, next){
 });
 
 router.get('/fields', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-    
     Field.find().then(function(fields){
       if(!fields){ return res.status(204).send({ error: "No field found" }); }
 
@@ -33,12 +29,11 @@ router.get('/fields', auth.required, function(req, res, next){
 });
 
 router.post('/fields', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-
-    var field = Object.create(Field);
+    var field = new Field();
 
     field.name = req.body.field.name;
     field.email = req.body.field.email;
+    field.clientId = req.body.field.clientId;
     field.active = true;
 
     field.save().then(function(){

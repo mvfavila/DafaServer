@@ -29,7 +29,7 @@ router.get('/eventTypes', auth.required, function(req, res, next){
 });
 
 router.post('/eventTypes', auth.required, function(req, res, next){
-    var eventType = Object.create(EventType);
+    var eventType = new EventType();
 
     eventType.name = req.body.eventType.name;
     eventType.numberOfDaysToWarning = req.body.eventType.numberOfDaysToWarning;

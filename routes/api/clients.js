@@ -8,8 +8,6 @@ router.get('/clients/healthcheck', function(req, res, next){
 });
 
 router.get('/clients/:clientId', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-    
     Client.findById(req.params.clientId).then(function(client){
         if(!client){ return res.sendStatus(401); }
 
@@ -17,9 +15,7 @@ router.get('/clients/:clientId', auth.required, function(req, res, next){
     }).catch(next);
 });
 
-router.get('/clients', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-    
+router.get('/clients', auth.required, function(req, res, next){    
     Client.find().then(function(clients){
       if(!clients){ return res.status(204).send({ error: "No client found" }); }
 
@@ -33,9 +29,7 @@ router.get('/clients', auth.required, function(req, res, next){
 });
 
 router.post('/clients', auth.required, function(req, res, next){
-    var token = decodeFromReq(req);
-
-    var client = Object.create(Client);
+    var client = new Client();
 
     client.name = req.body.client.name;
     client.email = req.body.client.email;

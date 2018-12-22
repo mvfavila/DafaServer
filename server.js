@@ -74,10 +74,10 @@ function isLoggable(req){
 
     return !isDangerousMethod || !isDangerousRoute;
 }
-function getPayload(raw){
-    if(isEmptyObject(raw))
+function getPayload(requestBody){
+    if(isEmptyObject(requestBody))
         return null;
-    return JSON.stringify(req.body);
+    return JSON.stringify(requestBody);
 }
 function isEmptyObject(obj){
     return Object.keys(obj).length === 0 && obj.constructor === Object;

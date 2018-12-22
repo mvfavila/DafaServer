@@ -3,8 +3,8 @@ var uniqueValidator = require('mongoose-unique-validator');
 
 var LogEntrySchema = new mongoose.Schema({
   id: { type: mongoose.Schema.Types.ObjectId },
-  message: { type: String, lowercase: true, required: [true, "can't be blank"] },
-  level: { type: String, lowercase: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'] },
+  message: { type: String, lowercase: false, required: [true, "can't be blank"] },
+  level: { type: String, lowercase: false, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'] },
   user: { type: mongoose.Schema.Types.ObjectId },
   payload: { type: String },
   createdAt: { type: mongoose.Schema.Types.Date },

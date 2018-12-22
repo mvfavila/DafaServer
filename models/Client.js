@@ -3,7 +3,7 @@ var uniqueValidator = require('mongoose-unique-validator');
 
 var ClientSchema = new mongoose.Schema({
   id: { type: mongoose.Schema.Types.ObjectId },
-  name: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true},
+  name: {type: String, lowercase: false, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9 ]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   fields: { type: [] },
   createdAt: { type: mongoose.Schema.Types.Date },
@@ -15,7 +15,7 @@ ClientSchema.plugin(uniqueValidator, {message: 'is already taken.'});
 
 ClientSchema.methods.toAuthJSON = function(){
   return {
-    id: this.id,
+    id: this._id,
     name: this.name,
     email: this.email,
     fields: this.fields,

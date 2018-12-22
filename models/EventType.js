@@ -3,7 +3,7 @@ var uniqueValidator = require('mongoose-unique-validator');
 
 var EventTypeSchema = new mongoose.Schema({
   id: { type: mongoose.Schema.Types.ObjectId },
-  name: { type: String, lowercase: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true },
+  name: { type: String, lowercase: false, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9 ]+$/, 'is invalid'], index: true },
   numberOfDaysToWarning: { type: Number, required: [true, "can't be blank"], match: [/^[0-9]+$/, 'is invalid'] },
   createdAt: { type: mongoose.Schema.Types.Date },
   updatedAt: { type: mongoose.Schema.Types.Date },
