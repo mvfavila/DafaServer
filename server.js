@@ -47,6 +47,7 @@ app.use(function(req, res, next) {
 // require models
 require('./models/User');
 require('./models/Client');
+require('./models/Field');
 app.use(require('./routes'));
 
 /// catch 404 and forward to error handler
