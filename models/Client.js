@@ -8,7 +8,7 @@ var ClientSchema = new mongoose.Schema({
   fields: { type: [] },
   createdAt: { type: mongoose.Schema.Types.Date },
   updatedAt: { type: mongoose.Schema.Types.Date },
-  active: Boolean,
+  active: { type: mongoose.Schema.Types.Boolean },
 }, {timestamps: true});
 
 ClientSchema.plugin(uniqueValidator, {message: 'is already taken.'});

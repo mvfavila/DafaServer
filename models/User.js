@@ -12,7 +12,7 @@ var UserSchema = new mongoose.Schema({
   salt: String,
   createdAt: { type: mongoose.Schema.Types.Date },
   updatedAt: { type: mongoose.Schema.Types.Date },
-  active: Boolean,
+  active: { type: mongoose.Schema.Types.Boolean },
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
