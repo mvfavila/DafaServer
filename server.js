@@ -8,6 +8,7 @@ var cors = require('cors');
 var session = require('express-session');
 var errorhandler = require('errorhandler');
 var passport = require('passport');
+var jwt = require("jsonwebtoken");
  
 var isProduction = process.env.NODE_ENV === 'production';
 
@@ -43,6 +44,28 @@ app.use(function(req, res, next) {
    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
    next();
 });
+
+// Log entry middleware
+require('./models/LogEntry');
+var LogEntry = mongoose.model('LogEntry');
+function decodeFromReq(req) {
+    if(!req.headers.authorization)
+        return null;
+    var token = req.headers.authorization.split(' ')[1];
+    return jwt.decode(token);
+}
+var addMiddlewareLoggerEntry = function(req, res, next) {
+    var token = decodeFromReq(req);
+
+    var logEntry = new LogEntry();
+    logEntry.message = req.method + " " + req.originalUrl;
+    logEntry.level = "INFO";
+    logEntry.user = token != null ? token.id : null;
+    logEntry.createdAt = new Date();
+    logEntry.save().catch(next);
+    next();
+}
+app.use(addMiddlewareLoggerEntry);
 
 // require models
 require('./models/User');
