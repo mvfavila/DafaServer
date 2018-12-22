@@ -5,10 +5,14 @@ var jwt = require('jsonwebtoken');
 var secret = require('../config').secret;
 
 var UserSchema = new mongoose.Schema({
+  id: { type: mongoose.Schema.Types.ObjectId },
   username: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   hash: String,
-  salt: String
+  salt: String,
+  createdAt: { type: mongoose.Schema.Types.Date },
+  updatedAt: { type: mongoose.Schema.Types.Date },
+  active: Boolean,
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});
