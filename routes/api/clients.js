@@ -2,13 +2,14 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var Client = mongoose.model('Client');
 var auth = require('../auth');
+var clientController = require('../../controllers/clientController')
 
 router.get('/clients/healthcheck', function(req, res, next){
     return res.sendStatus(200);
 });
 
 router.get('/clients/:clientId', auth.required, function(req, res, next){
-    Client.findById(req.params.clientId).then(function(client){
+    clientController.getClientById(req.params.clientId).then(function(client){
         if(!client){ return res.sendStatus(401); }
 
         return res.json({ client: client.toAuthJSON() });
@@ -16,7 +17,7 @@ router.get('/clients/:clientId', auth.required, function(req, res, next){
 });
 
 router.get('/clients', auth.required, function(req, res, next){    
-    Client.find().then(function(clients){
+    clientController.getAllClients().then(function(clients){
       if(!clients){ return res.status(204).send({ error: "No client found" }); }
 
       var clientsJson = [];
@@ -35,7 +36,7 @@ router.post('/clients', auth.required, function(req, res, next){
     client.email = req.body.client.email;
     client.active = true;
 
-    client.save().then(function(){
+    clientController.addClient(client).then(function(){
         return res.json({ client: client.toAuthJSON() });
     }).catch(next);
 });
