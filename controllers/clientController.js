@@ -5,7 +5,7 @@ var Field = mongoose.model('Field');
 var clientController = {
     getClientById(clientId) {
         return Client.findById(clientId).then(function(client){
-            if(client == null) return new Promise();
+            if(client == null) return new Promise((resolve, reject) => { resolve(null) });
 
             return new Promise((resolve, reject) => {
                 Field.find({ clientId: clientId, active: true }).then(function(fields){

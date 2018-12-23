@@ -17,7 +17,7 @@ router.get('/eventTypes/:eventTypeId', auth.required, function(req, res, next){
 
 router.get('/eventTypes', auth.required, function(req, res, next){
     EventType.find().then(function(eventType){
-      if(!eventType){ return res.status(204).send({ error: "No Event Type found" }); }
+      if(!eventType){ return res.status(204).send({ error: "No event type found" }); }
 
       var eventTypeJson = [];
       eventType.forEach(eventType => {

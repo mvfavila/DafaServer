@@ -10,7 +10,7 @@ router.get('/clients/healthcheck', function(req, res, next){
 
 router.get('/clients/:clientId', auth.required, function(req, res, next){
     clientController.getClientById(req.params.clientId).then(function(client){
-        if(!client){ return res.sendStatus(401); }
+        if(!client){ return res.status(204).send({ error: "No client found" }); }
 
         return res.json({ client: client.toAuthJSON() });
     }).catch(next);
