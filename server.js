@@ -8,6 +8,7 @@ var cors = require('cors');
 var session = require('express-session');
 var errorhandler = require('errorhandler');
 var passport = require('passport');
+var cookieParser = require('cookie-parser');
 var jwt = require("jsonwebtoken");
  
 var isProduction = process.env.NODE_ENV === 'production';
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({'extended':'true'}));            // parse applica
 app.use(bodyParser.json());                                     // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride());
+app.use(cookieParser());
 app.use(express.static(__dirname + '/public'));
  
 app.use(session({ secret: 'read secret from file', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
