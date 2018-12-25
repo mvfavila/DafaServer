@@ -4,11 +4,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');                        // log requests to the console (express4)
 var bodyParser = require('body-parser');               // pull information from HTML POST (express4)
+var methodOverride = require('method-override');       // simulate DELETE and PUT (express4)
+var cors = require('cors');                            // allows AJAX requests to access resources from remote hosts
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+app.use(cors());
 
 app.use(logger('dev'));                                         // log every request to the console
 app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
@@ -16,6 +20,7 @@ app.use(bodyParser.json());                                     // parse applica
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
