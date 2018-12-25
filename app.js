@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');               // pull information from 
 var methodOverride = require('method-override');       // simulate DELETE and PUT (express4)
 var cors = require('cors');                            // allows AJAX requests to access resources from remote hosts
 var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
 var errorhandler = require('errorhandler');            // development-only error handler middleware
 var passport = require('passport');
 
@@ -14,6 +15,20 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+var store = new MongoDBStore(
+{
+    uri: process.env.MONGODB_URI,
+    collection: 'mySessions'
+},
+function(error) {
+    // Should have gotten an error
+});
+   
+store.on('error', function(error) {
+    assert.ifError(error);
+    assert.ok(false);
+});
 
 app.use(cors());
 
@@ -26,8 +41,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: process.env.SECRET, cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
-
+app.use(session({
+    secret: process.env.SECRET,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+    },
+    store: store,
+    resave: false,
+    saveUninitialized: false
+  }));
 
 require('./models/User');
 app.use('/', indexRouter);
