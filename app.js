@@ -1,11 +1,13 @@
 var express  = require('express');                     // create our app w/ express
 var mongoose = require('mongoose');                    // mongoose for mongodb
 var path = require('path');
-var cookieParser = require('cookie-parser');
+var cookieParser = require('cookie-parser'); // TODO: try to remove
 var logger = require('morgan');                        // log requests to the console (express4)
 var bodyParser = require('body-parser');               // pull information from HTML POST (express4)
 var methodOverride = require('method-override');       // simulate DELETE and PUT (express4)
 var cors = require('cors');                            // allows AJAX requests to access resources from remote hosts
+var session = require('express-session');
+var errorhandler = require('errorhandler');            // development-only error handler middleware
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -23,11 +25,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: 'read secret from file', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 var isProduction = process.env.NODE_ENV === 'production';
+
+if (!isProduction) {
+    app.use(errorhandler());
+}
 
 if(isProduction){
     mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
