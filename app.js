@@ -15,6 +15,7 @@ var jwt = require("jsonwebtoken");
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+// Create global app object
 var app = express();
 
 var store = new MongoDBStore(
@@ -70,6 +71,13 @@ if(isProduction){
     mongoose.set('debug', true);
 }
 
+app.use(function(req, res, next) {
+   res.header("Access-Control-Allow-Origin", "*");
+   res.header('Access-Control-Allow-Methods', 'DELETE, PUT');
+   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+   next();
+});
+
 // Log entry middleware
 require('./models/LogEntry');
 var LogEntry = mongoose.model('LogEntry');
@@ -110,8 +118,49 @@ function isEmptyObject(obj){
 
 app.use(addMiddlewareLoggerEntry);
 
+// require models
+require('./models/User');
+require('./models/Client');
+require('./models/Field');
+require('./models/EventType');
+app.use(require('./routes'));
+
+/// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport')(passport); 
+ 
+/// error handlers
+
+// development error handler
+// will print stacktrace
+if (!isProduction) {
+    app.use(function(err, req, res, next) {
+        console.log(err.stack);
+
+        res.status(err.status || 500);
+
+        res.json({'errors': {
+        message: err.message,
+        error: err
+        }});
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({'errors': {
+      message: err.message,
+      error: {}
+    }});
+});
 
 module.exports = app;
