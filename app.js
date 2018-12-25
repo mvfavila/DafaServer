@@ -10,6 +10,7 @@ var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var errorhandler = require('errorhandler');            // development-only error handler middleware
 var passport = require('passport');
+var jwt = require("jsonwebtoken");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -68,6 +69,46 @@ if(isProduction){
     mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
     mongoose.set('debug', true);
 }
+
+// Log entry middleware
+require('./models/LogEntry');
+var LogEntry = mongoose.model('LogEntry');
+function decodeFromReq(req) {
+    if(!req.headers.authorization)
+        return null;
+    var token = req.headers.authorization.split(' ')[1];
+    return jwt.decode(token);
+}
+var addMiddlewareLoggerEntry = function(req, res, next) {
+    var token = decodeFromReq(req);
+
+    var logEntry = new LogEntry();
+    logEntry.message = req.method + " " + req.originalUrl;
+    logEntry.level = "INFO";
+    logEntry.user = token != null ? token.id : null;
+    logEntry.createdAt = new Date();
+    logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
+    logEntry.save().catch(next);
+    next();
+}
+function isLoggable(req){
+    var methods = ["post", "put", "patch"];
+    var isDangerousMethod = methods.indexOf(req.method.toLowerCase()) > -1;
+
+    var isDangerousRoute = req.originalUrl.toLowerCase().indexOf("user") > -1;
+
+    return !isDangerousMethod || !isDangerousRoute;
+}
+function getPayload(requestBody){
+    if(isEmptyObject(requestBody))
+        return null;
+    return JSON.stringify(requestBody);
+}
+function isEmptyObject(obj){
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
+
+app.use(addMiddlewareLoggerEntry);
 
 app.use(passport.initialize());
 app.use(passport.session());
