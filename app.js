@@ -8,6 +8,7 @@ var methodOverride = require('method-override');       // simulate DELETE and PU
 var cors = require('cors');                            // allows AJAX requests to access resources from remote hosts
 var session = require('express-session');
 var errorhandler = require('errorhandler');            // development-only error handler middleware
+var passport = require('passport');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -25,8 +26,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'read secret from file', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+app.use(session({ secret: process.env.SECRET, cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
+
+require('./models/User');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
@@ -43,5 +46,9 @@ if(isProduction){
     mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
     mongoose.set('debug', true);
 }
+
+app.use(passport.initialize());
+app.use(passport.session());
+require('./config/passport')(passport); 
 
 module.exports = app;
