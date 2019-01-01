@@ -32,7 +32,7 @@ router.put('/user', auth.required, function(req, res, next){
     }
 
     return user.save().then(function(){
-      return res.json({user: user.toAuthJSON()});
+      return res.json({token: user.generateJWT()});
     });
   }).catch(next);
 });
@@ -50,8 +50,7 @@ router.post('/users/login', function(req, res, next){
     if(err){ return next(err); }
 
     if(user){
-      user.token = user.generateJWT();
-      return res.json({user: user.toAuthJSON()});
+      return res.json({token: user.generateJWT()});
     } else {
       return res.status(422).json(info);
     }
@@ -67,7 +66,7 @@ router.post('/users', function(req, res, next){
   user.setPassword(req.body.user.password);
 
   user.save().then(function(){
-    return res.json({user: user.toAuthJSON()});
+    return res.json({token: user.generateJWT()});
   }).catch(next);
 });
 
