@@ -93,6 +93,7 @@ var addMiddlewareLoggerEntry = function(req, res, next) {
     logEntry.message = req.method + " " + req.originalUrl;
     logEntry.level = "INFO";
     logEntry.user = token != null ? token.id : null;
+    logEntry.ip = req.headers['x-forwarded-for'],
     logEntry.createdAt = new Date();
     logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
     logEntry.save().catch(next);
