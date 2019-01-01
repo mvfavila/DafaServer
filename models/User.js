@@ -10,6 +10,7 @@ var UserSchema = new mongoose.Schema({
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   hash: String,
   salt: String,
+  roles: { type: [] },
   createdAt: { type: mongoose.Schema.Types.Date },
   updatedAt: { type: mongoose.Schema.Types.Date },
   active: { type: mongoose.Schema.Types.Boolean },
@@ -35,6 +36,7 @@ UserSchema.methods.generateJWT = function() {
   return jwt.sign({
     id: this._id,
     username: this.username,
+    roles: this.roles,
     exp: parseInt(exp.getTime() / 1000),
   }, secret);
 };
@@ -43,7 +45,8 @@ UserSchema.methods.toAuthJSON = function(){
   return {
     username: this.username,
     email: this.email,
-    token: this.generateJWT()
+    token: this.generateJWT(),
+    roles: this.roles
   };
 };
 
