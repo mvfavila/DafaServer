@@ -32,7 +32,13 @@ router.get('/clients', auth.required, function(req, res, next){
 router.post('/clients', auth.required, function(req, res, next){
     var client = new Client();
 
-    client.name = req.body.client.name;
+    client.firstName = req.body.client.firstName;
+    client.lastName = req.body.client.lastName;
+    client.company = req.body.client.company;
+    client.address = req.body.client.address;
+    client.city = req.body.client.city;
+    client.state = req.body.client.state;
+    client.postalCode = req.body.client.postalCode;
     client.email = req.body.client.email;
     client.active = true;
 

@@ -60,7 +60,12 @@ if(isProduction){
     mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 } else {
     // Configuration
-    mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
+    if (process.env.MONGODB_URI) {
+        mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+    } else {
+        mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
+    }
+
     mongoose.set('debug', true);
 }
 
