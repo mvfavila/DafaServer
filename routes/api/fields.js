@@ -17,7 +17,7 @@ router.get('/fields/:fieldId', auth.required, function(req, res, next){
 
 router.get('/fields', auth.required, function(req, res, next){
     Field.find().then(function(fields){
-      if(!fields){ return res.status(204).send({ error: "No field found" }); }
+      if(!fields){ return res.status(401).send({ error: "No field found" }); }
 
       var fieldsJson = [];
       fields.forEach(field => {

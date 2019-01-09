@@ -11,6 +11,9 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 var errorhandler = require('errorhandler');            // development-only error handler middleware
 var passport = require('passport');
 var jwt = require("jsonwebtoken");
+var util = require("./util/util");
+var presentableErrorCodes = util.presentableErrorCodes;
+var httpStatus = util.httpStatus;
 
 // Create global app object
 var app = express();
@@ -101,6 +104,7 @@ var addMiddlewareLoggerEntry = function(req, res, next) {
     logEntry.ip = req.headers['x-forwarded-for'],
     logEntry.createdAt = new Date();
     logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
+    res.requestId = logEntry._id;
     logEntry.save().catch(next);
     next();
 }
@@ -124,14 +128,14 @@ function isEmptyObject(obj){
 var indexRouter = require('./routes/index');
 app.use('/', indexRouter);
 
-app.use(addMiddlewareLoggerEntry);
-
 app.use(require('./routes'));
+
+app.use(addMiddlewareLoggerEntry);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
-    err.status = 404;
+    err.status = httpStatus.NOT_FOUND;
     next(err);
 });
 
@@ -147,7 +151,7 @@ if (!isProduction) {
     app.use(function(err, req, res, next) {
         console.log(err.stack);
 
-        res.status(err.status || 500);
+        res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR);
 
         res.json({'errors': {
         message: err.message,
@@ -156,14 +160,31 @@ if (!isProduction) {
     });
 }
 
+function createStackTraceLog(stackTrace, creatorId, next) {
+    var logEntry = new LogEntry();
+    logEntry.message = creatorId;
+    logEntry.level = "ERROR";
+    logEntry.createdAt = new Date();
+    logEntry.payload = stackTrace;
+    logEntry.save();
+}
+
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
+    res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR);
+
+    const message = `Something failed! Please contact the administrator and attach request id [${res.requestId}]`;
+    const isPresentable = presentableErrorCodes.indexOf(err.status) >= 0;
+
     res.json({'errors': {
-      message: err.message,
-      error: {}
+        message: isPresentable ? err.message : message,
+        error: isPresentable ? err : {}
     }});
+    
+    if (err.status == httpStatus.INTERNAL_SERVER_ERROR) {
+        createStackTraceLog(err.stack, res.requestId);
+    }
 });
 
 module.exports = app;

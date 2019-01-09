@@ -17,7 +17,7 @@ router.get('/logs/:logEntryId', auth.required, function(req, res, next){
 
 router.get('/logs', auth.required, function(req, res, next){
     LogEntry.find().then(function(logs){
-      if(!logs){ return res.status(204).send({ error: "No log entry found" }); }
+      if(!logs){ return res.status(401).send({ error: "No log entry found" }); }
 
       var logsJson = [];
       logs.forEach(log => {
