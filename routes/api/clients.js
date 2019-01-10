@@ -2,15 +2,17 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var Client = mongoose.model('Client');
 var auth = require('../auth');
-var clientController = require('../../controllers/clientController')
+var clientController = require('../../controllers/clientController');
+var util = require("../../util/util");
+var httpStatus = util.httpStatus;
 
 router.get('/clients/healthcheck', function(req, res, next){
-    return res.sendStatus(200);
+    return res.sendStatus(httpStatus.SUCCESS);
 });
 
 router.get('/clients/:clientId', auth.required, function(req, res, next){
     clientController.getClientById(req.params.clientId).then(function(client){
-        if(!client){ return res.status(401).send({ error: "No client found" }); }
+        if(!client){ return res.status(httpStatus.UNAUTHORIZED).send({ error: "No client found" }); }
 
         return res.json({ client: client.toAuthJSON() });
     }).catch(next);
@@ -18,7 +20,7 @@ router.get('/clients/:clientId', auth.required, function(req, res, next){
 
 router.get('/clients', auth.required, function(req, res, next){    
     clientController.getAllClients().then(function(clients){
-      if(!clients){ return res.status(401).send({ error: "No client found" }); }
+      if(!clients){ return res.status(httpStatus.UNAUTHORIZED).send({ error: "No client found" }); }
 
       var clientsJson = [];
       clients.forEach(client => {
