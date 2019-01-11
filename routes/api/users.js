@@ -64,7 +64,7 @@ router.post('/users', function(req, res, next){
   var user = new User();
 
   if(!req.body.user){
-    return res.status(400).json({errors: {message: "Bad request"}});
+    return res.status(httpStatus.BAD_REQUEST).json({errors: {message: "Bad request"}});
   }  
 
   if(!req.body.user.email){

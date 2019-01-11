@@ -6,7 +6,7 @@ var util = require("../../util/util");
 var httpStatus = util.httpStatus;
 
 router.get('/eventTypes/healthcheck', function(req, res, next){
-    return res.sendStatus(200);
+    return res.sendStatus(httpStatus.SUCCESS);
 });
 
 router.get('/eventTypes/:eventTypeId', auth.required, function(req, res, next){
