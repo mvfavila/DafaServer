@@ -7,8 +7,18 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "nodemon Launch",
+            "runtimeExecutable": "nodemon",
+            "program": "${workspaceFolder}/src/bin/www",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\src\\bin\\www"
+            "program": "${workspaceFolder}/src/bin/www"
         }
     ]
 }
