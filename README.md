@@ -56,7 +56,7 @@ In command prompt:<br/>
   
 ### Elastic Beanstalk configuration before deploy
 
-In your Elastic Beanstalk configuration page (AWS Console) change the property "Node command" to `npm run start` and click the Apply button.
+In your Elastic Beanstalk configuration page (AWS Console) change the property "Node command" to `npm run serve` and click the Apply button.
 
 ### Elastic Beanstalk deploy
 
