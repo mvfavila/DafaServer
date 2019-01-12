@@ -10,13 +10,16 @@ var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var errorhandler = require('errorhandler');            // development-only error handler middleware
 var passport = require('passport');
-var jwt = require("jsonwebtoken");
-var util = require("./util/util");
+var jwt = require('jsonwebtoken');
+var compression = require('compression');
+var util = require('./util/util');
 var presentableErrorCodes = util.presentableErrorCodes;
 var httpStatus = util.httpStatus;
 
 // Create global app object
 var app = express();
+
+app.use(compression());
 
 var store = new MongoDBStore(
 {
