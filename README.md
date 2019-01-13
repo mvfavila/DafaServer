@@ -1,5 +1,5 @@
 # DafaServer
-Backend side of the DAFA App built in NodeJS, ECMAScript 6, MongoDB and configured to be automatically deployed with AWS Elastic Beanstalk.
+Backend side of the DAFA App built in NodeJS, ES6, MongoDB and configured to be automatically deployed with AWS Elastic Beanstalk.
 
 ## Environment Variables required to execute in dev (and in AWS Elastic Beanstalk)
 
