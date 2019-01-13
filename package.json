@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./src/bin/www",
-    "serve": "node ./src/bin/www"
+    "serve": "node ./src/bin/www",
+    "test": "mocha ./src/**/*.spec.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
