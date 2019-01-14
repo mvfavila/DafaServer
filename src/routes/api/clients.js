@@ -6,32 +6,42 @@ var clientController = require('../../controllers/clientController');
 var util = require("../../util/util");
 var httpStatus = util.httpStatus;
 
-router.get('/clients/healthcheck', function(req, res, next){
-    return res.sendStatus(httpStatus.SUCCESS);
-});
+router.route('/clients/healthcheck')
+    .get(getHealthCheck);
 
-router.get('/clients/:clientId', auth.required, function(req, res, next){
+router.route('/clients/:clientId', auth.required)
+    .get(getClientById);
+
+router.route('/clients', auth.required)
+    .get(getAll)
+    .post(createClient);
+
+function getHealthCheck(req, res, next) {
+    return res.sendStatus(httpStatus.SUCCESS);
+}
+
+function getClientById(req, res, next) {
     clientController.getClientById(req.params.clientId).then(function(client){
         if(!client){ return res.status(httpStatus.UNAUTHORIZED).send({ error: "No client found" }); }
 
         return res.json({ client: client.toAuthJSON() });
     }).catch(next);
-});
+}
 
-router.get('/clients', auth.required, function(req, res, next){    
+function getAll(req, res, next) {
     clientController.getAllClients().then(function(clients){
-      if(!clients){ return res.status(httpStatus.UNAUTHORIZED).send({ error: "No client found" }); }
-
-      var clientsJson = [];
-      clients.forEach(client => {
-          clientsJson.push(client.toJSON());
-      });
+        if(!clients){ return res.status(httpStatus.UNAUTHORIZED).send({ error: "No client found" }); }
   
-      return res.json({ clients: clientsJson });
+        var clientsJson = [];
+        clients.forEach(client => {
+            clientsJson.push(client.toJSON());
+        });
+    
+        return res.json({ clients: clientsJson });
     }).catch(next);
-});
+}
 
-router.post('/clients', auth.required, function(req, res, next){
+function createClient(req, res, next) {
     var client = new Client();
 
     client.firstName = req.body.client.firstName;
@@ -47,6 +57,6 @@ router.post('/clients', auth.required, function(req, res, next){
     clientController.addClient(client).then(function(){
         return res.json({ client: client.toAuthJSON() });
     }).catch(next);
-});
+}
 
 module.exports = router;

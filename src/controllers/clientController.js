@@ -21,6 +21,7 @@ var clientController = {
     },
 
     addClient(client){
+        client.active = true;
         return client.save();
     }
 }
