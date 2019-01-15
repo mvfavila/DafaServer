@@ -1,23 +1,18 @@
 //During the test the env variable is set to test
 process.env.NODE_ENV = 'test';
 
-var assert = require('assert');
-var chai = require('chai');   
-var request = chai.request;  // Using Assert style
-var assert = chai.assert;    // Using Assert style
-var expect = chai.expect;    // Using Expect style
+const assert = require('assert');
+const chai = require('chai');   
+const request = chai.request;  // Using Assert style
+// const assert = chai.assert;    // Using Assert style
+const expect = chai.expect;    // Using Expect style
 const chaiHttp = require('chai-http');
-require('../../models/User');
-require('../../models/Client');
-require('../../models/Field');
-require('../../models/EventType');
-require('../../models/LogEntry');
 const httpServer = require('../../bin/www');
 const should = chai.should();  // Using Should style
 
 chai.use(chaiHttp);
 
-describe('Clients API', function() {
+describe('Clients API - Integration', function() {
 
   // beforeEach((done) => {
     
