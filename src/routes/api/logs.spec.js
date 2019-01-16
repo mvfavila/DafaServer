@@ -4,7 +4,6 @@ process.env.NODE_ENV = 'test';
 const assert = require('assert');
 const chai = require('chai');   
 const request = chai.request;  // Using Assert style
-// const assert = chai.assert;    // Using Assert style
 const expect = chai.expect;    // Using Expect style
 const chaiHttp = require('chai-http');
 const httpServer = require('../../bin/www');
@@ -12,6 +11,8 @@ const should = chai.should();  // Using Should style
 const sinon = require('sinon');
 
 chai.use(chaiHttp);
+
+require('../../models/User');
 
 const mongoose = require('mongoose'); 
 const MongoMemoryServer = require('mongodb-memory-server');
@@ -36,23 +37,10 @@ after(() => {
     mongoServer.stop();
 });
 
-describe('Clients API - Integration', function() {
-
-  // beforeEach((done) => {
-    
-  // });
-  
-  describe('Health Check', () => {
-		it('Should return ok', (done) => {
-      chai.request(httpServer)
-        .get('api/clients/healthcheck')
-        .end((err, res) => {
-          should.not.exist(err);
-          should.exist(res);
-          res.should.have.status(200);          
-        });
-      done();
-		});
+describe('...', () => {
+    it("...", async () => {
+      const User = mongoose.model('User');
+      const cnt = await User.countDocuments();
+      expect(cnt).to.equal(0);
+    });
   });
-  
-});

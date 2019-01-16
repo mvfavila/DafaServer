@@ -1,5 +1,4 @@
 var express  = require('express');                     // create our app w/ express
-var mongoose = require('mongoose');                    // mongoose for mongodb
 var path = require('path');
 var cookieParser = require('cookie-parser'); // TODO: try to remove
 var logger = require('morgan');                        // log requests to the console (express4)
@@ -57,22 +56,26 @@ app.use(session({
   }));
 
 var isProduction = process.env.NODE_ENV === 'production';
+var isTest = process.env.NODE_ENV === 'test';
 
 if (!isProduction) {
     app.use(errorhandler());
 }
 
-if(isProduction){
-    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
-} else {
-    // Configuration
-    if (process.env.MONGODB_URI) {
+if (!isTest) {    
+    var mongoose = require('mongoose'); // mongoose for mongodb
+    if(isProduction){
         mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
     } else {
-        mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
+        // Configuration
+        if (process.env.MONGODB_URI) {
+            mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+        } else {
+            mongoose.connect('mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb', { useNewUrlParser: true }); 
+        }
+    
+        mongoose.set('debug', true);
     }
-
-    mongoose.set('debug', true);
 }
 
 app.use(function(req, res, next) {
@@ -87,53 +90,56 @@ require('./models/User');
 require('./models/Client');
 require('./models/Field');
 require('./models/EventType');
-
-// Log entry middleware
 require('./models/LogEntry');
-var LogEntry = mongoose.model('LogEntry');
-function decodeFromReq(req) {
-    if(!req.headers.authorization)
-        return null;
-    var token = req.headers.authorization.split(' ')[1];
-    return jwt.decode(token);
-}
-var addMiddlewareLoggerEntry = function(req, res, next) {
-    var token = decodeFromReq(req);
 
-    var logEntry = new LogEntry();
-    logEntry.message = req.method + " " + req.originalUrl;
-    logEntry.level = "INFO";
-    logEntry.user = token != null ? token.id : null;
-    logEntry.ip = req.headers['x-forwarded-for'],
-    logEntry.createdAt = new Date();
-    logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
-    res.requestId = logEntry._id;
-    logEntry.save().catch(next);
-    next();
-}
-function isLoggable(req){
-    var methods = ["post", "put", "patch"];
-    var isDangerousMethod = methods.indexOf(req.method.toLowerCase()) > -1;
+if (!isTest) { 
+    // Log entry middleware
+    var LogEntry = mongoose.model('LogEntry');
+    function decodeFromReq(req) {
+        if(!req.headers.authorization)
+            return null;
+        var token = req.headers.authorization.split(' ')[1];
+        return jwt.decode(token);
+    }
+    var addMiddlewareLoggerEntry = function(req, res, next) {
+        var token = decodeFromReq(req);
 
-    var isDangerousRoute = req.originalUrl.toLowerCase().indexOf("user") > -1;
+        var logEntry = new LogEntry();
+        logEntry.message = req.method + " " + req.originalUrl;
+        logEntry.level = "INFO";
+        logEntry.user = token != null ? token.id : null;
+        logEntry.ip = req.headers['x-forwarded-for'],
+        logEntry.createdAt = new Date();
+        logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
+        res.requestId = logEntry._id;
+        logEntry.save().catch(next);
+        next();
+    }
+    function isLoggable(req){
+        var methods = ["post", "put", "patch"];
+        var isDangerousMethod = methods.indexOf(req.method.toLowerCase()) > -1;
 
-    return !isDangerousMethod || !isDangerousRoute;
-}
-function getPayload(requestBody){
-    if(isEmptyObject(requestBody))
-        return null;
-    return JSON.stringify(requestBody);
-}
-function isEmptyObject(obj){
-    return Object.keys(obj).length === 0 && obj.constructor === Object;
+        var isDangerousRoute = req.originalUrl.toLowerCase().indexOf("user") > -1;
+
+        return !isDangerousMethod || !isDangerousRoute;
+    }
+    function getPayload(requestBody){
+        if(isEmptyObject(requestBody))
+            return null;
+        return JSON.stringify(requestBody);
+    }
+    function isEmptyObject(obj){
+        return Object.keys(obj).length === 0 && obj.constructor === Object;
+    }
 }
 
 var indexRouter = require('./routes/index');
 app.use('/', indexRouter);
 
 app.use(require('./routes'));
-
-app.use(addMiddlewareLoggerEntry);
+if (!isTest) { 
+    app.use(addMiddlewareLoggerEntry);
+}
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
