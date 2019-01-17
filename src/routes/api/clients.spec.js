@@ -18,12 +18,7 @@ const MongoMemoryServer = require('mongodb-memory-server');
 let mongoServer;
 
 before((done) => {
-    mongoServer = new MongoMemoryServer.default({
-        binary: {
-            version: '3.6.1',
-        },
-        // debug: true,
-    });
+  mongoServer = new MongoMemoryServer.default({ /* debug: true,*/ });
     mongoServer.getConnectionString().then((mongoUri) => {
         return mongoose.connect(mongoUri, { useNewUrlParser: true }, (err) => {
           if (err) done(err);

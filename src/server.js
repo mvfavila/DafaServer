@@ -37,7 +37,7 @@ store.on('error', function(error) {
 app.use(cors());
 
 app.use(logger('dev'));                                         // log every request to the console
-app.use(bodyParser.urlencoded({'extended':'false'}));            // parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({'extended':'false'}));           // parse application/x-www-form-urlencoded
 app.use(bodyParser.json());                                     // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(express.json());
