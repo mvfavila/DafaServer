@@ -1,5 +1,6 @@
 require('../models/LogEntry');
 var mongoose = require('mongoose'); // mongoose for mongodb
+var jwt = require('jsonwebtoken');
 
 var LogEntry = mongoose.model('LogEntry');
 function decodeFromReq(req) {
