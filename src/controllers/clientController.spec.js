@@ -16,6 +16,7 @@ const MongoMemoryServer = require('mongodb-memory-server');
 require('../models/Client');
 require('../models/Field');
 const clientController = require('./clientController');
+const Client = mongoose.model('Client');
 let mongoServer;
 
 before((done) => {
@@ -35,9 +36,9 @@ after(() => {
 describe('Client controller', () => {
   
   it("clientController - Add client - Should succeed", async () => {
-    const Client = mongoose.model('Client');
     let cnt = await Client.countDocuments();
 
+    // Dataset must be empty
     expect(cnt).to.equal(0);
 
     var client = new Client();
@@ -53,6 +54,7 @@ describe('Client controller', () => {
 
     await clientController.addClient(client).then(async function(){
         await Client.countDocuments().then(function(count){
+          // Dataset must have exactly one item
           expect(count).to.equal(1);
         }).catch(_ => { throw new Error(); });      
     }).catch(_ => { throw new Error(); });
