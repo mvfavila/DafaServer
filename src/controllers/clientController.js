@@ -23,7 +23,34 @@ var clientController = {
     addClient(client){
         client.active = true;
         return client.save();
-    }
+    },
+
+    updateClientStatus(client){
+        this.getClientById(client.clientId).then(function(foundClient) {
+            if(client == null) return new Promise((resolve, reject) => { resolve(null) });
+
+            foundClient.active = client.active;
+            return foundClient.save();
+        })
+    },
+
+    updateClient(client){
+        this.getClientById(client.clientId).then(function(foundClient) {
+            if(client == null) return new Promise((resolve, reject) => { resolve(null) });
+
+            foundClient.firstName = client.firstName;
+            foundClient.lastName = client.lastName;
+            foundClient.company = client.company;
+            foundClient.address = client.address;
+            foundClient.city = client.city;
+            foundClient.state = client.state;
+            foundClient.postalCode = client.postalCode;
+            foundClient.email = client.email;
+            foundClient.active = client.active;
+
+            return foundClient.save();
+        })
+    },
 }
 
 module.exports = clientController;
