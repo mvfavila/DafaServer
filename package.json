@@ -5,7 +5,8 @@
   "scripts": {
     "start": "nodemon ./src/bin/www",
     "serve": "node ./src/bin/www",
-    "test": "mocha --timeout 60000 ./src/**/*.spec.js"
+    "test": "mocha --timeout 60000 ./src/**/*.spec.js",
+    "testDebug": "mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

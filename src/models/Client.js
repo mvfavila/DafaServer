@@ -9,7 +9,7 @@ var ClientSchema = new mongoose.Schema({
   address: {type: String, lowercase: false, match: [/^[a-zA-Z0-9 ]+$/, 'is invalid']},
   city: {type: String, lowercase: false, match: [/^[a-zA-Z0-9 ]+$/, 'is invalid']},
   state: {type: String, lowercase: false, match: [/^[a-zA-Z0-9 ]+$/, 'is invalid']},
-  postalCode: {type: String, lowercase: false, match: [/^[a-zA-Z0-9 ]+$/, 'is invalid']},
+  postalCode: {type: String, lowercase: false, match: [/^[0-9]{5}[-][0-9]{3}$/, 'is invalid']},
   email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   fields: { type: [] },
   createdAt: { type: mongoose.Schema.Types.Date },
