@@ -1,21 +1,17 @@
-"use strict";
+const mongoose = require('mongoose');
+const router = require('express').Router();
+const passport = require('passport');
 
-var mongoose = require("mongoose");
-var router = require("express").Router();
-var passport = require("passport");
-var User = mongoose.model("User");
-var auth = require("../auth");
-var util = require("../../util/util");
-var dafaRoles = require("../index").dafaRoles;
-var httpStatus = util.httpStatus;
+const User = mongoose.model('User');
+const auth = require('../auth');
+const { httpStatus } = require('../../util/util');
+const { dafaRoles } = require('../../config');
 
-router.get("/users/healthcheck", function(req, res, next) {
-  return res.sendStatus(httpStatus.SUCCESS);
-});
+router.get('/users/healthcheck', (req, res) => res.sendStatus(httpStatus.SUCCESS));
 
-router.get("/user", auth.required, function(req, res, next) {
+router.get('/user', auth.required, (req, res, next) => {
   User.findById(req.payload.id)
-    .then(function(user) {
+    .then((user) => {
       if (!user) {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
@@ -25,32 +21,32 @@ router.get("/user", auth.required, function(req, res, next) {
     .catch(next);
 });
 
-router.put("/user", auth.required, function(req, res, next) {
+router.put('/user', auth.required, (req, res, next) => {
   User.findById(req.payload.id)
-    .then(function(user) {
+    .then((user) => {
       if (!user) {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
 
+      const usr = user;
+
       // only update fields that were actually passed...
-      if (typeof req.body.user.username !== "undefined") {
-        user.username = req.body.user.username;
+      if (typeof req.body.user.username !== 'undefined') {
+        usr.username = req.body.user.username;
       }
-      if (typeof req.body.user.email !== "undefined") {
-        user.email = req.body.user.email;
+      if (typeof req.body.user.email !== 'undefined') {
+        usr.email = req.body.user.email;
       }
-      if (typeof req.body.user.password !== "undefined") {
-        user.setPassword(req.body.user.password);
+      if (typeof req.body.user.password !== 'undefined') {
+        usr.setPassword(req.body.user.password);
       }
 
-      return user.save().then(function() {
-        return res.json({ token: user.generateJWT() });
-      });
+      return usr.save().then(() => res.json({ token: usr.generateJWT() }));
     })
     .catch(next);
 });
 
-router.post("/users/login", function(req, res, next) {
+router.post('/users/login', (req, res, next) => {
   if (!req.body.user.email) {
     return res
       .status(httpStatus.UNPROCESSABLE_ENTITY)
@@ -63,26 +59,25 @@ router.post("/users/login", function(req, res, next) {
       .json({ errors: { password: "can't be blank" } });
   }
 
-  passport.authenticate("local", { session: false }, function(err, user, info) {
+  return passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err) {
       return next(err);
     }
 
     if (user) {
       return res.json({ token: user.generateJWT() });
-    } else {
-      return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
     }
+    return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
   })(req, res, next);
 });
 
-router.post("/users", function(req, res, next) {
-  var user = new User();
+router.post('/users', (req, res, next) => {
+  const user = new User();
 
   if (!req.body.user) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ errors: { message: "Bad request" } });
+      .json({ errors: { message: 'Bad request' } });
   }
 
   if (!req.body.user.email) {
@@ -108,11 +103,9 @@ router.post("/users", function(req, res, next) {
   user.roles = [dafaRoles.BASIC];
   user.setPassword(req.body.user.password);
 
-  user
+  return user
     .save()
-    .then(function() {
-      return res.json({ token: user.generateJWT() });
-    })
+    .then(() => res.json({ token: user.generateJWT() }))
     .catch(next);
 });
 
