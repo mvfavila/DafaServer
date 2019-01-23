@@ -1,39 +1,30 @@
-"use strict";
-
-//During the test the env variable is set to test
+/* eslint-disable new-cap */
+/* eslint-disable no-undef */
+// During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
-const assert = require("assert");
-const chai = require("chai");
-const request = chai.request; // Using Assert style
-// const assert = chai.assert;    // Using Assert style
-const expect = chai.expect; // Using Expect style
+const { use, should, request } = require("chai");
 const chaiHttp = require("chai-http");
-const httpServer = require("../../bin/www");
-const should = chai.should(); // Using Should style
-const sinon = require("sinon");
 
-chai.use(chaiHttp);
+use(chaiHttp);
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
+const httpServer = require("../../bin/www");
+
 let mongoServer;
 
 before(done => {
   mongoServer = new MongoMemoryServer.default({
-    /* debug: true,*/
+    /* debug: true, */
   });
   mongoServer
     .getConnectionString()
-    .then(mongoUri => {
-      return mongoose.connect(
-        mongoUri,
-        { useNewUrlParser: true },
-        err => {
-          if (err) done(err);
-        }
-      );
-    })
+    .then(mongoUri =>
+      mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
+        if (err) done(err);
+      })
+    )
     .then(() => done());
 });
 
@@ -42,15 +33,14 @@ after(() => {
   mongoServer.stop();
 });
 
-describe("Clients API - Integration", function() {
+describe("Clients API - Integration", () => {
   // beforeEach((done) => {
 
   // });
 
   describe("Health Check", () => {
     it("Should return ok", done => {
-      chai
-        .request(httpServer)
+      request(httpServer)
         .get("api/clients/healthcheck")
         .end((err, res) => {
           should.not.exist(err);

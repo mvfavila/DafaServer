@@ -1,40 +1,32 @@
-"use strict";
-
-//During the test the env variable is set to test
+/* eslint-disable new-cap */
+/* eslint-disable no-undef */
+// During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
-const assert = require("assert");
-const chai = require("chai");
-const request = chai.request; // Using Assert style
-const expect = chai.expect; // Using Expect style
-const chaiHttp = require("chai-http");
-const httpServer = require("../../bin/www");
-const should = chai.should(); // Using Should style
-const sinon = require("sinon");
+const { use, expect } = require("chai");
 
-chai.use(chaiHttp);
+const chaiHttp = require("chai-http");
+
+use(chaiHttp);
 
 require("../../models/User");
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
+
 let mongoServer;
 
 before(done => {
   mongoServer = new MongoMemoryServer.default({
-    /* debug: true,*/
+    /* debug: true, */
   });
   mongoServer
     .getConnectionString()
-    .then(mongoUri => {
-      return mongoose.connect(
-        mongoUri,
-        { useNewUrlParser: true },
-        err => {
-          if (err) done(err);
-        }
-      );
-    })
+    .then(mongoUri =>
+      mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
+        if (err) done(err);
+      })
+    )
     .then(() => done());
 });
 

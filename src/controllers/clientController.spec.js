@@ -1,41 +1,33 @@
-"use strict";
-
-//During the test the env variable is set to test
+/* eslint-disable new-cap */
+/* eslint-disable no-undef */
+// During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
-const assert = require("assert");
-const chai = require("chai");
-const request = chai.request; // Using Assert style
-const expect = chai.expect; // Using Expect style
+const { use, expect } = require("chai");
 const chaiHttp = require("chai-http");
-const should = chai.should(); // Using Should style
-const sinon = require("sinon");
 
-chai.use(chaiHttp);
+use(chaiHttp);
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/Client");
 require("../models/Field");
 const clientController = require("./clientController");
+
 const Client = mongoose.model("Client");
 let mongoServer;
 
 before(done => {
   mongoServer = new MongoMemoryServer.default({
-    /* debug: true,*/
+    /* debug: true, */
   });
   mongoServer
     .getConnectionString()
-    .then(mongoUri => {
-      return mongoose.connect(
-        mongoUri,
-        { useNewUrlParser: true },
-        err => {
-          if (err) done(err);
-        }
-      );
-    })
+    .then(mongoUri =>
+      mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
+        if (err) done(err);
+      })
+    )
     .then(() => done());
 });
 
@@ -46,12 +38,12 @@ after(() => {
 
 describe("Client controller", () => {
   it("clientController - Add client - Must succeed", async () => {
-    let cnt = await Client.countDocuments();
+    const cnt = await Client.countDocuments();
 
     // Dataset must be empty
     expect(cnt).to.equal(0);
 
-    var client = new Client();
+    const client = new Client();
 
     client.firstName = "First Name";
     client.lastName = "Last Name";
@@ -64,9 +56,9 @@ describe("Client controller", () => {
 
     await clientController
       .addClient(client)
-      .then(async function() {
+      .then(async () => {
         await Client.countDocuments()
-          .then(function(count) {
+          .then(count => {
             // Dataset must have exactly one item
             expect(count).to.equal(1);
           })
@@ -80,14 +72,14 @@ describe("Client controller", () => {
   });
 
   it("clientController - Get all clients - Must return 1 client", async () => {
-    let cnt = await Client.countDocuments();
+    const cnt = await Client.countDocuments();
 
     // Dataset must be empty
     expect(cnt).to.equal(1);
 
     await clientController
       .getAllClients()
-      .then(function(clients) {
+      .then(clients => {
         // Must return exactly one client
         expect(clients.length).to.equal(1);
       })
@@ -97,14 +89,14 @@ describe("Client controller", () => {
   });
 
   it("clientController - Update client - Must succeed", async () => {
-    let cnt = await Client.countDocuments();
+    const cnt = await Client.countDocuments();
 
     // Dataset must be empty
     expect(cnt).to.equal(1);
 
     clientController
       .getAllClients()
-      .then(async function(clients) {
+      .then(async clients => {
         const client = clients[0];
         client.firstName = "New First Name";
         client.lastName = "New Last Name";
@@ -120,7 +112,7 @@ describe("Client controller", () => {
 
         clientController
           .getAllClients()
-          .then(function(newFoundClients) {
+          .then(newFoundClients => {
             const updClient = newFoundClients[0];
             expect(updClient._id.toString()).to.equal(client._id.toString());
             expect(updClient.firstName).to.equal(client.firstName);

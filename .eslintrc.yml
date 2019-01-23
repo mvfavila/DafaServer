@@ -1,5 +1,11 @@
-extends: airbnb-base
+extends:
+  - airbnb-base
+  - prettier
+plugins:
+  [ prettier ]
 rules: 
   linebreak-style:
     - 0
     - windows
+  prettier/prettier:
+    error

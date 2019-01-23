@@ -34,9 +34,11 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.6.0",
     "eslint-plugin-import": "^2.15.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^2.9.3",
     "nock": "^10.0.6",
+    "prettier": "^1.16.1",
     "sinon": "^7.2.2"
   }
 }
