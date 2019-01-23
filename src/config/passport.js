@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(app, passport) {
   var passport = require('passport');
   const LocalStrategy = require('passport-local').Strategy;

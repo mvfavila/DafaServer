@@ -1,3 +1,5 @@
+'use strict';
+
 var express  = require('express');                     // create our app w/ express
 var path = require('path');
 var cookieParser = require('cookie-parser'); // TODO: try to remove

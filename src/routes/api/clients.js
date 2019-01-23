@@ -1,3 +1,5 @@
+'use strict';
+
 var mongoose = require('mongoose');
 var router = require('express').Router();
 var Client = mongoose.model('Client');
