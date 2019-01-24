@@ -1,9 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const ClientSchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     firstName: {
       type: String,
       lowercase: false,
@@ -62,7 +62,7 @@ ClientSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 ClientSchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this._id,
+    id: this.getId(),
     firstName: this.firstName,
     lastName: this.lastName,
     company: this.company,
@@ -76,6 +76,10 @@ ClientSchema.methods.toAuthJSON = function parseToJSON() {
     updatedAt: this.updatedAt,
     active: this.active
   };
+};
+
+ClientSchema.methods.getId = function getId() {
+  return this._id;
 };
 
 mongoose.model("Client", ClientSchema);

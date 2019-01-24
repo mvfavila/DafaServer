@@ -114,7 +114,9 @@ describe("Client controller", () => {
           .getAllClients()
           .then(newFoundClients => {
             const updClient = newFoundClients[0];
-            expect(updClient._id.toString()).to.equal(client._id.toString());
+            expect(updClient.getId().toString()).to.equal(
+              client.getId().toString()
+            );
             expect(updClient.firstName).to.equal(client.firstName);
             expect(updClient.lastName).to.equal(client.lastName);
             expect(updClient.company).to.equal(client.company);
