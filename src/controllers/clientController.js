@@ -1,20 +1,19 @@
-"use strict";
+const mongoose = require("mongoose");
 
-var mongoose = require("mongoose");
-var Client = mongoose.model("Client");
-var Field = mongoose.model("Field");
+const Client = mongoose.model("Client");
+const Field = mongoose.model("Field");
 
-var clientController = {
+const clientController = {
   async getClientById(clientId) {
     try {
       const client = await Client.findById(clientId);
       if (client == null)
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           resolve(null);
         });
-      return new Promise((resolve, reject) => {
-        Field.find({ clientId: clientId, active: true })
-          .then(function(fields) {
+      return new Promise(resolve => {
+        Field.find({ clientId, active: true })
+          .then(fields => {
             client.fields = fields;
             resolve(client);
           })
@@ -22,8 +21,8 @@ var clientController = {
             throw err;
           });
       });
-    } catch (err_1) {
-      throw err_1;
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -32,20 +31,23 @@ var clientController = {
   },
 
   addClient(client) {
-    client.active = true;
-    return client.save();
+    const clientToAdd = client;
+    clientToAdd.active = true;
+    return clientToAdd.save();
   },
 
   async updateClientStatus(client) {
-    await this.getClientById(client._id)
-      .then(function(foundClient) {
+    await this.getClientById(client.getId())
+      .then(foundClient => {
         if (client == null)
-          return new Promise((resolve, reject) => {
+          return new Promise(resolve => {
             resolve(null);
           });
 
-        foundClient.active = client.active;
-        return foundClient.save();
+        const clientToBeUpdated = foundClient;
+
+        clientToBeUpdated.active = client.active;
+        return clientToBeUpdated.save();
       })
       .catch(err => {
         throw err;
@@ -53,23 +55,25 @@ var clientController = {
   },
 
   async updateClient(client) {
-    await this.getClientById(client._id)
+    await this.getClientById(client.getId())
       .then(foundClient => {
         if (foundClient == null)
-          return new Promise((resolve, reject) => {
+          return new Promise(resolve => {
             resolve(null);
           });
 
-        foundClient.firstName = client.firstName;
-        foundClient.lastName = client.lastName;
-        foundClient.company = client.company;
-        foundClient.address = client.address;
-        foundClient.city = client.city;
-        foundClient.state = client.state;
-        foundClient.postalCode = client.postalCode;
-        foundClient.email = client.email;
-        foundClient.active = client.active;
-        return foundClient.save();
+        const clientToBeUpdated = foundClient;
+
+        clientToBeUpdated.firstName = client.firstName;
+        clientToBeUpdated.lastName = client.lastName;
+        clientToBeUpdated.company = client.company;
+        clientToBeUpdated.address = client.address;
+        clientToBeUpdated.city = client.city;
+        clientToBeUpdated.state = client.state;
+        clientToBeUpdated.postalCode = client.postalCode;
+        clientToBeUpdated.email = client.email;
+        clientToBeUpdated.active = client.active;
+        return clientToBeUpdated.save();
       })
       .catch(err => {
         throw err;
