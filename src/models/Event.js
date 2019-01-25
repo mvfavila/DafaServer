@@ -1,9 +1,7 @@
-"use strict";
+const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
-var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
-
-var EventSchema = new mongoose.Schema(
+const EventSchema = new mongoose.Schema(
   {
     id: { type: mongoose.Schema.Types.ObjectId },
     name: {
@@ -30,7 +28,7 @@ var EventSchema = new mongoose.Schema(
 
 EventSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-EventSchema.methods.toAuthJSON = function() {
+EventSchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this.id,
     name: this.name,
