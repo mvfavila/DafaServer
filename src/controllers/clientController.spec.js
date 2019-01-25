@@ -74,7 +74,6 @@ describe("Client controller", () => {
   it("clientController - Get all clients - Must return 1 client", async () => {
     const cnt = await Client.countDocuments();
 
-    // Dataset must be empty
     expect(cnt).to.equal(1);
 
     await clientController
@@ -88,10 +87,44 @@ describe("Client controller", () => {
       });
   });
 
+  it("clientController - Get client - Must return exact client", async () => {
+    const cnt = await Client.countDocuments();
+
+    expect(cnt).to.equal(1);
+
+    await clientController
+      .getAllClients()
+      .then(async clients => {
+        const client = clients[0];
+
+        await clientController
+          .getClientById(client.getId())
+          .then(async clientFound => {
+            expect(client.getId().toString()).to.equal(
+              clientFound.getId().toString()
+            );
+            expect(client.firstName).to.equal(clientFound.firstName);
+            expect(client.lastName).to.equal(clientFound.lastName);
+            expect(client.company).to.equal(clientFound.company);
+            expect(client.address).to.equal(clientFound.address);
+            expect(client.city).to.equal(clientFound.city);
+            expect(client.state).to.equal(clientFound.state);
+            expect(client.postalCode).to.equal(clientFound.postalCode);
+            expect(client.email).to.equal(clientFound.email);
+            expect(client.active).to.equal(clientFound.active);
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      })
+      .catch(err => {
+        throw new Error(err);
+      });
+  });
+
   it("clientController - Update client - Must succeed", async () => {
     const cnt = await Client.countDocuments();
 
-    // Dataset must be empty
     expect(cnt).to.equal(1);
 
     clientController
