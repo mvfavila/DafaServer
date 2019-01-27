@@ -1,9 +1,7 @@
-"use strict";
+const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
-var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
-
-var FieldSchema = new mongoose.Schema(
+const FieldSchema = new mongoose.Schema(
   {
     id: { type: mongoose.Schema.Types.ObjectId },
     name: {
@@ -32,7 +30,7 @@ var FieldSchema = new mongoose.Schema(
 
 FieldSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-FieldSchema.methods.toAuthJSON = function() {
+FieldSchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this.id,
     name: this.name,
