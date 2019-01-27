@@ -1,9 +1,7 @@
-"use strict";
+const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
-var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
-
-var LogEntrySchema = new mongoose.Schema(
+const LogEntrySchema = new mongoose.Schema(
   {
     id: { type: mongoose.Schema.Types.ObjectId },
     message: {
@@ -27,7 +25,7 @@ var LogEntrySchema = new mongoose.Schema(
 
 LogEntrySchema.plugin(uniqueValidator, { message: "is already taken." });
 
-LogEntrySchema.methods.toAuthJSON = function() {
+LogEntrySchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this.id,
     message: this.message,
