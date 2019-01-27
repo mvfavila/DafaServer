@@ -1,19 +1,17 @@
-"use strict";
+const mongoose = require("mongoose");
+const router = require("express").Router();
 
-var mongoose = require("mongoose");
-var router = require("express").Router();
-var EventType = mongoose.model("EventType");
-var auth = require("../auth");
-var util = require("../../util/util");
-var httpStatus = util.httpStatus;
+const EventType = mongoose.model("EventType");
+const auth = require("../auth");
+const { httpStatus } = require("../../util/util");
 
-router.get("/eventTypes/healthcheck", function(req, res, next) {
-  return res.sendStatus(httpStatus.SUCCESS);
-});
+router.get("/eventTypes/healthcheck", (req, res) =>
+  res.sendStatus(httpStatus.SUCCESS)
+);
 
-router.get("/eventTypes/:eventTypeId", auth.required, function(req, res, next) {
+router.get("/eventTypes/:eventTypeId", auth.required, (req, res, next) => {
   EventType.findById(req.params.eventTypeId)
-    .then(function(eventType) {
+    .then(eventType => {
       if (!eventType) {
         return res.sendStatus(httpStatus.UNAUTHORIZED);
       }
@@ -23,18 +21,18 @@ router.get("/eventTypes/:eventTypeId", auth.required, function(req, res, next) {
     .catch(next);
 });
 
-router.get("/eventTypes", auth.required, function(req, res, next) {
+router.get("/eventTypes", auth.required, (req, res, next) => {
   EventType.find()
-    .then(function(eventType) {
+    .then(eventType => {
       if (!eventType) {
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No event type found" });
       }
 
-      var eventTypeJson = [];
-      eventType.forEach(eventType => {
-        eventTypeJson.push(eventType.toJSON());
+      const eventTypeJson = [];
+      eventType.forEach(evType => {
+        eventTypeJson.push(evType.toJSON());
       });
 
       return res.json({ eventTypes: eventTypeJson });
@@ -42,8 +40,8 @@ router.get("/eventTypes", auth.required, function(req, res, next) {
     .catch(next);
 });
 
-router.post("/eventTypes", auth.required, function(req, res, next) {
-  var eventType = new EventType();
+router.post("/eventTypes", auth.required, (req, res, next) => {
+  const eventType = new EventType();
 
   eventType.name = req.body.eventType.name;
   eventType.numberOfDaysToWarning = req.body.eventType.numberOfDaysToWarning;
@@ -51,9 +49,7 @@ router.post("/eventTypes", auth.required, function(req, res, next) {
 
   eventType
     .save()
-    .then(function() {
-      return res.json({ eventType: eventType.toAuthJSON() });
-    })
+    .then(() => res.json({ eventType: eventType.toAuthJSON() }))
     .catch(next);
 });
 
