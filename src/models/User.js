@@ -1,12 +1,11 @@
-"use strict";
+/* eslint-disable no-underscore-dangle */
+const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const { secret } = require("../config");
 
-var mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
-var crypto = require("crypto");
-var jwt = require("jsonwebtoken");
-var secret = require("../config").secret;
-
-var UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     id: { type: mongoose.Schema.Types.ObjectId },
     username: {
@@ -37,37 +36,42 @@ var UserSchema = new mongoose.Schema(
 
 UserSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-UserSchema.methods.validPassword = function(password) {
-  var hash = crypto
+UserSchema.methods.validPassword = function validPassword(password) {
+  const hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
     .toString("hex");
   return this.hash === hash;
 };
 
-UserSchema.methods.setPassword = function(password) {
+UserSchema.methods.setPassword = function setPassword(password) {
   this.salt = crypto.randomBytes(16).toString("hex");
   this.hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
     .toString("hex");
 };
 
-UserSchema.methods.generateJWT = function() {
-  var today = new Date();
-  var exp = new Date(today);
+UserSchema.methods.generateJWT = function generateJWT() {
+  const today = new Date();
+  const exp = new Date(today);
   exp.setDate(today.getDate() + 60);
+  const radix = 10;
 
   return jwt.sign(
     {
-      id: this._id,
+      id: this.getId(),
       username: this.username,
       roles: this.roles,
-      exp: parseInt(exp.getTime() / 1000)
+      exp: parseInt(exp.getTime() / 1000, radix)
     },
     secret
   );
 };
 
-UserSchema.methods.toAuthJSON = function() {
+UserSchema.methods.getId = function getId() {
+  return this._id;
+};
+
+UserSchema.methods.toAuthJSON = function toAuthJSON() {
   return {
     username: this.username,
     email: this.email,
