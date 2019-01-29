@@ -108,10 +108,10 @@ function updateClientStatus(req, res, next) {
     PUT
     Updates client
 */
-function updateClient(req, res, next) {
+async function updateClient(req, res, next) {
   const client = new Client();
 
-  client.clientId = req.body.client.clientId;
+  client.setId(req.body.client.id);
   client.firstName = req.body.client.firstName;
   client.lastName = req.body.client.lastName;
   client.company = req.body.client.company;
@@ -122,10 +122,17 @@ function updateClient(req, res, next) {
   client.email = req.body.client.email;
   client.active = req.body.client.active;
 
-  clientController
+  await clientController
     .updateClient(client)
     .then(() => res.json({ client: client.toAuthJSON() }))
-    .catch(next);
+    .catch(err => {
+      if (err.message === "Client not found") {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No client found" });
+      }
+      return next(err);
+    });
 }
 
 // Routers

@@ -4,6 +4,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const ClientSchema = new mongoose.Schema(
   {
+    _id: { type: mongoose.Schema.Types.ObjectId },
     firstName: {
       type: String,
       lowercase: false,
@@ -80,6 +81,10 @@ ClientSchema.methods.toAuthJSON = function parseToJSON() {
 
 ClientSchema.methods.getId = function getId() {
   return this._id;
+};
+
+ClientSchema.methods.setId = function setId(id) {
+  this._id = id;
 };
 
 mongoose.model("Client", ClientSchema);
