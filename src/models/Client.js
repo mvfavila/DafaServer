@@ -4,7 +4,6 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const ClientSchema = new mongoose.Schema(
   {
-    _id: { type: mongoose.Schema.Types.ObjectId },
     firstName: {
       type: String,
       lowercase: false,
@@ -56,7 +55,7 @@ const ClientSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true }
+  { timestamps: true, _id: true }
 );
 
 ClientSchema.plugin(uniqueValidator, { message: "is already taken." });
