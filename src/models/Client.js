@@ -62,7 +62,7 @@ ClientSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 ClientSchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this.getId(),
+    id: this._id,
     firstName: this.firstName,
     lastName: this.lastName,
     company: this.company,
@@ -78,12 +78,12 @@ ClientSchema.methods.toAuthJSON = function parseToJSON() {
   };
 };
 
-ClientSchema.methods.getId = function getId() {
-  return this._id;
-};
-
-ClientSchema.methods.setId = function setId(id) {
-  this._id = id;
-};
+ClientSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 mongoose.model("Client", ClientSchema);

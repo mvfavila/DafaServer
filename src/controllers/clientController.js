@@ -37,7 +37,7 @@ const clientController = {
   },
 
   async updateClientStatus(client) {
-    await this.getClientById(client.getId())
+    await this.getClientById(client.id)
       .then(foundClient => {
         if (client == null)
           return new Promise(resolve => {
@@ -58,7 +58,7 @@ const clientController = {
     await this.getClientById(client.id)
       .then(async foundClient => {
         if (foundClient == null) {
-          throw new Error("No client found");
+          throw new Error("Client not found");
         }
 
         const clientToBeUpdated = foundClient;

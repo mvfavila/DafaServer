@@ -111,7 +111,7 @@ function updateClientStatus(req, res, next) {
 async function updateClient(req, res, next) {
   const client = new Client();
 
-  client.setId(req.body.client.id);
+  client.id = req.body.client.id;
   client.firstName = req.body.client.firstName;
   client.lastName = req.body.client.lastName;
   client.company = req.body.client.company;

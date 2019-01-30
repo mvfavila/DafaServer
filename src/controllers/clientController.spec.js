@@ -98,11 +98,9 @@ describe("Client controller", () => {
         const client = clients[0];
 
         await clientController
-          .getClientById(client.getId())
+          .getClientById(client.id)
           .then(async clientFound => {
-            expect(client.getId().toString()).to.equal(
-              clientFound.getId().toString()
-            );
+            expect(client.id.toString()).to.equal(clientFound.id.toString());
             expect(client.firstName).to.equal(clientFound.firstName);
             expect(client.lastName).to.equal(clientFound.lastName);
             expect(client.company).to.equal(clientFound.company);
@@ -147,9 +145,7 @@ describe("Client controller", () => {
           .getAllClients()
           .then(newFoundClients => {
             const updClient = newFoundClients[0];
-            expect(updClient.getId().toString()).to.equal(
-              client.getId().toString()
-            );
+            expect(updClient.id.toString()).to.equal(client.id.toString());
             expect(updClient.firstName).to.equal(client.firstName);
             expect(updClient.lastName).to.equal(client.lastName);
             expect(updClient.company).to.equal(client.company);
