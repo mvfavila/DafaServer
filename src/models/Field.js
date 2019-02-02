@@ -1,9 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const FieldSchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     name: {
       type: String,
       lowercase: false,
@@ -25,14 +25,22 @@ const FieldSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true }
+  { timestamps: true, _id: true }
 );
+
+FieldSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 FieldSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 FieldSchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this.id,
+    id: this._id,
     name: this.name,
     email: this.email,
     events: this.events,
