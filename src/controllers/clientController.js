@@ -12,7 +12,7 @@ const clientController = {
           resolve(null);
         });
       return new Promise(resolve => {
-        Field.find({ clientId, active: true })
+        Field.find({ client: clientId, active: true })
           .then(fields => {
             client.fields = fields;
             resolve(client);

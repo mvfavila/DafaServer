@@ -47,7 +47,7 @@ router.post("/fields", auth.required, function(req, res, next) {
 
   field.name = req.body.field.name;
   field.email = req.body.field.email;
-  field.clientId = req.body.field.clientId;
+  field.client = req.body.field.client;
   field.active = true;
 
   field

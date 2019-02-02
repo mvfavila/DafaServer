@@ -22,7 +22,7 @@ const eventWarningController = {
         solved: false
       })
         .populate("eventType")
-        .populate("field");
+        .populate({ path: "field", populate: { path: "client" } });
       if (eventWarnings == null)
         return new Promise(resolve => {
           resolve(null);
@@ -36,9 +36,9 @@ const eventWarningController = {
           solved: eventWarning.solved,
           nameEventType: eventWarning.eventType.name,
           idField: eventWarning.field.id,
-          nameField: eventWarning.field.name
-          /* clientId: ,
-          company:   */
+          nameField: eventWarning.field.name,
+          clientId: eventWarning.field.client.id,
+          company: eventWarning.field.client.company
         });
       });
       return new Promise(resolve => {

@@ -17,8 +17,9 @@ const FieldSchema = new mongoose.Schema(
       match: [/\S+@\S+\.\S+/, "is invalid"]
     },
     events: { type: [] },
-    clientId: {
+    client: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
       required: [true, "can't be blank"]
     },
     createdAt: { type: mongoose.Schema.Types.Date },
@@ -44,7 +45,7 @@ FieldSchema.methods.toAuthJSON = function parseToJSON() {
     name: this.name,
     email: this.email,
     events: this.events,
-    clientId: this.clientId,
+    client: this.client,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active
