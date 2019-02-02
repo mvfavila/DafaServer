@@ -13,9 +13,10 @@ const EventWarningSchema = new mongoose.Schema(
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean },
-    _creator: {
+    eventType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "EventType"
+      ref: "EventType",
+      required: [true, "can't be blank"]
     }
   },
   { timestamps: true }
@@ -32,7 +33,7 @@ EventWarningSchema.methods.toAuthJSON = function parseToJSON() {
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active,
-    _creator: this._creator
+    eventType: this.eventType
   };
 };
 

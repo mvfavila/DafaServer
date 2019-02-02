@@ -20,23 +20,19 @@ const eventWarningController = {
       const eventWarnings = await EventWarning.find({
         active: true,
         solved: false
-      }).populate("_creator");
+      }).populate("eventType");
       if (eventWarnings == null)
         return new Promise(resolve => {
           resolve(null);
         });
       const eventWarningsFields = [];
       eventWarnings.forEach(eventWarning => {
-        let creator = { name: "" };
-        if (eventWarning._creator != null) {
-          creator = eventWarning._creator
-        }
         eventWarningsFields.push({
           idEventWarning: eventWarning.id,
           date: eventWarning.date,
           solutionDate: eventWarning.solutionDate,
           solved: eventWarning.solved,
-          nameEventType: creator.name
+          nameEventType: eventWarning.eventType.name
           /* idField: ,
           nameField: ,
           clientId: ,

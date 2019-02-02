@@ -46,7 +46,7 @@ function createEventWarning(req, res, next) {
   const eventWarning = new EventWarning();
 
   eventWarning.date = req.body.eventWarning.date;
-  eventWarning._creator = req.body.eventWarning.eventTypeId;
+  eventWarning.eventType = req.body.eventWarning.eventTypeId;
 
   eventWarningController
     .addEventWarning(eventWarning)
