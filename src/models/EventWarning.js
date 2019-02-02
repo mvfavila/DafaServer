@@ -12,7 +12,11 @@ const EventWarningSchema = new mongoose.Schema(
     solved: { type: mongoose.Schema.Types.Boolean },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
-    active: { type: mongoose.Schema.Types.Boolean }
+    active: { type: mongoose.Schema.Types.Boolean },
+    _creator: {
+      type: Number,
+      ref: "EventType"
+    }
   },
   { timestamps: true }
 );

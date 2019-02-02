@@ -106,6 +106,7 @@ require("./models/User");
 require("./models/Client");
 require("./models/Field");
 require("./models/EventType");
+require("./models/EventWarning");
 require("./models/LogEntry");
 
 if (!isTest) {

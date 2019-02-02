@@ -18,7 +18,13 @@ const EventTypeSchema = new mongoose.Schema(
     },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
-    active: { type: mongoose.Schema.Types.Boolean }
+    active: { type: mongoose.Schema.Types.Boolean },
+    eventWarnings: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "EventWarning"
+      }
+    ]
   },
   { timestamps: true }
 );
