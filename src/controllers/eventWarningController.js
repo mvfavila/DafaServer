@@ -3,27 +3,17 @@ const mongoose = require("mongoose");
 const EventWarning = mongoose.model("EventWarning");
 
 const eventWarningController = {
-  /* async getClientById(clientId) {
-    try {
-      const client = await Client.findById(clientId);
-      if (client == null)
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      return new Promise(resolve => {
-        Field.find({ clientId, active: true })
-          .then(fields => {
-            client.fields = fields;
-            resolve(client);
-          })
-          .catch(err => {
-            throw err;
-          });
-      });
-    } catch (error) {
-      throw error;
-    }
-  }, */
+  getAllActiveEventWarnings() {
+    return EventWarning.find({ active: true });
+  },
+
+  addEventWarning(eventWarning) {
+    const eventWarningToAdd = eventWarning;
+    eventWarningToAdd.solutionDate = null;
+    eventWarningToAdd.solved = false;
+    eventWarningToAdd.active = true;
+    return eventWarningToAdd.save();
+  },
 
   async getEventWarningsFields() {
     try {
@@ -37,13 +27,16 @@ const eventWarningController = {
         });
       const eventWarningsFields = [];
       eventWarnings.forEach(eventWarning => {
+        let creator = { name: "" };
+        if (eventWarning._creator != null) {
+          creator = eventWarning._creator
+        }
         eventWarningsFields.push({
           idEventWarning: eventWarning.id,
           date: eventWarning.date,
           solutionDate: eventWarning.solutionDate,
           solved: eventWarning.solved,
-          // eslint-disable-next-line no-underscore-dangle
-          nameEventType: eventWarning._creator.name
+          nameEventType: creator.name
           /* idField: ,
           nameField: ,
           clientId: ,

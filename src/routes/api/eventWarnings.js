@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
 const router = require("express").Router();
 
+const EventWarning = mongoose.model("EventWarning");
 const auth = require("../auth");
 const eventWarningController = require("../../controllers/eventWarningController");
 const { httpStatus } = require("../../util/util");
@@ -28,7 +30,7 @@ function getEventWarningsFields(req, res, next) {
 
       const eventWarningsJson = [];
       eventWarnings.forEach(eventWarning => {
-        eventWarningsJson.push(eventWarning.toJSON());
+        eventWarningsJson.push(eventWarning);
       });
 
       return res.json({ eventWarnings: eventWarningsJson });
@@ -36,8 +38,26 @@ function getEventWarningsFields(req, res, next) {
     .catch(next);
 }
 
+/*
+    POST
+    Creates a new Event Warning
+*/
+function createEventWarning(req, res, next) {
+  const eventWarning = new EventWarning();
+
+  eventWarning.date = req.body.eventWarning.date;
+  eventWarning._creator = req.body.eventWarning.eventTypeId;
+
+  eventWarningController
+    .addEventWarning(eventWarning)
+    .then(() => res.json({ eventWarning: eventWarning.toAuthJSON() }))
+    .catch(next);
+}
+
 // Routers
 router.route("/eventWarnings/healthcheck").get(getHealthCheck);
+
+router.route("/eventWarnings", auth.required).post(createEventWarning);
 
 router.route("/eventWarningsFields", auth.required).get(getEventWarningsFields);
 

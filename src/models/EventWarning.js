@@ -14,7 +14,7 @@ const EventWarningSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean },
     _creator: {
-      type: Number,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "EventType"
     }
   },
@@ -31,7 +31,8 @@ EventWarningSchema.methods.toAuthJSON = function parseToJSON() {
     solved: this.solved,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
-    active: this.active
+    active: this.active,
+    _creator: this._creator
   };
 };
 

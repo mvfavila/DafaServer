@@ -3,54 +3,85 @@ const router = require("express").Router();
 
 const EventType = mongoose.model("EventType");
 const auth = require("../auth");
+const eventTypeController = require("../../controllers/eventTypeController");
 const { httpStatus } = require("../../util/util");
 
-router.get("/eventTypes/healthcheck", (req, res) =>
-  res.sendStatus(httpStatus.SUCCESS)
-);
+/*
+    GET
+    Health check for the Client endpoint
+*/
+function getHealthCheck(req, res) {
+  return res.sendStatus(httpStatus.SUCCESS);
+}
 
-router.get("/eventTypes/:eventTypeId", auth.required, (req, res, next) => {
-  EventType.findById(req.params.eventTypeId)
+/*
+    GET
+    Get Event Type by id
+*/
+function getEventTypeById(req, res, next) {
+  eventTypeController
+    .getEventTypeById(req.params.eventTypeId)
     .then(eventType => {
       if (!eventType) {
-        return res.sendStatus(httpStatus.UNAUTHORIZED);
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No Event Type found" });
       }
 
       return res.json({ eventType: eventType.toAuthJSON() });
     })
     .catch(next);
-});
+}
 
-router.get("/eventTypes", auth.required, (req, res, next) => {
-  EventType.find()
-    .then(eventType => {
-      if (!eventType) {
+/*
+    GET
+    Get all active Event Types
+*/
+function getAllActiveEventTypes(req, res, next) {
+  eventTypeController
+    .getAllActiveEventTypes()
+    .then(eventTypes => {
+      if (!eventTypes) {
         return res
           .status(httpStatus.UNAUTHORIZED)
-          .send({ error: "No event type found" });
+          .send({ error: "No Event Type found" });
       }
 
-      const eventTypeJson = [];
-      eventType.forEach(evType => {
-        eventTypeJson.push(evType.toJSON());
+      const eventTypesJson = [];
+      eventTypes.forEach(eventType => {
+        eventTypesJson.push(eventType.toJSON());
       });
 
-      return res.json({ eventTypes: eventTypeJson });
+      return res.json({ eventTypes: eventTypesJson });
     })
     .catch(next);
-});
+}
 
-router.post("/eventTypes", auth.required, (req, res, next) => {
+/*
+    POST
+    Creates a new Event Type
+*/
+function createEventType(req, res, next) {
   const eventType = new EventType();
 
   eventType.name = req.body.eventType.name;
   eventType.numberOfDaysToWarning = req.body.eventType.numberOfDaysToWarning;
   eventType.active = true;
 
-  eventType
-    .save()
+  eventTypeController
+    .addEventType(eventType)
     .then(() => res.json({ eventType: eventType.toAuthJSON() }))
     .catch(next);
-});
+}
+
+// Routers
+router.route("/eventTypes/healthcheck").get(getHealthCheck);
+
+router.route("/eventTypes/:eventTypeId", auth.required).get(getEventTypeById);
+
+router
+  .route("/eventTypes", auth.required)
+  .get(getAllActiveEventTypes)
+  .post(createEventType);
 
 module.exports = router;
