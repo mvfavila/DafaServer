@@ -1,9 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const LogEntrySchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     message: {
       type: String,
       lowercase: false,
@@ -20,14 +20,22 @@ const LogEntrySchema = new mongoose.Schema(
     ip: { type: String },
     createdAt: { type: mongoose.Schema.Types.Date }
   },
-  { timestamps: false }
+  { timestamps: false, _id: true }
 );
+
+LogEntrySchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 LogEntrySchema.plugin(uniqueValidator, { message: "is already taken." });
 
 LogEntrySchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this.id,
+    id: this._id,
     message: this.message,
     level: this.level,
     user: this.user,

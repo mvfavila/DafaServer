@@ -7,7 +7,6 @@ const { secret } = require("../config");
 
 const UserSchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     username: {
       type: String,
       lowercase: true,
@@ -31,8 +30,16 @@ const UserSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true }
+  { timestamps: true, _id: true }
 );
+
+UserSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 UserSchema.plugin(uniqueValidator, { message: "is already taken." });
 
@@ -58,17 +65,13 @@ UserSchema.methods.generateJWT = function generateJWT() {
 
   return jwt.sign(
     {
-      id: this.getId(),
+      id: this.id,
       username: this.username,
       roles: this.roles,
       exp: parseInt(exp.getTime() / 1000, radix)
     },
     secret
   );
-};
-
-UserSchema.methods.getId = function getId() {
-  return this._id;
 };
 
 UserSchema.methods.toAuthJSON = function toAuthJSON() {

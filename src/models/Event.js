@@ -1,9 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const EventSchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     name: {
       type: String,
       lowercase: false,
@@ -23,14 +23,22 @@ const EventSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true }
+  { timestamps: true, _id: true }
 );
+
+EventSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 EventSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 EventSchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this.id,
+    id: this._id,
     name: this.name,
     description: this.description,
     date: this.date,

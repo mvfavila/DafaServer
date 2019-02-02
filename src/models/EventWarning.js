@@ -1,9 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const EventWarningSchema = new mongoose.Schema(
   {
-    id: { type: mongoose.Schema.Types.ObjectId },
     date: {
       type: mongoose.Schema.Types.Date,
       required: [true, "can't be blank"]
@@ -24,14 +24,22 @@ const EventWarningSchema = new mongoose.Schema(
       required: [true, "can't be blank"]
     }
   },
-  { timestamps: true }
+  { timestamps: true, _id: true }
 );
+
+EventWarningSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 EventWarningSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 EventWarningSchema.methods.toAuthJSON = function parseToJSON() {
   return {
-    id: this.id,
+    id: this._id,
     date: this.date,
     solutionDate: this.solutionDate,
     solved: this.solved,
