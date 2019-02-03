@@ -45,10 +45,7 @@ function getEventWarningsFields(req, res, next) {
 function createEventWarning(req, res, next) {
   const eventWarning = new EventWarning();
 
-  eventWarning.date = req.body.eventWarning.date;
-  eventWarning.alertType = req.body.eventWarning.alertTypeIds;
   eventWarning.event = req.body.eventWarning.eventId;
-  eventWarning.field = req.body.eventWarning.fieldId;
 
   eventWarningController
     .addEventWarning(eventWarning)

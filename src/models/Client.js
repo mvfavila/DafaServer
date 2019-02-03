@@ -50,12 +50,16 @@ const ClientSchema = new mongoose.Schema(
       match: [/\S+@\S+\.\S+/, "is invalid"],
       index: true
     },
-    fields: { type: [] },
+    fields: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Field",
+      required: [true, "can't be blank"]
+    },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true, _id: true }
+  { timestamps: true, _id: true, versionKey: false }
 );
 
 ClientSchema.plugin(uniqueValidator, { message: "is already taken." });

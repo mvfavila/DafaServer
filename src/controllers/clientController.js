@@ -1,25 +1,13 @@
 const mongoose = require("mongoose");
 
 const Client = mongoose.model("Client");
-const Field = mongoose.model("Field");
 
 const clientController = {
   async getClientById(clientId) {
     try {
-      const client = await Client.findById(clientId);
-      if (client == null)
-        return new Promise(resolve => {
-          resolve(null);
-        });
+      const client = await Client.findById(clientId).populate("fields");
       return new Promise(resolve => {
-        Field.find({ client: clientId, active: true })
-          .then(fields => {
-            client.fields = fields;
-            resolve(client);
-          })
-          .catch(err => {
-            throw err;
-          });
+        resolve(client);
       });
     } catch (error) {
       throw error;

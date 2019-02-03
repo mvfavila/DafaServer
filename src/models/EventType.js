@@ -2,21 +2,23 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const EventSchema = new mongoose.Schema(
+const EventTypeSchema = new mongoose.Schema(
   {
-    date: {
-      type: Date,
+    name: {
+      type: String,
+      lowercase: false,
       required: [true, "can't be blank"],
+      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"],
       index: true
     },
-    eventType: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "EventType",
-      required: [true, "can't be blank"]
+    description: {
+      type: String,
+      lowercase: false,
+      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
     },
-    field: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Field",
+    alertType: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "AlertType",
       required: [true, "can't be blank"]
     },
     createdAt: { type: mongoose.Schema.Types.Date },
@@ -26,7 +28,7 @@ const EventSchema = new mongoose.Schema(
   { timestamps: true, _id: true, versionKey: false }
 );
 
-EventSchema.virtual("id")
+EventTypeSchema.virtual("id")
   .get(function geId() {
     return this._id;
   })
@@ -34,18 +36,18 @@ EventSchema.virtual("id")
     this._id = v;
   });
 
-EventSchema.plugin(uniqueValidator, { message: "is already taken." });
+EventTypeSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-EventSchema.methods.toAuthJSON = function parseToJSON() {
+EventTypeSchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this._id,
-    date: this.date,
-    eventType: this.eventType,
-    field: this.field,
+    name: this.name,
+    description: this.description,
+    alertType: this.alertType,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active
   };
 };
 
-mongoose.model("Event", EventSchema);
+mongoose.model("EventType", EventTypeSchema);

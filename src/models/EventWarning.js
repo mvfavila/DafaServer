@@ -4,10 +4,6 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const EventWarningSchema = new mongoose.Schema(
   {
-    date: {
-      type: mongoose.Schema.Types.Date,
-      required: [true, "can't be blank"]
-    },
     solutionDate: { type: mongoose.Schema.Types.Date },
     solved: { type: mongoose.Schema.Types.Boolean },
     createdAt: { type: mongoose.Schema.Types.Date },
@@ -17,14 +13,9 @@ const EventWarningSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Event",
       required: [true, "can't be blank"]
-    },
-    field: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Field",
-      required: [true, "can't be blank"]
     }
   },
-  { timestamps: true, _id: true }
+  { timestamps: true, _id: true, versionKey: false }
 );
 
 EventWarningSchema.virtual("id")
@@ -40,14 +31,12 @@ EventWarningSchema.plugin(uniqueValidator, { message: "is already taken." });
 EventWarningSchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this._id,
-    date: this.date,
     solutionDate: this.solutionDate,
     solved: this.solved,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active,
-    event: this.event,
-    field: this.field
+    event: this.event
   };
 };
 

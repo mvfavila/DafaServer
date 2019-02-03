@@ -18,15 +18,9 @@ const AlertTypeSchema = new mongoose.Schema(
     },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
-    active: { type: mongoose.Schema.Types.Boolean },
-    eventWarnings: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "EventWarning"
-      }
-    ]
+    active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true, _id: true }
+  { timestamps: true, _id: true, versionKey: false }
 );
 
 AlertTypeSchema.virtual("id")

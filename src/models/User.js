@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema(
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true, _id: true }
+  { timestamps: true, _id: true, versionKey: false }
 );
 
 UserSchema.virtual("id")

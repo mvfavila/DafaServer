@@ -16,17 +16,26 @@ const FieldSchema = new mongoose.Schema(
       lowercase: true,
       match: [/\S+@\S+\.\S+/, "is invalid"]
     },
-    events: { type: [] },
+    events: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Event",
+      required: [true, "can't be blank"]
+    },
     client: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Client",
+      required: [true, "can't be blank"]
+    },
+    eventWarnings: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "EventWarning",
       required: [true, "can't be blank"]
     },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
   },
-  { timestamps: true, _id: true }
+  { timestamps: true, _id: true, versionKey: false }
 );
 
 FieldSchema.virtual("id")

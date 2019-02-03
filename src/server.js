@@ -105,6 +105,8 @@ app.use(function(req, res, next) {
 require("./models/User");
 require("./models/Client");
 require("./models/Field");
+require("./models/Event");
+require("./models/EventType");
 require("./models/AlertType");
 require("./models/EventWarning");
 require("./models/LogEntry");

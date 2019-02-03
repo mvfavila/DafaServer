@@ -20,9 +20,10 @@ const eventWarningController = {
       const eventWarnings = await EventWarning.find({
         active: true,
         solved: false
-      })
-        .populate("alertType")
-        .populate({ path: "field", populate: { path: "client" } });
+      }).populate({
+        path: "event",
+        populate: { path: "field", populate: { path: "client" } }
+      });
       if (eventWarnings == null)
         return new Promise(resolve => {
           resolve(null);
@@ -34,11 +35,12 @@ const eventWarningController = {
           date: eventWarning.date,
           solutionDate: eventWarning.solutionDate,
           solved: eventWarning.solved,
-          nameAlertType: eventWarning.alertType.name,
-          idField: eventWarning.field.id,
-          nameField: eventWarning.field.name,
-          clientId: eventWarning.field.client.id,
-          company: eventWarning.field.client.company
+          nameEvent: eventWarning.event.name,
+          description: eventWarning.event.description,
+          idField: eventWarning.event.field.id,
+          nameField: eventWarning.event.field.name,
+          clientId: eventWarning.event.field.client.id,
+          company: eventWarning.event.field.client.company
         });
       });
       return new Promise(resolve => {

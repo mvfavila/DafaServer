@@ -20,7 +20,7 @@ const LogEntrySchema = new mongoose.Schema(
     ip: { type: String },
     createdAt: { type: mongoose.Schema.Types.Date }
   },
-  { timestamps: false, _id: true }
+  { timestamps: false, _id: true, versionKey: false }
 );
 
 LogEntrySchema.virtual("id")
