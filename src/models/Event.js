@@ -17,8 +17,11 @@ const EventSchema = new mongoose.Schema(
       match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
     },
     date: { type: mongoose.Schema.Types.Date },
-    eventType: { type: mongoose.Schema.Types.ObjectId },
-    eventWarnings: { type: [] },
+    alertType: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "AlertType",
+      required: [true, "can't be blank"]
+    },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
@@ -42,8 +45,7 @@ EventSchema.methods.toAuthJSON = function parseToJSON() {
     name: this.name,
     description: this.description,
     date: this.date,
-    eventType: this.eventType,
-    eventWarnings: this.eventWarnings,
+    alertType: this.alertType,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active

@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
-const EventTypeSchema = new mongoose.Schema(
+const AlertTypeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -29,7 +29,7 @@ const EventTypeSchema = new mongoose.Schema(
   { timestamps: true, _id: true }
 );
 
-EventTypeSchema.virtual("id")
+AlertTypeSchema.virtual("id")
   .get(function geId() {
     return this._id;
   })
@@ -37,9 +37,9 @@ EventTypeSchema.virtual("id")
     this._id = v;
   });
 
-EventTypeSchema.plugin(uniqueValidator, { message: "is already taken." });
+AlertTypeSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-EventTypeSchema.methods.toAuthJSON = function parseToJSON() {
+AlertTypeSchema.methods.toAuthJSON = function parseToJSON() {
   return {
     id: this._id,
     name: this.name,
@@ -50,4 +50,4 @@ EventTypeSchema.methods.toAuthJSON = function parseToJSON() {
   };
 };
 
-mongoose.model("EventType", EventTypeSchema);
+mongoose.model("AlertType", AlertTypeSchema);

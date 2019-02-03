@@ -21,7 +21,7 @@ const eventWarningController = {
         active: true,
         solved: false
       })
-        .populate("eventType")
+        .populate("alertType")
         .populate({ path: "field", populate: { path: "client" } });
       if (eventWarnings == null)
         return new Promise(resolve => {
@@ -34,7 +34,7 @@ const eventWarningController = {
           date: eventWarning.date,
           solutionDate: eventWarning.solutionDate,
           solved: eventWarning.solved,
-          nameEventType: eventWarning.eventType.name,
+          nameAlertType: eventWarning.alertType.name,
           idField: eventWarning.field.id,
           nameField: eventWarning.field.name,
           clientId: eventWarning.field.client.id,

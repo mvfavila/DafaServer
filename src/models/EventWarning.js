@@ -13,9 +13,9 @@ const EventWarningSchema = new mongoose.Schema(
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean },
-    eventType: {
+    event: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "EventType",
+      ref: "Event",
       required: [true, "can't be blank"]
     },
     field: {
@@ -46,7 +46,7 @@ EventWarningSchema.methods.toAuthJSON = function parseToJSON() {
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active,
-    eventType: this.eventType,
+    event: this.event,
     field: this.field
   };
 };
