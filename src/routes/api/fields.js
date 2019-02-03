@@ -1,38 +1,53 @@
-"use strict";
+const mongoose = require("mongoose");
+const router = require("express").Router();
 
-var mongoose = require("mongoose");
-var router = require("express").Router();
-var Field = mongoose.model("Field");
-var auth = require("../auth");
-var util = require("../../util/util");
-var httpStatus = util.httpStatus;
+const Field = mongoose.model("Field");
+const auth = require("../auth");
+const fieldController = require("../../controllers/fieldController");
+const { httpStatus } = require("../../util/util");
 
-router.get("/fields/healthcheck", function(req, res, next) {
+/*
+    GET
+    Health check for the Field endpoint
+*/
+function getHealthCheck(req, res) {
   return res.sendStatus(httpStatus.SUCCESS);
-});
+}
 
-router.get("/fields/:fieldId", auth.required, function(req, res, next) {
-  Field.findById(req.params.fieldId)
-    .then(function(field) {
+/*
+    GET
+    Get field by id
+*/
+function getFieldById(req, res, next) {
+  fieldController
+    .getFieldById(req.params.fieldId)
+    .then(field => {
       if (!field) {
-        return res.sendStatus(httpStatus.UNAUTHORIZED);
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No field found" });
       }
 
       return res.json({ field: field.toAuthJSON() });
     })
     .catch(next);
-});
+}
 
-router.get("/fields", auth.required, function(req, res, next) {
-  Field.find()
-    .then(function(fields) {
+/*
+    GET
+    Get all active fields
+*/
+function getAll(req, res, next) {
+  fieldController
+    .getAllFields()
+    .then(fields => {
       if (!fields) {
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No field found" });
       }
 
-      var fieldsJson = [];
+      const fieldsJson = [];
       fields.forEach(field => {
         fieldsJson.push(field.toJSON());
       });
@@ -40,22 +55,34 @@ router.get("/fields", auth.required, function(req, res, next) {
       return res.json({ fields: fieldsJson });
     })
     .catch(next);
-});
+}
 
-router.post("/fields", auth.required, function(req, res, next) {
-  var field = new Field();
+/*
+    POST
+    Creates a new field
+*/
+function createField(req, res, next) {
+  const field = new Field();
 
   field.name = req.body.field.name;
   field.email = req.body.field.email;
   field.client = req.body.field.client;
   field.active = true;
 
-  field
-    .save()
-    .then(function() {
-      return res.json({ field: field.toAuthJSON() });
-    })
+  fieldController
+    .addField(field)
+    .then(() => res.json({ field: field.toAuthJSON() }))
     .catch(next);
-});
+}
+
+// Routers
+router.route("/fields/healthcheck").get(getHealthCheck);
+
+router.route("/fields/:fieldId", auth.required).get(getFieldById);
+
+router
+  .route("/fields", auth.required)
+  .get(getAll)
+  .post(createField);
 
 module.exports = router;
