@@ -1,17 +1,19 @@
-const mongoose = require('mongoose');
-const router = require('express').Router();
-const passport = require('passport');
+const mongoose = require("mongoose");
+const router = require("express").Router();
+const passport = require("passport");
 
-const User = mongoose.model('User');
-const auth = require('../auth');
-const { httpStatus } = require('../../util/util');
-const { dafaRoles } = require('../../config');
+const User = mongoose.model("User");
+const auth = require("../auth");
+const { httpStatus } = require("../../util/util");
+const { dafaRoles } = require("../../config");
 
-router.get('/users/healthcheck', (req, res) => res.sendStatus(httpStatus.SUCCESS));
+router.get("/users/healthcheck", (req, res) =>
+  res.sendStatus(httpStatus.SUCCESS)
+);
 
-router.get('/user', auth.required, (req, res, next) => {
+router.get("/user", auth.required, (req, res, next) => {
   User.findById(req.payload.id)
-    .then((user) => {
+    .then(user => {
       if (!user) {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
@@ -21,9 +23,9 @@ router.get('/user', auth.required, (req, res, next) => {
     .catch(next);
 });
 
-router.put('/user', auth.required, (req, res, next) => {
+router.put("/user", auth.required, (req, res, next) => {
   User.findById(req.payload.id)
-    .then((user) => {
+    .then(user => {
       if (!user) {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
@@ -31,13 +33,13 @@ router.put('/user', auth.required, (req, res, next) => {
       const usr = user;
 
       // only update fields that were actually passed...
-      if (typeof req.body.user.username !== 'undefined') {
+      if (typeof req.body.user.username !== "undefined") {
         usr.username = req.body.user.username;
       }
-      if (typeof req.body.user.email !== 'undefined') {
+      if (typeof req.body.user.email !== "undefined") {
         usr.email = req.body.user.email;
       }
-      if (typeof req.body.user.password !== 'undefined') {
+      if (typeof req.body.user.password !== "undefined") {
         usr.setPassword(req.body.user.password);
       }
 
@@ -46,7 +48,7 @@ router.put('/user', auth.required, (req, res, next) => {
     .catch(next);
 });
 
-router.post('/users/login', (req, res, next) => {
+router.post("/users/login", (req, res, next) => {
   if (!req.body.user.email) {
     return res
       .status(httpStatus.UNPROCESSABLE_ENTITY)
@@ -59,25 +61,29 @@ router.post('/users/login', (req, res, next) => {
       .json({ errors: { password: "can't be blank" } });
   }
 
-  return passport.authenticate('local', { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
+  return passport.authenticate(
+    "local",
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
 
-    if (user) {
-      return res.json({ token: user.generateJWT() });
+      if (user) {
+        return res.json({ token: user.generateJWT() });
+      }
+      return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
     }
-    return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
-  })(req, res, next);
+  )(req, res, next);
 });
 
-router.post('/users', (req, res, next) => {
+router.post("/users", (req, res, next) => {
   const user = new User();
 
   if (!req.body.user) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ errors: { message: 'Bad request' } });
+      .json({ errors: { message: "Bad request" } });
   }
 
   if (!req.body.user.email) {
