@@ -1,15 +1,15 @@
-const router = require('express').Router();
-const { httpStatus } = require('../../util/util');
+const router = require("express").Router();
+const { httpStatus } = require("../../util/util");
 
-router.use('/', require('./users'));
-router.use('/', require('./clients'));
-router.use('/', require('./fields'));
-router.use('/', require('./alertTypes'));
-router.use('/', require('./eventWarnings'));
-router.use('/', require('./logs'));
+router.use("/", require("./users"));
+router.use("/", require("./clients"));
+router.use("/", require("./fields"));
+router.use("/", require("./alertTypes"));
+router.use("/", require("./eventWarnings"));
+router.use("/", require("./logs"));
 
 router.use((err, req, res, next) => {
-  if (err.name === 'ValidationError') {
+  if (err.name === "ValidationError") {
     return res.status(httpStatus.UNPROCESSABLE_ENTITY).json({
       errors: Object.keys(err.errors).reduce((errs, key) => {
         const errors = errs;
@@ -17,7 +17,7 @@ router.use((err, req, res, next) => {
         errors[key] = err.errors[key].message;
 
         return errors;
-      }, {}),
+      }, {})
     });
   }
 
