@@ -1,19 +1,17 @@
-"use strict";
+const mongoose = require("mongoose");
+const router = require("express").Router();
 
-var mongoose = require("mongoose");
-var router = require("express").Router();
-var LogEntry = mongoose.model("LogEntry");
-var auth = require("../auth");
-var util = require("../../util/util");
-var httpStatus = util.httpStatus;
+const LogEntry = mongoose.model("LogEntry");
+const auth = require("../auth");
+const { httpStatus } = require("../../util/util");
 
-router.get("/logs/healthcheck", function(req, res, next) {
-  return res.sendStatus(httpStatus.SUCCESS);
-});
+router.get("/logs/healthcheck", (req, res) =>
+  res.sendStatus(httpStatus.SUCCESS)
+);
 
-router.get("/logs/:logEntryId", auth.required, function(req, res, next) {
+router.get("/logs/:logEntryId", auth.required, (req, res, next) => {
   LogEntry.findById(req.params.logEntryId)
-    .then(function(log) {
+    .then(log => {
       if (!log) {
         return res.sendStatus(httpStatus.UNAUTHORIZED);
       }
@@ -23,16 +21,16 @@ router.get("/logs/:logEntryId", auth.required, function(req, res, next) {
     .catch(next);
 });
 
-router.get("/logs", auth.required, function(req, res, next) {
+router.get("/logs", auth.required, (req, res, next) => {
   LogEntry.find()
-    .then(function(logs) {
+    .then(logs => {
       if (!logs) {
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No log entry found" });
       }
 
-      var logsJson = [];
+      const logsJson = [];
       logs.forEach(log => {
         logsJson.push(log.toJSON());
       });
