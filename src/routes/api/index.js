@@ -5,6 +5,7 @@ router.use("/", require("./users"));
 router.use("/", require("./clients"));
 router.use("/", require("./fields"));
 router.use("/", require("./alertTypes"));
+router.use("/", require("./events"));
 router.use("/", require("./eventWarnings"));
 router.use("/", require("./logs"));
 
