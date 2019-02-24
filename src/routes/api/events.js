@@ -18,9 +18,9 @@ function getHealthCheck(req, res) {
     GET
     Get all active events
 */
-function getEventsFields(req, res, next) {
+function getEvents(req, res, next) {
   eventController
-    .getEventsFields()
+    .getEvents()
     .then(event => {
       if (!event) {
         return res
@@ -54,8 +54,9 @@ function createEvent(req, res, next) {
 // Routers
 router.route("/events/healthcheck").get(getHealthCheck);
 
-router.route("/events", auth.required).post(createEvent);
-
-router.route("/eventsFields", auth.required).get(getEventsFields);
+router
+  .route("/events", auth.required)
+  .get(getEvents)
+  .post(createEvent);
 
 module.exports = router;

@@ -16,7 +16,7 @@ const eventController = {
     return eventToAdd.save();
   },
 
-  async getEventsFields() {
+  async getEvents() {
     try {
       const events = await Event.find({
         active: true
