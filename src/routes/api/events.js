@@ -33,7 +33,7 @@ function getEvents(req, res, next) {
         eventJson.push(e);
       });
 
-      return res.json({ event: eventJson });
+      return res.json({ events: eventJson });
     })
     .catch(next);
 }
