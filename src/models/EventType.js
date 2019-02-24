@@ -16,11 +16,13 @@ const EventTypeSchema = new mongoose.Schema(
       lowercase: false,
       match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
     },
-    alertType: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "AlertType",
-      required: [true, "can't be blank"]
-    },
+    alertTypes: [
+      {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "AlertType",
+        required: [true, "can't be blank"]
+      }
+    ],
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },
     active: { type: mongoose.Schema.Types.Boolean }
@@ -43,7 +45,7 @@ EventTypeSchema.methods.toAuthJSON = function parseToJSON() {
     id: this._id,
     name: this.name,
     description: this.description,
-    alertType: this.alertType,
+    alertTypes: this.alertTypes,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     active: this.active

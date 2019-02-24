@@ -35,7 +35,7 @@ const eventTypeController = {
 
         eventTypeToBeUpdated.name = eventType.name;
         eventTypeToBeUpdated.description = eventType.description;
-        eventTypeToBeUpdated.alertType = eventType.alertType;
+        eventTypeToBeUpdated.alertTypes = eventType.alertTypes;
         eventTypeToBeUpdated.active = eventType.active;
         return eventTypeToBeUpdated.save();
       })

@@ -66,7 +66,7 @@ function createEventType(req, res, next) {
 
   eventType.name = req.body.eventType.name;
   eventType.description = req.body.eventType.description;
-  eventType.alertType = req.body.eventType.alertType;
+  eventType.alertTypes = req.body.eventType.alertTypes;
   eventType.active = true;
 
   eventTypeController
