@@ -8,7 +8,7 @@ const { httpStatus } = require("../../util/util");
 
 /*
     GET
-    Health check for the Client endpoint
+    Health check for the Alert Type endpoint
 */
 function getHealthCheck(req, res) {
   return res.sendStatus(httpStatus.SUCCESS);
