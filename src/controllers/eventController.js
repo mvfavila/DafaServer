@@ -9,9 +9,6 @@ const eventController = {
 
   addEvent(event) {
     const eventToAdd = event;
-    eventToAdd.date = null;
-    eventToAdd.eventType = null;
-    eventToAdd.field = null;
     eventToAdd.active = true;
     return eventToAdd.save();
   },

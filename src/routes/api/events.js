@@ -45,6 +45,11 @@ function getEvents(req, res, next) {
 function createEvent(req, res, next) {
   const event = new Event();
 
+  event.date = req.body.event.date;
+  event.eventType = req.body.event.eventType;
+  event.field = req.body.event.field;
+  event.active = true;
+
   eventController
     .addEvent(event)
     .then(() => res.json({ event: event.toAuthJSON() }))
