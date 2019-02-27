@@ -5,7 +5,7 @@ const Field = mongoose.model("Field");
 const fieldController = {
   async getFieldById(fieldId) {
     try {
-      const field = await Field.findById(fieldId);
+      const field = await Field.findById(fieldId).populate("events");
       return new Promise(resolve => {
         resolve(field);
       });
