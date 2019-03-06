@@ -22,6 +22,12 @@ const fieldController = {
     const fieldToAdd = field;
     fieldToAdd.active = true;
     return fieldToAdd.save();
+  },
+
+  async attachEventToField(event) {
+    const field = await this.getFieldById(event.field);
+    field.events.push(event);
+    field.save();
   }
 };
 

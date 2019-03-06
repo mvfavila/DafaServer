@@ -85,4 +85,7 @@ router
   .get(getAll)
   .post(createField);
 
+router.route("/fields/:fieldId/events", auth.required).get(getFieldById);
+
+
 module.exports = router;
