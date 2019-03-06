@@ -58,6 +58,30 @@ function getAll(req, res, next) {
 }
 
 /*
+    GET
+    Get all active Fields of a Client
+*/
+function getFieldsByClient(req, res, next) {
+  clientController
+    .getFieldsByClient(req.params.clientId)
+    .then(fields => {
+      if (!fields) {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No field found" });
+      }
+
+      const fieldsJson = [];
+      fields.forEach(e => {
+        fieldsJson.push(e);
+      });
+
+      return res.json({ fields: fieldsJson });
+    })
+    .catch(next);
+}
+
+/*
     POST
     Creates a new client
 */
@@ -142,6 +166,8 @@ router
   .route("/clients/:clientId", auth.required)
   .get(getClientById)
   .patch(updateClientStatus);
+
+router.route("/clients/:clientId/fields").get(getFieldsByClient);
 
 router
   .route("/clients", auth.required)

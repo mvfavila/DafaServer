@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Client = mongoose.model("Client");
+const Field = mongoose.model("Field");
 
 const clientController = {
   async getClientById(clientId) {
@@ -16,6 +17,26 @@ const clientController = {
 
   getAllClients() {
     return Client.find();
+  },
+
+  async getFieldsByClient(client) {
+    try {
+      const fields = await Field.find({
+        client,
+        active: true
+      })
+        .populate({
+          path: "event"
+        })
+        .populate({
+          path: "eventWarning"
+        });
+      return new Promise(resolve => {
+        resolve(fields);
+      });
+    } catch (error) {
+      throw error;
+    }
   },
 
   addClient(client) {

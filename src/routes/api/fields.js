@@ -59,7 +59,7 @@ function getAll(req, res, next) {
 
 /*
     GET
-    Get all active events
+    Get all active Events of a Field
 */
 function getEventsByField(req, res, next) {
   fieldController
