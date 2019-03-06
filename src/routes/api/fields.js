@@ -58,6 +58,30 @@ function getAll(req, res, next) {
 }
 
 /*
+    GET
+    Get all active events
+*/
+function getEventsByField(req, res, next) {
+  fieldController
+    .getEventsByField(req.params.fieldId)
+    .then(events => {
+      if (!events) {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No event found" });
+      }
+
+      const eventsJson = [];
+      events.forEach(e => {
+        eventsJson.push(e);
+      });
+
+      return res.json({ events: eventsJson });
+    })
+    .catch(next);
+}
+
+/*
     POST
     Creates a new field
 */
@@ -85,7 +109,6 @@ router
   .get(getAll)
   .post(createField);
 
-router.route("/fields/:fieldId/events", auth.required).get(getFieldById);
-
+router.route("/fields/:fieldId/events", auth.required).get(getEventsByField);
 
 module.exports = router;

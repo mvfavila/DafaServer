@@ -53,42 +53,6 @@ const eventController = {
     } catch (error) {
       throw error;
     }
-  },
-
-  async getEventsByField(field) {
-    try {
-      const events = await Event.find({
-        field,
-        active: true
-      })
-        .populate({
-          path: "eventType"
-        })
-        .populate({
-          path: "field"
-        });
-      if (events == null)
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      const eventsFields = [];
-      events.forEach(event => {
-        eventsFields.push({
-          idEvent: event.id,
-          date: event.date,
-          eventType: event.eventType,
-          field: event.field,
-          createdAt: event.createdAt,
-          updatedAt: event.updatedAt,
-          active: event.active
-        });
-      });
-      return new Promise(resolve => {
-        resolve(eventsFields);
-      });
-    } catch (error) {
-      throw error;
-    }
   }
 };
 

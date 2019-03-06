@@ -39,30 +39,6 @@ function getEvents(req, res, next) {
 }
 
 /*
-    GET
-    Get all active events
-*/
-function getEventsByField(req, res, next) {
-  eventController
-    .getEventsByField(req.params.field)
-    .then(events => {
-      if (!events) {
-        return res
-          .status(httpStatus.UNAUTHORIZED)
-          .send({ error: "No event found" });
-      }
-
-      const eventsJson = [];
-      events.forEach(e => {
-        eventsJson.push(e);
-      });
-
-      return res.json({ events: eventsJson });
-    })
-    .catch(next);
-}
-
-/*
     POST
     Creates a new Event 
 */
@@ -87,7 +63,5 @@ router
   .route("/events", auth.required)
   .get(getEvents)
   .post(createEvent);
-
-router.route("/events/:field", auth.required).get(getEventsByField);
 
 module.exports = router;
