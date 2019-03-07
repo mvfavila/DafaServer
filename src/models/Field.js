@@ -16,6 +16,30 @@ const FieldSchema = new mongoose.Schema(
       lowercase: true,
       match: [/\S+@\S+\.\S+/, "is invalid"]
     },
+    description: {
+      type: String,
+      lowercase: false
+    },
+    address: {
+      type: String,
+      lowercase: false,
+      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+    },
+    city: {
+      type: String,
+      lowercase: false,
+      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+    },
+    state: {
+      type: String,
+      lowercase: false,
+      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+    },
+    postalCode: {
+      type: String,
+      lowercase: false,
+      match: [/^[0-9]{5}[-][0-9]{3}$/, "is invalid"]
+    },
     events: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -55,6 +79,11 @@ FieldSchema.methods.toAuthJSON = function parseToJSON() {
     id: this._id,
     name: this.name,
     email: this.email,
+    description: this.description,
+    address: this.address,
+    city: this.city,
+    state: this.state,
+    postalCode: this.postalCode,
     events: this.events,
     client: this.client,
     createdAt: this.createdAt,

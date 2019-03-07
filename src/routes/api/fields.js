@@ -89,7 +89,12 @@ function createField(req, res, next) {
   const field = new Field();
 
   field.name = req.body.field.name;
+  field.description = req.body.field.description;
   field.email = req.body.field.email;
+  field.address = req.body.field.address;
+  field.city = req.body.field.city;
+  field.state = req.body.field.state;
+  field.postalCode = req.body.field.postalCode;
   field.client = req.body.field.client;
   field.active = true;
 
