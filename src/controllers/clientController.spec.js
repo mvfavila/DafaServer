@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 /* eslint-disable new-cap */
 /* eslint-disable no-undef */
 // During the test the env variable is set to test
