@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 /* eslint-disable new-cap */
 /* eslint-disable no-undef */
 // During the test the env variable is set to test
@@ -36,99 +37,134 @@ after(() => {
   mongoServer.stop();
 });
 
+beforeEach(done => {
+  // Setup
+
+  // removes all existing clients from repository
+  Client.deleteMany({}, () => {});
+
+  // adds a sample client to the repository
+  const client = new Client();
+
+  client.firstName = "First Name";
+  client.lastName = "Last Name";
+  client.company = "Company name SA";
+  client.address = "Street 1";
+  client.city = "Paris";
+  client.state = "Sergipe";
+  client.postalCode = "12000-000";
+  client.email = "email@domain.com";
+
+  clientController
+    .addClient(client)
+    .then(async () => {
+      done();
+    })
+    .catch(err => {
+      throw new Error(err);
+    });
+});
+
 describe("Client controller", () => {
-  it("clientController - Add client - Must succeed", async () => {
-    const cnt = await Client.countDocuments();
+  // it("clientController - Add client - Must succeed", async () => {
+  //   const cnt = await Client.countDocuments();
 
-    // Dataset must be empty
-    expect(cnt).to.equal(0);
+  //   // Dataset must be empty
+  //   expect(cnt).to.equal(1);
 
-    const client = new Client();
+  //   const client = new Client();
 
-    client.firstName = "First Name";
-    client.lastName = "Last Name";
-    client.company = "Company name SA";
-    client.address = "Street 1";
-    client.city = "Paris";
-    client.state = "Sergipe";
-    client.postalCode = "12000-000";
-    client.email = "email@domain.com";
+  //   client.firstName = "John";
+  //   client.lastName = "Doe";
+  //   client.company = "Company name Doe";
+  //   client.address = "Street Doe";
+  //   client.city = "Paris Doe";
+  //   client.state = "Alagoas";
+  //   client.postalCode = "12000-123";
+  //   client.email = "john.doe@domain.com";
 
-    await clientController
-      .addClient(client)
-      .then(async () => {
-        await Client.countDocuments()
-          .then(count => {
-            // Dataset must have exactly one item
-            expect(count).to.equal(1);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
-  });
+  //   await clientController
+  //     .addClient(client)
+  //     .then(async () => {
+  //       await Client.countDocuments()
+  //         .then(count => {
+  //           // Dataset must have exactly one item
+  //           expect(count).to.equal(2);
+  //         })
+  //         .catch(err => {
+  //           throw new Error(err);
+  //         });
+  //     })
+  //     .catch(err => {
+  //       throw new Error(err);
+  //     });
+  // });
 
-  it("clientController - Get all clients - Must return 1 client", async () => {
-    const cnt = await Client.countDocuments();
+  // it("clientController - Get all clients - Must return 1 client", async () => {
+  //   const cnt = await Client.countDocuments();
 
-    expect(cnt).to.equal(1);
+  //   expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(clients => {
-        // Must return exactly one client
-        expect(clients.length).to.equal(1);
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
-  });
+  //   await clientController
+  //     .getAllClients()
+  //     .then(clients => {
+  //       // Must return exactly one client
+  //       expect(clients.length).to.equal(1);
+  //     })
+  //     .catch(err => {
+  //       throw new Error(err);
+  //     });
+  // });
 
-  it("clientController - Get client - Must return exact client", async () => {
-    const cnt = await Client.countDocuments();
+  // it("clientController - Get client by Id - Must return exact client", async () => {
+  //   const cnt = await Client.countDocuments();
 
-    expect(cnt).to.equal(1);
+  //   expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(async clients => {
-        const client = clients[0];
+  //   await clientController
+  //     .getAllClients()
+  //     .then(async clients => {
+  //       const client = clients[0];
 
-        await clientController
-          .getClientById(client.id)
-          .then(async clientFound => {
-            expect(client.id.toString()).to.equal(clientFound.id.toString());
-            expect(client.firstName).to.equal(clientFound.firstName);
-            expect(client.lastName).to.equal(clientFound.lastName);
-            expect(client.company).to.equal(clientFound.company);
-            expect(client.address).to.equal(clientFound.address);
-            expect(client.city).to.equal(clientFound.city);
-            expect(client.state).to.equal(clientFound.state);
-            expect(client.postalCode).to.equal(clientFound.postalCode);
-            expect(client.email).to.equal(clientFound.email);
-            expect(client.active).to.equal(clientFound.active);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
-  });
+  //       await clientController
+  //         .getClientById(client.id)
+  //         .then(async clientFound => {
+  //           // returned client must be exactly the existing one
+  //           expect(client.id.toString()).to.equal(clientFound.id.toString());
+  //           expect(client.firstName).to.equal(clientFound.firstName);
+  //           expect(client.lastName).to.equal(clientFound.lastName);
+  //           expect(client.company).to.equal(clientFound.company);
+  //           expect(client.address).to.equal(clientFound.address);
+  //           expect(client.city).to.equal(clientFound.city);
+  //           expect(client.state).to.equal(clientFound.state);
+  //           expect(client.postalCode).to.equal(clientFound.postalCode);
+  //           expect(client.email).to.equal(clientFound.email);
+  //           expect(client.active).to.equal(clientFound.active);
+  //         })
+  //         .catch(err => {
+  //           throw new Error(err);
+  //         });
+  //     })
+  //     .catch(err => {
+  //       throw new Error(err);
+  //     });
+  // });
 
   it("clientController - Update client - Must succeed", async () => {
     const cnt = await Client.countDocuments();
 
     expect(cnt).to.equal(1);
 
-    clientController
+    const cls = await Client.find({}, () => {});
+    console.log(`====> Found schema: ${cls[0].id.toString()}`);
+
+    await clientController
       .getAllClients()
       .then(async clients => {
         const client = clients[0];
+
+        console.log(`====> Found controller: ${client.id.toString()}`);
+
         client.firstName = "New First Name";
         client.lastName = "New Last Name";
         client.company = "New Company SA";
@@ -139,29 +175,115 @@ describe("Client controller", () => {
         client.email = "new@domain.com";
         client.active = false;
 
-        await clientController.updateClient(client);
-
-        clientController
-          .getAllClients()
-          .then(newFoundClients => {
-            const updClient = newFoundClients[0];
-            expect(updClient.id.toString()).to.equal(client.id.toString());
-            expect(updClient.firstName).to.equal(client.firstName);
-            expect(updClient.lastName).to.equal(client.lastName);
-            expect(updClient.company).to.equal(client.company);
-            expect(updClient.address).to.equal(client.address);
-            expect(updClient.city).to.equal(client.city);
-            expect(updClient.state).to.equal(client.state);
-            expect(updClient.postalCode).to.equal(client.postalCode);
-            expect(updClient.email).to.equal(client.email);
-            expect(updClient.active).to.equal(client.active);
-          })
-          .catch(err => {
-            throw err;
+        await clientController
+          .updateClient(client)
+          .then(async updatedClient => {
+            if (updatedClient) {
+              console.log(`====> Updated: ${updatedClient.id.toString()}`);
+            } else {
+              console.log(`====> Nothing updated`);
+            }
+            await clientController
+              .getAllClients()
+              .then(newFoundClients => {
+                // eslint-disable-next-line no-debugger
+                debugger;
+                expect(newFoundClients.length).to.greaterThan(0);
+                const updClient = newFoundClients[0];
+                expect(updClient.id.toString()).to.equal(client.id.toString());
+                expect(updClient.firstName).to.equal(client.firstName);
+                expect(updClient.lastName).to.equal(client.lastName);
+                expect(updClient.company).to.equal(client.company);
+                expect(updClient.address).to.equal(client.address);
+                expect(updClient.city).to.equal(client.city);
+                expect(updClient.state).to.equal(client.state);
+                expect(updClient.postalCode).to.equal(client.postalCode);
+                expect(updClient.email).to.equal(client.email);
+                expect(updClient.active).to.equal(client.active);
+              })
+              .catch(err => {
+                throw err;
+              });
           });
       })
       .catch(err => {
         throw err;
       });
   });
+
+  // it("clientController - Update client status - Must succeed", async () => {
+  //   const cnt = await Client.countDocuments();
+
+  //   expect(cnt).to.equal(1);
+
+  //   clientController
+  //     .getAllClients()
+  //     .then(async clients => {
+  //       // eslint-disable-next-line no-debugger
+  //       debugger;
+  //       const previousStatus = clients[0].active;
+
+  //       clientController.getClientById(clients[0].id).then(upd => {
+  //         // eslint-disable-next-line no-debugger
+  //         debugger;
+  //         let a = "";
+  //         let b = "";
+  //         if (a !== b) {
+  //           a = upd;
+  //           b = a;
+  //         }
+  //       });
+
+  //       const client = new Client();
+  //       client.id = clients[0].id;
+  //       client.firstName = "New First Name";
+  //       client.lastName = "New Last Name";
+  //       client.company = "New Company SA";
+  //       client.address = "Street 2";
+  //       client.city = "London";
+  //       client.state = "Alagoas";
+  //       client.postalCode = "12000-001";
+  //       client.email = "new@domain.com";
+  //       client.active = !previousStatus;
+
+  //       await clientController.updateClientStatus(client);
+
+  //       clientController.getClientById(clients[0].id).then(updClient => {
+  //         // eslint-disable-next-line no-debugger
+  //         debugger;
+  //         let a = "";
+  //         let b = "";
+  //         if (a !== b) {
+  //           a = updClient;
+  //           b = a;
+  //         }
+  //       });
+
+  //       clientController
+  //         .getClientById(client.id)
+  //         .then(updClient => {
+  //           // eslint-disable-next-line no-debugger
+  //           debugger;
+  //           // must have not received new values
+  //           expect(updClient.id.toString()).to.equal(client.id.toString());
+  //           expect(updClient.firstName).to.not.equal(client.firstName);
+  //           expect(updClient.lastName).to.not.equal(client.lastName);
+  //           expect(updClient.company).to.not.equal(client.company);
+  //           expect(updClient.address).to.not.equal(client.address);
+  //           expect(updClient.city).to.not.equal(client.city);
+  //           expect(updClient.state).to.not.equal(client.state);
+  //           expect(updClient.postalCode).to.not.equal(client.postalCode);
+  //           expect(updClient.email).to.not.equal(client.email);
+
+  //           // must have changed
+  //           expect(updClient.active).to.not.equal(previousStatus);
+  //         })
+  //         .catch(err => {
+  //           throw err;
+  //         });
+  //     })
+  //     .catch(err => {
+  //       throw err;
+  //     });
+  // });
 });

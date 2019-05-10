@@ -15,8 +15,15 @@ const clientController = {
     }
   },
 
-  getAllClients() {
-    return Client.find();
+  async getAllClients() {
+    try {
+      const clients = await Client.find({}, () => {});
+      return new Promise(resolve => {
+        resolve(clients);
+      });
+    } catch (error) {
+      throw error;
+    }
   },
 
   async getFieldsByClient(client) {
@@ -55,6 +62,7 @@ const clientController = {
 
         const clientToBeUpdated = foundClient;
 
+        // the status must be the only thing that gets updated
         clientToBeUpdated.active = client.active;
         return clientToBeUpdated.save();
       })
@@ -64,11 +72,16 @@ const clientController = {
   },
 
   async updateClient(client) {
-    await this.getClientById(client.id)
-      .then(async foundClient => {
+    if (!client || !client.id) {
+      throw new Error("Invalid argument 'client'");
+    }
+    return this.getClientById(client.id)
+      .then(foundClient => {
         if (foundClient == null) {
           throw new Error("Client not found");
         }
+
+        console.log(`====> Found to update: ${client.id.toString()}`);
 
         const clientToBeUpdated = foundClient;
 
@@ -81,7 +94,20 @@ const clientController = {
         clientToBeUpdated.postalCode = client.postalCode;
         clientToBeUpdated.email = client.email;
         clientToBeUpdated.active = client.active;
-        return clientToBeUpdated.save();
+        console.log(`====> Saving: ${clientToBeUpdated.id.toString()}`);
+
+        return new Promise(resolve => {
+          const result = Client.findByIdAndUpdate(
+            clientToBeUpdated.id,
+            clientToBeUpdated,
+            err => {
+              if (err) throw err;
+              console.log(`====> Saved: ${clientToBeUpdated.id.toString()}`);
+              return clientToBeUpdated;
+            }
+          );
+          resolve(result);
+        });
       })
       .catch(err => {
         throw err;
