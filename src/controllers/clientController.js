@@ -53,18 +53,26 @@ const clientController = {
   },
 
   async updateClientStatus(client) {
-    await this.getClientById(client.id)
+    if (!client || !client.id) {
+      throw new Error("Invalid argument 'client'");
+    }
+    return this.getClientById(client.id)
       .then(foundClient => {
-        if (client == null)
-          return new Promise(resolve => {
-            resolve(null);
-          });
-
         const clientToBeUpdated = foundClient;
 
         // the status must be the only thing that gets updated
         clientToBeUpdated.active = client.active;
-        return clientToBeUpdated.save();
+        return new Promise(resolve => {
+          const result = Client.findByIdAndUpdate(
+            clientToBeUpdated.id,
+            clientToBeUpdated,
+            err => {
+              if (err) throw err;
+              return clientToBeUpdated;
+            }
+          );
+          resolve(result);
+        });
       })
       .catch(err => {
         throw err;

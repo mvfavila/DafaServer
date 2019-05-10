@@ -192,79 +192,48 @@ describe("Client controller", () => {
       });
   });
 
-  // it("clientController - Update client status - Must succeed", async () => {
-  //   const cnt = await Client.countDocuments();
+  it("clientController - Update client status - Must succeed", async () => {
+    const cnt = await Client.countDocuments();
 
-  //   expect(cnt).to.equal(1);
+    expect(cnt).to.equal(1);
 
-  //   clientController
-  //     .getAllClients()
-  //     .then(async clients => {
-  //       // eslint-disable-next-line no-debugger
-  //       debugger;
-  //       const previousStatus = clients[0].active;
+    await clientController
+      .getAllClients()
+      .then(async clients => {
+        const previousStatus = clients[0].active;
 
-  //       clientController.getClientById(clients[0].id).then(upd => {
-  //         // eslint-disable-next-line no-debugger
-  //         debugger;
-  //         let a = "";
-  //         let b = "";
-  //         if (a !== b) {
-  //           a = upd;
-  //           b = a;
-  //         }
-  //       });
+        const client = new Client();
+        client.id = clients[0].id;
+        client.firstName = "New First Name";
+        client.lastName = "New Last Name";
+        client.company = "New Company SA";
+        client.address = "Street 2";
+        client.city = "London";
+        client.state = "Alagoas";
+        client.postalCode = "12000-001";
+        client.email = "new@domain.com";
+        client.active = !previousStatus;
 
-  //       const client = new Client();
-  //       client.id = clients[0].id;
-  //       client.firstName = "New First Name";
-  //       client.lastName = "New Last Name";
-  //       client.company = "New Company SA";
-  //       client.address = "Street 2";
-  //       client.city = "London";
-  //       client.state = "Alagoas";
-  //       client.postalCode = "12000-001";
-  //       client.email = "new@domain.com";
-  //       client.active = !previousStatus;
+        await clientController
+          .updateClientStatus(client)
+          .then(async updatedClient => {
+            // must have not received new values
+            expect(updatedClient.id.toString()).to.equal(client.id.toString());
+            expect(updatedClient.firstName).to.not.equal(client.firstName);
+            expect(updatedClient.lastName).to.not.equal(client.lastName);
+            expect(updatedClient.company).to.not.equal(client.company);
+            expect(updatedClient.address).to.not.equal(client.address);
+            expect(updatedClient.city).to.not.equal(client.city);
+            expect(updatedClient.state).to.not.equal(client.state);
+            expect(updatedClient.postalCode).to.not.equal(client.postalCode);
+            expect(updatedClient.email).to.not.equal(client.email);
 
-  //       await clientController.updateClientStatus(client);
-
-  //       clientController.getClientById(clients[0].id).then(updClient => {
-  //         // eslint-disable-next-line no-debugger
-  //         debugger;
-  //         let a = "";
-  //         let b = "";
-  //         if (a !== b) {
-  //           a = updClient;
-  //           b = a;
-  //         }
-  //       });
-
-  //       clientController
-  //         .getClientById(client.id)
-  //         .then(updClient => {
-  //           // eslint-disable-next-line no-debugger
-  //           debugger;
-  //           // must have not received new values
-  //           expect(updClient.id.toString()).to.equal(client.id.toString());
-  //           expect(updClient.firstName).to.not.equal(client.firstName);
-  //           expect(updClient.lastName).to.not.equal(client.lastName);
-  //           expect(updClient.company).to.not.equal(client.company);
-  //           expect(updClient.address).to.not.equal(client.address);
-  //           expect(updClient.city).to.not.equal(client.city);
-  //           expect(updClient.state).to.not.equal(client.state);
-  //           expect(updClient.postalCode).to.not.equal(client.postalCode);
-  //           expect(updClient.email).to.not.equal(client.email);
-
-  //           // must have changed
-  //           expect(updClient.active).to.not.equal(previousStatus);
-  //         })
-  //         .catch(err => {
-  //           throw err;
-  //         });
-  //     })
-  //     .catch(err => {
-  //       throw err;
-  //     });
-  // });
+            // must have changed
+            expect(updatedClient.active).to.not.equal(previousStatus);
+          });
+      })
+      .catch(err => {
+        throw err;
+      });
+  });
 });
