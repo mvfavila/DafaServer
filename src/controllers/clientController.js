@@ -72,6 +72,7 @@ const clientController = {
   },
 
   async updateClient(client) {
+    // TODO: this can be improved. I don't think I need to fetch the client before trying to update it
     if (!client || !client.id) {
       throw new Error("Invalid argument 'client'");
     }
