@@ -81,8 +81,6 @@ const clientController = {
           throw new Error("Client not found");
         }
 
-        console.log(`====> Found to update: ${client.id.toString()}`);
-
         const clientToBeUpdated = foundClient;
 
         clientToBeUpdated.firstName = client.firstName;
@@ -94,7 +92,6 @@ const clientController = {
         clientToBeUpdated.postalCode = client.postalCode;
         clientToBeUpdated.email = client.email;
         clientToBeUpdated.active = client.active;
-        console.log(`====> Saving: ${clientToBeUpdated.id.toString()}`);
 
         return new Promise(resolve => {
           const result = Client.findByIdAndUpdate(
@@ -102,7 +99,6 @@ const clientController = {
             clientToBeUpdated,
             err => {
               if (err) throw err;
-              console.log(`====> Saved: ${clientToBeUpdated.id.toString()}`);
               return clientToBeUpdated;
             }
           );
