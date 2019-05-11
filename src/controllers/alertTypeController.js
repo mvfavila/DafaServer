@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const AlertType = mongoose.model("AlertType");
 
 const alertTypeController = {
+  /**
+   * Gets a single alert type by it's id
+   * @param {ObjectId} alertTypeId
+   */
   async getAlertTypeById(alertTypeId) {
     try {
       const alertType = await AlertType.findById(alertTypeId);
@@ -14,21 +18,67 @@ const alertTypeController = {
     }
   },
 
+  /**
+   * Gets all active alert types
+   */
   getAllActiveAlertTypes() {
-    return AlertType.find();
+    return AlertType.find({ active: true }, () => {});
   },
 
+  /**
+   * Adds a new alert type to the repository
+   * @param {AlertType} alertType
+   */
   addAlertType(alertType) {
     const alertTypeToAdd = alertType;
     alertTypeToAdd.active = true;
     return alertTypeToAdd.save();
   },
 
+  /**
+   * Updates an alertType's status
+   * @param {AlertType} alertType
+   */
+  async updateAlertTypeStatus(alertType) {
+    if (!alertType || !alertType.id) {
+      throw new Error("Invalid argument 'alertType'");
+    }
+    return this.getAlertTypeById(alertType.id)
+      .then(foundAlertType => {
+        const alertTypeToBeUpdated = foundAlertType;
+
+        // the status must be the only thing that gets updated
+        alertTypeToBeUpdated.active = alertType.active;
+        return new Promise(resolve => {
+          const result = AlertType.findByIdAndUpdate(
+            alertTypeToBeUpdated.id,
+            alertTypeToBeUpdated,
+            err => {
+              if (err) throw err;
+              return alertTypeToBeUpdated;
+            }
+          );
+          resolve(result);
+        });
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
+
+  /**
+   * Updates an existing alertType
+   * @param {AlertType} alertType
+   */
   async updateAlertType(alertType) {
-    await this.getAlertTypeById(alertType.id)
-      .then(async foundAlertType => {
+    // TODO: this can be improved. I don't think I need to fetch the alertType before trying to update it
+    if (!alertType || !alertType.id) {
+      throw new Error("Invalid argument 'alertType'");
+    }
+    return this.getAlertTypeById(alertType.id)
+      .then(foundAlertType => {
         if (foundAlertType == null) {
-          throw new Error("Alert Type not found");
+          throw new Error("AlertType not found");
         }
 
         const alertTypeToBeUpdated = foundAlertType;
@@ -37,7 +87,18 @@ const alertTypeController = {
         alertTypeToBeUpdated.numberOfDaysToWarning =
           alertType.numberOfDaysToWarning;
         alertTypeToBeUpdated.active = alertType.active;
-        return alertTypeToBeUpdated.save();
+
+        return new Promise(resolve => {
+          const result = AlertType.findByIdAndUpdate(
+            alertTypeToBeUpdated.id,
+            alertTypeToBeUpdated,
+            err => {
+              if (err) throw err;
+              return alertTypeToBeUpdated;
+            }
+          );
+          resolve(result);
+        });
       })
       .catch(err => {
         throw err;

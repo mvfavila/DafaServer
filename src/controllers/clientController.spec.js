@@ -87,7 +87,7 @@ describe("Client controller", () => {
       .then(async () => {
         await Client.countDocuments()
           .then(count => {
-            // Dataset must have exactly one item
+            // Dataset must have exactly two items
             expect(count).to.equal(2);
           })
           .catch(err => {
@@ -181,6 +181,7 @@ describe("Client controller", () => {
             expect(updatedClient.state).to.equal(client.state);
             expect(updatedClient.postalCode).to.equal(client.postalCode);
             expect(updatedClient.email).to.equal(client.email);
+            expect(updatedClient.active).to.equal(client.active);
           });
 
         cnt = await Client.countDocuments();
