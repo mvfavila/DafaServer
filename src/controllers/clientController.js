@@ -85,15 +85,14 @@ const clientController = {
         // the status must be the only thing that gets updated
         clientToBeUpdated.active = client.active;
         return new Promise(resolve => {
-          const result = Client.findByIdAndUpdate(
-            clientToBeUpdated.id,
+          Client.updateOne(
+            { id: clientToBeUpdated.id },
             clientToBeUpdated,
             err => {
               if (err) throw err;
-              return clientToBeUpdated;
             }
           );
-          resolve(result);
+          resolve(clientToBeUpdated);
         });
       })
       .catch(err => {
@@ -129,15 +128,14 @@ const clientController = {
         clientToBeUpdated.active = client.active;
 
         return new Promise(resolve => {
-          const result = Client.findByIdAndUpdate(
-            clientToBeUpdated.id,
+          Client.updateOne(
+            { id: clientToBeUpdated.id },
             clientToBeUpdated,
             err => {
               if (err) throw err;
-              return clientToBeUpdated;
             }
           );
-          resolve(result);
+          resolve(clientToBeUpdated);
         });
       })
       .catch(err => {

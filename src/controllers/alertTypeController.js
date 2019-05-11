@@ -50,15 +50,14 @@ const alertTypeController = {
         // the status must be the only thing that gets updated
         alertTypeToBeUpdated.active = alertType.active;
         return new Promise(resolve => {
-          const result = AlertType.findByIdAndUpdate(
-            alertTypeToBeUpdated.id,
+          AlertType.updateOne(
+            { id: alertTypeToBeUpdated.id },
             alertTypeToBeUpdated,
             err => {
               if (err) throw err;
-              return alertTypeToBeUpdated;
             }
           );
-          resolve(result);
+          resolve(alertTypeToBeUpdated);
         });
       })
       .catch(err => {
@@ -89,15 +88,14 @@ const alertTypeController = {
         alertTypeToBeUpdated.active = alertType.active;
 
         return new Promise(resolve => {
-          const result = AlertType.findByIdAndUpdate(
-            alertTypeToBeUpdated.id,
+          AlertType.updateOne(
+            { id: alertTypeToBeUpdated.id },
             alertTypeToBeUpdated,
             err => {
               if (err) throw err;
-              return alertTypeToBeUpdated;
             }
           );
-          resolve(result);
+          resolve(alertTypeToBeUpdated);
         });
       })
       .catch(err => {
