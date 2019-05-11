@@ -22,11 +22,12 @@ before(done => {
   });
   mongoServer
     .getConnectionString()
-    .then(mongoUri =>
-      mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
+    .then(mongoUri => {
+      const options = { useNewUrlParser: true, useCreateIndex: true };
+      mongoose.connect(mongoUri, options, err => {
         if (err) done(err);
-      })
-    )
+      });
+    })
     .then(() => done());
 });
 

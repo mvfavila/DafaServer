@@ -68,22 +68,23 @@ if (!isProduction) {
 
 if (!isTest) {
   var mongoose = require("mongoose"); // mongoose for mongodb
+  const options = { useNewUrlParser: true, useCreateIndex: true };
   if (isProduction) {
     mongoose.connect(
       process.env.MONGODB_URI,
-      { useNewUrlParser: true }
+      options
     );
   } else {
     // Configuration
     if (process.env.MONGODB_URI) {
       mongoose.connect(
         process.env.MONGODB_URI,
-        { useNewUrlParser: true }
+        options
       );
     } else {
       mongoose.connect(
         "mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb",
-        { useNewUrlParser: true }
+        options
       );
     }
 
