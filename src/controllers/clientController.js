@@ -3,7 +3,14 @@ const mongoose = require("mongoose");
 const Client = mongoose.model("Client");
 const Field = mongoose.model("Field");
 
+/**
+ * Orchestrates operations related to clients
+ */
 const clientController = {
+  /**
+   * Gets a single client by it's id
+   * @param {ObjectId} clientId
+   */
   async getClientById(clientId) {
     try {
       const client = await Client.findById(clientId).populate("fields");
@@ -15,6 +22,9 @@ const clientController = {
     }
   },
 
+  /**
+   * Gets all existing clients
+   */
   async getAllClients() {
     try {
       const clients = await Client.find({}, () => {});
@@ -26,6 +36,10 @@ const clientController = {
     }
   },
 
+  /**
+   * Gets all fields of a client
+   * @param {Client} client
+   */
   async getFieldsByClient(client) {
     try {
       const fields = await Field.find({
@@ -46,12 +60,20 @@ const clientController = {
     }
   },
 
+  /**
+   * Adds a new client to the repository
+   * @param {Client} client
+   */
   addClient(client) {
     const clientToAdd = client;
     clientToAdd.active = true;
     return clientToAdd.save();
   },
 
+  /**
+   * Updates a client's status
+   * @param {Client} client
+   */
   async updateClientStatus(client) {
     if (!client || !client.id) {
       throw new Error("Invalid argument 'client'");
@@ -79,6 +101,10 @@ const clientController = {
       });
   },
 
+  /**
+   * Updates an existing client
+   * @param {Client} client
+   */
   async updateClient(client) {
     // TODO: this can be improved. I don't think I need to fetch the client before trying to update it
     if (!client || !client.id) {
