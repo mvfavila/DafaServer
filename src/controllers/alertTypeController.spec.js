@@ -58,7 +58,7 @@ beforeEach(done => {
     });
 });
 
-describe("AlertType controller", () => {
+describe("AlertTypeController", () => {
   it("alertTypeController - Add alertType - Must succeed", async () => {
     const cnt = await AlertType.countDocuments();
 

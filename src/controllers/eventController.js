@@ -1,23 +1,30 @@
 const mongoose = require("mongoose");
+const fieldController = require("./fieldController");
 
 const Event = mongoose.model("Event");
 
-const fieldController = require("./fieldController");
-
 const eventController = {
-  getAllActiveEvents() {
-    return Event.find({ active: true });
+  async getAllActiveEvents() {
+    const events = Event.find({ active: true }, () => {});
+    return events;
   },
 
   async addEvent(event) {
     const eventToAdd = event;
     eventToAdd.active = true;
 
-    const addedEvent = await eventToAdd.save();
-
-    fieldController.attachEventToField(addedEvent);
-
-    return addedEvent;
+    return new Promise(async resolve => {
+      let eventAdded;
+      await eventToAdd.save(async (error, results) => {
+        if (error) throw error;
+        await fieldController
+          .attachEventToField(results)
+          .then(resolve(eventAdded))
+          .catch(err => {
+            throw err;
+          });
+      });
+    });
   },
 
   async getEvents() {
