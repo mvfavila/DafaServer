@@ -67,8 +67,8 @@
 //   // adds a sample event type to the repository
 //   const eventType = new EventType();
 
-//   eventType.name = "60 days";
-//   eventType.description = "Warning 60 days before";
+//   eventType.name = "Licenca ambiental";
+//   eventType.description = "Licenca do IBAMA";
 //   eventType.alertTypes = [guid.new()];
 
 //   // adds a sample event to the repository
