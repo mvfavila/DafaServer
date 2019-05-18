@@ -49,12 +49,10 @@ beforeEach(done => {
   alertTypeController
     .addAlertType(alertType)
     .then(done())
-    .catch(err => {
-      throw new Error(err);
-    });
+    .catch(err => done(err));
 });
 
-describe("AlertTypeController", () => {
+describe("alertTypeController", () => {
   it("alertTypeController - Add alertType - Must succeed", async () => {
     const cnt = await AlertType.countDocuments();
 
@@ -96,15 +94,9 @@ describe("AlertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    await alertTypeController
-      .getAllActiveAlertTypes()
-      .then(alertTypes => {
-        // Must return exactly one alertType
-        expect(alertTypes.length).to.equal(1);
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
+    // Must return exactly one alertType
+    expect(alertTypes.length).to.equal(1);
   });
 
   it("alertTypeController - Get alertType by Id - Must return exact alertType", async () => {
@@ -112,31 +104,21 @@ describe("AlertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    await alertTypeController
-      .getAllActiveAlertTypes()
-      .then(async alertTypes => {
-        const alertType = alertTypes[0];
+    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
 
-        await alertTypeController
-          .getAlertTypeById(alertType.id)
-          .then(async alertTypeFound => {
-            // returned alertType must be exactly the existing one
-            expect(alertType.id.toString()).to.equal(
-              alertTypeFound.id.toString()
-            );
-            expect(alertType.name).to.equal(alertTypeFound.name);
-            expect(alertType.numberOfDaysToWarning).to.equal(
-              alertTypeFound.numberOfDaysToWarning
-            );
-            expect(alertType.active).to.equal(alertTypeFound.active);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const alertType = alertTypes[0];
+
+    const alertTypeFound = await alertTypeController.getAlertTypeById(
+      alertType.id
+    );
+
+    // returned alertType must be exactly the existing one
+    expect(alertType.id.toString()).to.equal(alertTypeFound.id.toString());
+    expect(alertType.name).to.equal(alertTypeFound.name);
+    expect(alertType.numberOfDaysToWarning).to.equal(
+      alertTypeFound.numberOfDaysToWarning
+    );
+    expect(alertType.active).to.equal(alertTypeFound.active);
   });
 
   it("alertTypeController - Update alertType - Must succeed", async () => {
@@ -144,34 +126,27 @@ describe("AlertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    await alertTypeController
-      .getAllActiveAlertTypes()
-      .then(async alertTypes => {
-        const alertType = alertTypes[0];
+    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
 
-        alertType.name = "Warning in 61 days";
-        alertType.numberOfDaysToWarning = 61;
-        alertType.active = false;
+    const alertType = alertTypes[0];
 
-        await alertTypeController
-          .updateAlertType(alertType)
-          .then(async updatedAlertType => {
-            expect(updatedAlertType.id.toString()).to.equal(
-              alertType.id.toString()
-            );
-            expect(updatedAlertType.name).to.equal(alertType.name);
-            expect(updatedAlertType.numberOfDaysToWarning).to.equal(
-              alertType.numberOfDaysToWarning
-            );
-            expect(updatedAlertType.active).to.equal(alertType.active);
-          });
+    alertType.name = "Warning in 61 days";
+    alertType.numberOfDaysToWarning = 61;
+    alertType.active = false;
 
-        cnt = await AlertType.countDocuments();
-        expect(cnt).to.equal(1);
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedAlertType = await alertTypeController.updateAlertType(
+      alertType
+    );
+
+    expect(updatedAlertType.id.toString()).to.equal(alertType.id.toString());
+    expect(updatedAlertType.name).to.equal(alertType.name);
+    expect(updatedAlertType.numberOfDaysToWarning).to.equal(
+      alertType.numberOfDaysToWarning
+    );
+    expect(updatedAlertType.active).to.equal(alertType.active);
+
+    cnt = await AlertType.countDocuments();
+    expect(cnt).to.equal(1);
   });
 
   it("alertTypeController - Update alertType status - Must succeed", async () => {
@@ -179,35 +154,28 @@ describe("AlertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    await alertTypeController
-      .getAllActiveAlertTypes()
-      .then(async alertTypes => {
-        const previousStatus = alertTypes[0].active;
+    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
 
-        const alertType = new AlertType();
-        alertType.id = alertTypes[0].id;
-        alertType.name = "Warning in 61 days";
-        alertType.numberOfDaysToWarning = 61;
-        alertType.active = !previousStatus;
+    const previousStatus = alertTypes[0].active;
 
-        await alertTypeController
-          .updateAlertTypeStatus(alertType)
-          .then(async updatedAlertType => {
-            // must have not received new values
-            expect(updatedAlertType.id.toString()).to.equal(
-              alertType.id.toString()
-            );
-            expect(updatedAlertType.name).to.not.equal(alertType.name);
-            expect(updatedAlertType.numberOfDaysToWarning).to.not.equal(
-              alertType.numberOfDaysToWarning
-            );
+    const alertType = new AlertType();
+    alertType.id = alertTypes[0].id;
+    alertType.name = "Warning in 61 days";
+    alertType.numberOfDaysToWarning = 61;
+    alertType.active = !previousStatus;
 
-            // must have changed
-            expect(updatedAlertType.active).to.not.equal(previousStatus);
-          });
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedAlertType = await alertTypeController.updateAlertTypeStatus(
+      alertType
+    );
+
+    // must have not received new values
+    expect(updatedAlertType.id.toString()).to.equal(alertType.id.toString());
+    expect(updatedAlertType.name).to.not.equal(alertType.name);
+    expect(updatedAlertType.numberOfDaysToWarning).to.not.equal(
+      alertType.numberOfDaysToWarning
+    );
+
+    // must have changed
+    expect(updatedAlertType.active).to.not.equal(previousStatus);
   });
 });
