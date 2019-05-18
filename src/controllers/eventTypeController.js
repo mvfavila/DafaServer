@@ -11,21 +11,30 @@ const eventTypeController = {
    * @param {ObjectId} eventTypeId
    */
   async getEventTypeById(eventTypeId) {
-    try {
-      const eventType = await EventType.findById(eventTypeId);
-      return new Promise(resolve => {
-        resolve(eventType);
-      });
-    } catch (error) {
-      throw error;
-    }
+    let eventType;
+    return new Promise(async (resolve, reject) => {
+      try {
+        eventType = await EventType.findById(eventTypeId);
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(eventType);
+    });
   },
 
   /**
    * Gets all active eventTypes
    */
   async getAllActiveEventTypes() {
-    return EventType.find({}, () => {});
+    return new Promise(async (resolve, reject) => {
+      let eventTypes;
+      try {
+        eventTypes = await EventType.find({}, () => {});
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(eventTypes);
+    });
   },
 
   /**
@@ -35,10 +44,10 @@ const eventTypeController = {
   async addEventType(eventType) {
     const eventTypeToAdd = eventType;
     eventTypeToAdd.active = true;
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       await eventTypeToAdd.save(async (err, eventTypeAdded) => {
-        if (err) throw err;
-        resolve(eventTypeAdded);
+        if (err) return reject(err);
+        return resolve(eventTypeAdded);
       });
     });
   },
@@ -48,37 +57,35 @@ const eventTypeController = {
    * @param {EventType} eventType
    */
   async updateEventType(eventType) {
-    // TODO: this can be improved. I don't think I need to fetch the eventType before trying to update it
-    if (!eventType || !eventType.id) {
-      throw new Error("Invalid argument 'eventType'");
-    }
-    return this.getEventTypeById(eventType.id)
-      .then(foundEventType => {
-        if (foundEventType == null) {
-          throw new Error("EventType not found");
+    // TODO: this can be improved. I don't think I need to fetch the client before trying to update it
+    return new Promise(async (resolve, reject) => {
+      if (!eventType || !eventType.id) {
+        return reject(new Error("Invalid argument 'client'"));
+      }
+
+      const foundEventType = await this.getEventTypeById(eventType.id);
+
+      if (foundEventType == null) {
+        return reject(new Error("EventType not found"));
+      }
+
+      const eventTypeToBeUpdated = foundEventType;
+
+      eventTypeToBeUpdated.name = eventType.name;
+      eventTypeToBeUpdated.description = eventType.description;
+      eventTypeToBeUpdated.alertTypes = eventType.alertTypes;
+      eventTypeToBeUpdated.active = eventType.active;
+
+      await EventType.updateOne(
+        { id: eventTypeToBeUpdated.id },
+        eventTypeToBeUpdated,
+        err => {
+          if (err) return reject(err);
+          return resolve(eventTypeToBeUpdated);
         }
-
-        const eventTypeToBeUpdated = foundEventType;
-
-        eventTypeToBeUpdated.name = eventType.name;
-        eventTypeToBeUpdated.description = eventType.description;
-        eventTypeToBeUpdated.alertTypes = eventType.alertTypes;
-        eventTypeToBeUpdated.active = eventType.active;
-
-        return new Promise(resolve => {
-          EventType.updateOne(
-            { id: eventTypeToBeUpdated.id },
-            eventTypeToBeUpdated,
-            err => {
-              if (err) throw err;
-            }
-          );
-          resolve(eventTypeToBeUpdated);
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      );
+      return resolve(eventTypeToBeUpdated);
+    });
   }
 };
 

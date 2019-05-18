@@ -111,7 +111,7 @@ const clientController = {
    * @param {Client} client
    */
   async updateClient(client) {
-    // TODO: this can be improved. I don't think I need to fetch the alertType before trying to update it
+    // TODO: this can be improved. I don't think I need to fetch the client before trying to update it
     return new Promise(async (resolve, reject) => {
       if (!client || !client.id) {
         return reject(new Error("Invalid argument 'client'"));
