@@ -109,39 +109,25 @@ describe("Event controller", () => {
     expect(eventAdded.updatedAt).to.be.an("date");
   });
 
-  //   it("getAllActiveEvents - Exists 1 event - Must return 1 event", async () => {
-  //     const cnt = await Event.countDocuments();
-  //     // eslint-disable-next-line no-debugger
-  //     debugger;
+  it("getAllActiveEvents - Exists 1 event - Must return 1 event", async () => {
+    const cnt = await Event.countDocuments();
 
-  //     expect(cnt).to.equal(1);
+    expect(cnt).to.equal(1);
 
-  //     await eventController
-  //       .getAllActiveEvents()
-  //       .then(events => {
-  //         // eslint-disable-next-line no-debugger
-  //         debugger;
-  //         // Must return exactly one event
-  //         expect(events.length).to.equal(1);
-  //       })
-  //       .catch(err => {
-  //         throw new Error(err);
-  //       });
-  //   });
+    const events = await eventController.getAllActiveEvents();
 
-  // it("eventController - Get all events - Must return 1 event", async () => {
-  //   const cnt = await Event.countDocuments();
+    // Must return exactly one event
+    expect(events.length).to.equal(1);
+  });
 
-  //   expect(cnt).to.equal(1);
+  it("getEvents - Exists 1 event - Must return 1 event", async () => {
+    const cnt = await Event.countDocuments();
 
-  //   await eventController
-  //     .getEvents()
-  //     .then(events => {
-  //       // Must return exactly one event
-  //       expect(events.length).to.equal(1);
-  //     })
-  //     .catch(err => {
-  //       throw new Error(err);
-  //     });
-  // });
+    expect(cnt).to.equal(1);
+
+    const events = await eventController.getEvents();
+
+    // Must return exactly one event
+    expect(events.length).to.equal(1);
+  });
 });
