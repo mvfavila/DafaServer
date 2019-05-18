@@ -14,21 +14,30 @@ const fieldController = {
    * @param {ObjectId} fieldId
    */
   async getFieldById(fieldId) {
-    try {
-      const field = await Field.findById(fieldId).populate("events");
-      return new Promise(resolve => {
-        resolve(field);
-      });
-    } catch (error) {
-      throw error;
-    }
+    return new Promise(async (resolve, reject) => {
+      let field;
+      try {
+        field = await Field.findById(fieldId).populate("events");
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(field);
+    });
   },
 
   /**
    * Gets all existing fields
    */
   async getAllFields() {
-    return Field.find({}, () => {});
+    return new Promise(async (resolve, reject) => {
+      let fields;
+      try {
+        fields = await Field.find({}, () => {});
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(fields);
+    });
   },
 
   /**
@@ -36,23 +45,24 @@ const fieldController = {
    * @param {Field} field
    */
   async getEventsByField(field) {
-    try {
-      const events = await Event.find({
-        field,
-        active: true
-      })
-        .populate({
-          path: "eventType"
+    return new Promise(async (resolve, reject) => {
+      let events;
+      try {
+        events = await Event.find({
+          field,
+          active: true
         })
-        .populate({
-          path: "field"
-        });
-      return new Promise(resolve => {
-        resolve(events);
-      });
-    } catch (error) {
-      throw error;
-    }
+          .populate({
+            path: "eventType"
+          })
+          .populate({
+            path: "field"
+          });
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(events);
+    });
   },
 
   /**
@@ -62,10 +72,10 @@ const fieldController = {
   async addField(field) {
     const fieldToAdd = field;
     fieldToAdd.active = true;
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       await fieldToAdd.save(async (err, fieldAdded) => {
-        if (err) throw err;
-        resolve(fieldAdded);
+        if (err) return reject(err);
+        return resolve(fieldAdded);
       });
     });
   },
@@ -75,29 +85,27 @@ const fieldController = {
    * @param {Field} field
    */
   async updateFieldStatus(field) {
-    if (!field || !field.id) {
-      throw new Error("Invalid argument 'field'");
-    }
-    return this.getFieldById(field.id)
-      .then(foundField => {
-        const fieldToBeUpdated = foundField;
+    return new Promise(async (resolve, reject) => {
+      if (!field || !field.id) {
+        return reject(new Error("Invalid argument 'field'"));
+      }
+      const foundField = await this.getFieldById(field.id);
 
-        // the status must be the only thing that gets updated
-        fieldToBeUpdated.active = field.active;
-        return new Promise(resolve => {
-          Field.updateOne(
-            { id: fieldToBeUpdated.id },
-            fieldToBeUpdated,
-            err => {
-              if (err) throw err;
-            }
-          );
-          resolve(fieldToBeUpdated);
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      const fieldToBeUpdated = foundField;
+
+      // the status must be the only thing that gets updated
+      fieldToBeUpdated.active = field.active;
+
+      await Field.updateOne(
+        { id: fieldToBeUpdated.id },
+        fieldToBeUpdated,
+        err => {
+          if (err) return reject(err);
+          return resolve(fieldToBeUpdated);
+        }
+      );
+      return resolve(fieldToBeUpdated);
+    });
   },
 
   /**
@@ -106,41 +114,39 @@ const fieldController = {
    */
   async updateField(field) {
     // TODO: this can be improved. I don't think I need to fetch the field before trying to update it
-    if (!field || !field.id) {
-      throw new Error("Invalid argument 'field'");
-    }
-    return this.getFieldById(field.id)
-      .then(foundField => {
-        if (foundField == null) {
-          throw new Error("Field not found");
+    return new Promise(async (resolve, reject) => {
+      if (!field || !field.id) {
+        return reject(new Error("Invalid argument 'field'"));
+      }
+
+      const foundField = await this.getFieldById(field.id);
+
+      if (foundField == null) {
+        return reject(new Error("Field not found"));
+      }
+
+      const fieldToBeUpdated = foundField;
+
+      fieldToBeUpdated.name = field.name;
+      fieldToBeUpdated.email = field.email;
+      fieldToBeUpdated.description = field.description;
+      fieldToBeUpdated.address = field.address;
+      fieldToBeUpdated.city = field.city;
+      fieldToBeUpdated.state = field.state;
+      fieldToBeUpdated.postalCode = field.postalCode;
+      fieldToBeUpdated.events = field.events;
+      fieldToBeUpdated.active = field.active;
+
+      await Field.updateOne(
+        { id: fieldToBeUpdated.id },
+        fieldToBeUpdated,
+        err => {
+          if (err) return reject(err);
+          return resolve(fieldToBeUpdated);
         }
-
-        const fieldToBeUpdated = foundField;
-
-        fieldToBeUpdated.name = field.name;
-        fieldToBeUpdated.email = field.email;
-        fieldToBeUpdated.description = field.description;
-        fieldToBeUpdated.address = field.address;
-        fieldToBeUpdated.city = field.city;
-        fieldToBeUpdated.state = field.state;
-        fieldToBeUpdated.postalCode = field.postalCode;
-        fieldToBeUpdated.events = field.events;
-        fieldToBeUpdated.active = field.active;
-
-        return new Promise(resolve => {
-          Field.updateOne(
-            { id: fieldToBeUpdated.id },
-            fieldToBeUpdated,
-            err => {
-              if (err) throw err;
-            }
-          );
-          resolve(fieldToBeUpdated);
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      );
+      return resolve(fieldToBeUpdated);
+    });
   },
 
   /**
@@ -148,15 +154,17 @@ const fieldController = {
    * @param {Event} event
    */
   async attachEventToField(event) {
-    if (event == null) {
-      throw new Error("Event is required");
-    }
-    if (event.field == null) {
-      throw new Error("Field ID is required");
-    }
-    const field = await this.getFieldById(event.field);
-    field.events.push(event);
-    field.save();
+    return new Promise(async (resolve, reject) => {
+      if (event == null) {
+        return reject(new Error("Event is required"));
+      }
+      if (event.field == null) {
+        return reject(new Error("Field ID is required"));
+      }
+      const field = await this.getFieldById(event.field);
+      field.events.push(event);
+      return field(field);
+    });
   }
 };
 

@@ -36,11 +36,11 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(done => {
+beforeEach(async () => {
   // Setup
 
   // removes all existing fields from repository
-  Field.deleteMany({}, () => {});
+  await Field.deleteMany({}, () => {});
 
   // adds a sample field to the repository
   const field = new Field();
@@ -55,14 +55,14 @@ beforeEach(done => {
   field.events = [];
   field.client = guid.new();
 
-  fieldController
-    .addField(field)
-    .then(async () => {
-      done();
-    })
-    .catch(err => {
-      throw new Error(err);
-    });
+  return new Promise(async (resolve, reject) => {
+    try {
+      await fieldController.addField(field);
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
 });
 
 describe("Field controller", () => {
