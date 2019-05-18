@@ -45,29 +45,26 @@ const alertTypeController = {
    * @param {AlertType} alertType
    */
   async updateAlertTypeStatus(alertType) {
-    if (!alertType || !alertType.id) {
-      throw new Error("Invalid argument 'alertType'");
-    }
-    return this.getAlertTypeById(alertType.id)
-      .then(foundAlertType => {
-        const alertTypeToBeUpdated = foundAlertType;
+    return new Promise(async (resolve, reject) => {
+      if (!alertType || !alertType.id) {
+        return reject(new Error("Invalid argument 'alertType'"));
+      }
+      const foundAlertType = await this.getAlertTypeById(alertType.id);
+      const alertTypeToBeUpdated = foundAlertType;
 
-        // the status must be the only thing that gets updated
-        alertTypeToBeUpdated.active = alertType.active;
-        return new Promise(resolve => {
-          AlertType.updateOne(
-            { id: alertTypeToBeUpdated.id },
-            alertTypeToBeUpdated,
-            err => {
-              if (err) throw err;
-            }
-          );
-          resolve(alertTypeToBeUpdated);
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      // the status must be the only thing that gets updated
+      alertTypeToBeUpdated.active = alertType.active;
+
+      await AlertType.updateOne(
+        { id: alertTypeToBeUpdated.id },
+        alertTypeToBeUpdated,
+        err => {
+          if (err) return reject(err);
+          return resolve(alertTypeToBeUpdated);
+        }
+      );
+      return resolve(alertTypeToBeUpdated);
+    });
   },
 
   /**
