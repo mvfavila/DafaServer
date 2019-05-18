@@ -9,8 +9,8 @@ const alertTypeController = {
    */
   async getAlertTypeById(alertTypeId) {
     try {
-      const alertType = await AlertType.findById(alertTypeId);
       return new Promise(resolve => {
+        const alertType = AlertType.findById(alertTypeId);
         resolve(alertType);
       });
     } catch (error) {
@@ -32,7 +32,12 @@ const alertTypeController = {
   addAlertType(alertType) {
     const alertTypeToAdd = alertType;
     alertTypeToAdd.active = true;
-    return alertTypeToAdd.save();
+    return new Promise(async (resolve, reject) => {
+      await alertTypeToAdd.save(async (err, alertTypeAdded) => {
+        if (err) return reject(err);
+        return resolve(alertTypeAdded);
+      });
+    });
   },
 
   /**

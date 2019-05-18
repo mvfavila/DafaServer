@@ -72,7 +72,7 @@ describe("AlertTypeController", () => {
 
     await alertTypeController
       .addAlertType(alertType)
-      .then(async () => {
+      .then(async alertTypeAdded => {
         await AlertType.countDocuments()
           .then(count => {
             // Dataset must have exactly two items
@@ -81,6 +81,14 @@ describe("AlertTypeController", () => {
           .catch(err => {
             throw new Error(err);
           });
+        expect(alertTypeAdded).to.not.be.null;
+        expect(alertTypeAdded.name).to.equal(alertType.name);
+        expect(alertTypeAdded.numberOfDaysToWarning).to.equal(
+          alertType.numberOfDaysToWarning
+        );
+        expect(alertTypeAdded.active).to.be.true;
+        expect(alertTypeAdded.createdAt).to.be.an("date");
+        expect(alertTypeAdded.updatedAt).to.be.an("date");
       })
       .catch(err => {
         throw new Error(err);
