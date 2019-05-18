@@ -37,12 +37,12 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(done => {
+beforeEach(async () => {
   // Setup
 
   // removes all existing eventTypes and alertTypes from repository
-  EventType.deleteMany({}, () => {});
-  AlertType.deleteMany({}, () => {});
+  await EventType.deleteMany({}, () => {});
+  await AlertType.deleteMany({}, () => {});
 
   // adds a sample alertType to the repository
   const alertType = new AlertType();
@@ -59,24 +59,18 @@ beforeEach(done => {
   eventType.description = "Licenciamento do IBAMA";
   eventType.alertTypes = alertTypeId;
 
-  alertTypeController
-    .addAlertType(alertType)
-    .then(
-      eventTypeController
-        .addEventType(eventType)
-        .then(async () => {
-          done();
-        })
-        .catch(err => {
-          throw new Error(err);
-        })
-    )
-    .catch(err => {
-      throw new Error(err);
-    });
+  return new Promise(async (resolve, reject) => {
+    try {
+      await alertTypeController.addAlertType(alertType);
+      await eventTypeController.addEventType(eventType);
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
 });
 
-describe("EventType controller", () => {
+describe("eventTypeController", () => {
   it("addEventType - Valid eventType - Must succeed", async () => {
     const cnt = await EventType.countDocuments();
 
@@ -87,23 +81,24 @@ describe("EventType controller", () => {
 
     eventType.name = "ADEMA";
     eventType.description = "Licenciamento da ADEMA";
-    eventType.alertTypes = alertTypeId;
+    eventType.alertTypes = [alertTypeId];
 
-    await eventTypeController
-      .addEventType(eventType)
-      .then(async () => {
-        await EventType.countDocuments()
-          .then(count => {
-            // Dataset must have exactly two items
-            expect(count).to.equal(2);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const eventTypeAdded = await eventTypeController.addEventType(eventType);
+
+    const count = await EventType.countDocuments();
+
+    // Dataset must have exactly two items
+    expect(count).to.equal(2);
+
+    expect(eventTypeAdded).to.not.be.null;
+    expect(eventTypeAdded.name).to.equal(eventType.name);
+    expect(eventTypeAdded.description).to.equal(eventType.description);
+    expect(eventTypeAdded.alertTypes.length).to.equal(
+      eventType.alertTypes.length
+    );
+    expect(eventTypeAdded.active).to.be.true;
+    expect(eventTypeAdded.createdAt).to.be.an("date");
+    expect(eventTypeAdded.updatedAt).to.be.an("date");
   });
 
   it("getAllActiveEventTypes - Exists 1 eventType - Must return 1 eventType", async () => {
@@ -111,15 +106,10 @@ describe("EventType controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await eventTypeController
-      .getAllActiveEventTypes()
-      .then(eventTypes => {
-        // Must return exactly one eventType
-        expect(eventTypes.length).to.equal(1);
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const eventTypes = await eventTypeController.getAllActiveEventTypes();
+
+    // Must return exactly one eventType
+    expect(eventTypes.length).to.equal(1);
   });
 
   it("getEventTypeById - Adds eventType before fetching - Must return exact eventType", async () => {
@@ -127,32 +117,22 @@ describe("EventType controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await eventTypeController
-      .getAllActiveEventTypes()
-      .then(async eventTypes => {
-        const eventType = eventTypes[0];
+    const eventTypes = await eventTypeController.getAllActiveEventTypes();
 
-        await eventTypeController
-          .getEventTypeById(eventType.id)
-          .then(async eventTypeFound => {
-            // returned eventType must be exactly the existing one
-            expect(eventType.id.toString()).to.equal(
-              eventTypeFound.id.toString()
-            );
-            expect(eventType.name).to.equal(eventTypeFound.name);
-            expect(eventType.description).to.equal(eventTypeFound.description);
-            expect(eventType.alertTypes.toString()).to.equal(
-              eventTypeFound.alertTypes.toString()
-            );
-            expect(eventType.active).to.equal(eventTypeFound.active);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const eventType = eventTypes[0];
+
+    const eventTypeFound = await eventTypeController.getEventTypeById(
+      eventType.id
+    );
+
+    // returned eventType must be exactly the existing one
+    expect(eventType.id.toString()).to.equal(eventTypeFound.id.toString());
+    expect(eventType.name).to.equal(eventTypeFound.name);
+    expect(eventType.description).to.equal(eventTypeFound.description);
+    expect(eventType.alertTypes.toString()).to.equal(
+      eventTypeFound.alertTypes.toString()
+    );
+    expect(eventType.active).to.equal(eventTypeFound.active);
   });
 
   it("updateEventType - Updates all attributes - Must succeed", async () => {
@@ -160,33 +140,25 @@ describe("EventType controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await eventTypeController
-      .getAllActiveEventTypes()
-      .then(async eventTypes => {
-        const eventType = eventTypes[0];
+    const eventTypes = await eventTypeController.getAllActiveEventTypes();
 
-        eventType.name = "ADEMA";
-        eventType.description = "Licenciamento da ADEMA";
-        eventType.active = false;
+    const eventType = eventTypes[0];
 
-        await eventTypeController
-          .updateEventType(eventType)
-          .then(async updatedEventType => {
-            expect(updatedEventType.id.toString()).to.equal(
-              eventType.id.toString()
-            );
-            expect(updatedEventType.name).to.equal(eventType.name);
-            expect(updatedEventType.description).to.equal(
-              eventType.description
-            );
-            expect(updatedEventType.active).to.equal(eventType.active);
-          });
+    eventType.name = "ADEMA";
+    eventType.description = "Licenciamento da ADEMA";
+    eventType.active = false;
 
-        cnt = await EventType.countDocuments();
-        expect(cnt).to.equal(1);
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedEventType = await eventTypeController.updateEventType(
+      eventType
+    );
+
+    expect(updatedEventType.id.toString()).to.equal(eventType.id.toString());
+    expect(updatedEventType.name).to.equal(eventType.name);
+    expect(updatedEventType.description).to.equal(eventType.description);
+    expect(updatedEventType.active).to.equal(eventType.active);
+
+    cnt = await EventType.countDocuments();
+
+    expect(cnt).to.equal(1);
   });
 });
