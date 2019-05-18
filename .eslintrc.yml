@@ -11,3 +11,5 @@ overrides:
   files: ["*-test.js", "*.spec.js"]
   rules:
     no-unused-expressions: off
+    new-cap: off
+    no-undef: off

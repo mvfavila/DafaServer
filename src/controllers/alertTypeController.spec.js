@@ -1,5 +1,3 @@
-/* eslint-disable new-cap */
-/* eslint-disable no-undef */
 // During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
@@ -28,7 +26,7 @@ before(done => {
         if (err) done(err);
       });
     })
-    .then(() => done());
+    .then(done());
 });
 
 after(() => {
@@ -50,9 +48,7 @@ beforeEach(done => {
 
   alertTypeController
     .addAlertType(alertType)
-    .then(async () => {
-      done();
-    })
+    .then(done())
     .catch(err => {
       throw new Error(err);
     });
