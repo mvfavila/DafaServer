@@ -13,17 +13,24 @@ const eventController = {
     const eventToAdd = event;
     eventToAdd.active = true;
 
-    return new Promise(async resolve => {
-      let eventAdded;
-      await eventToAdd.save(async (error, results) => {
-        if (error) throw error;
-        await fieldController
-          .attachEventToField(results)
-          .then(resolve(eventAdded))
-          .catch(err => {
-            throw err;
-          });
+    return new Promise(async (resolve, reject) => {
+      await eventToAdd.save(async (err, eventAdded) => {
+        if (err) return reject(err);
+        return resolve(eventAdded);
       });
+    });
+  },
+
+  async addAndAttach(event) {
+    const eventAdded = await eventController.addEvent(event);
+    return new Promise(async (resolve, reject) => {
+      let eventUpdated;
+      try {
+        eventUpdated = await fieldController.attachEventToField(eventAdded);
+      } catch (error) {
+        return reject(error);
+      }
+      return resolve(eventUpdated);
     });
   },
 
