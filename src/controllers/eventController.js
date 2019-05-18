@@ -35,38 +35,23 @@ const eventController = {
   },
 
   async getEvents() {
-    try {
-      const events = await Event.find({
-        active: true
-      })
-        .populate({
-          path: "eventType"
+    return new Promise(async (resolve, reject) => {
+      let events;
+      try {
+        events = await Event.find({
+          active: true
         })
-        .populate({
-          path: "field"
-        });
-      if (events == null)
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      const eventsFields = [];
-      events.forEach(event => {
-        eventsFields.push({
-          idEvent: event.id,
-          date: event.date,
-          eventType: event.eventType,
-          field: event.field,
-          createdAt: event.createdAt,
-          updatedAt: event.updatedAt,
-          active: event.active
-        });
-      });
-      return new Promise(resolve => {
-        resolve(eventsFields);
-      });
-    } catch (error) {
-      throw error;
-    }
+          .populate({
+            path: "eventType"
+          })
+          .populate({
+            path: "field"
+          });
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(events);
+    });
   }
 };
 
