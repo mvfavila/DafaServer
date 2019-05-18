@@ -64,29 +64,21 @@ describe("alertTypeController", () => {
     alertType.name = "Warning 61 days before";
     alertType.numberOfDaysToWarning = 61;
 
-    await alertTypeController
-      .addAlertType(alertType)
-      .then(async alertTypeAdded => {
-        await AlertType.countDocuments()
-          .then(count => {
-            // Dataset must have exactly two items
-            expect(count).to.equal(2);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-        expect(alertTypeAdded).to.not.be.null;
-        expect(alertTypeAdded.name).to.equal(alertType.name);
-        expect(alertTypeAdded.numberOfDaysToWarning).to.equal(
-          alertType.numberOfDaysToWarning
-        );
-        expect(alertTypeAdded.active).to.be.true;
-        expect(alertTypeAdded.createdAt).to.be.an("date");
-        expect(alertTypeAdded.updatedAt).to.be.an("date");
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const alertTypeAdded = await alertTypeController.addAlertType(alertType);
+
+    const count = await AlertType.countDocuments();
+
+    // Dataset must have exactly two items
+    expect(count).to.equal(2);
+
+    expect(alertTypeAdded).to.not.be.null;
+    expect(alertTypeAdded.name).to.equal(alertType.name);
+    expect(alertTypeAdded.numberOfDaysToWarning).to.equal(
+      alertType.numberOfDaysToWarning
+    );
+    expect(alertTypeAdded.active).to.be.true;
+    expect(alertTypeAdded.createdAt).to.be.an("date");
+    expect(alertTypeAdded.updatedAt).to.be.an("date");
   });
 
   it("alertTypeController - Get all active alertTypes - Must return 1 alertType", async () => {
