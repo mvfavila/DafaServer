@@ -73,36 +73,34 @@ const alertTypeController = {
    */
   async updateAlertType(alertType) {
     // TODO: this can be improved. I don't think I need to fetch the alertType before trying to update it
-    if (!alertType || !alertType.id) {
-      throw new Error("Invalid argument 'alertType'");
-    }
-    return this.getAlertTypeById(alertType.id)
-      .then(foundAlertType => {
-        if (foundAlertType == null) {
-          throw new Error("AlertType not found");
+    return new Promise(async (resolve, reject) => {
+      if (!alertType || !alertType.id) {
+        return reject(new Error("Invalid argument 'alertType'"));
+      }
+
+      const foundAlertType = await this.getAlertTypeById(alertType.id);
+
+      if (foundAlertType == null) {
+        return reject(new Error("AlertType not found"));
+      }
+
+      const alertTypeToBeUpdated = foundAlertType;
+
+      alertTypeToBeUpdated.name = alertType.name;
+      alertTypeToBeUpdated.numberOfDaysToWarning =
+        alertType.numberOfDaysToWarning;
+      alertTypeToBeUpdated.active = alertType.active;
+
+      AlertType.updateOne(
+        { id: alertTypeToBeUpdated.id },
+        alertTypeToBeUpdated,
+        err => {
+          if (err) return reject(err);
+          return resolve(alertTypeToBeUpdated);
         }
-
-        const alertTypeToBeUpdated = foundAlertType;
-
-        alertTypeToBeUpdated.name = alertType.name;
-        alertTypeToBeUpdated.numberOfDaysToWarning =
-          alertType.numberOfDaysToWarning;
-        alertTypeToBeUpdated.active = alertType.active;
-
-        return new Promise(resolve => {
-          AlertType.updateOne(
-            { id: alertTypeToBeUpdated.id },
-            alertTypeToBeUpdated,
-            err => {
-              if (err) throw err;
-            }
-          );
-          resolve(alertTypeToBeUpdated);
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+      );
+      return resolve(alertTypeToBeUpdated);
+    });
   }
 };
 
