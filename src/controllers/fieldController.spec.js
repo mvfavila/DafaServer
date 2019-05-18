@@ -84,21 +84,26 @@ describe("Field controller", () => {
     field.events = [];
     field.client = guid.new();
 
-    await fieldController
-      .addField(field)
-      .then(async () => {
-        await Field.countDocuments()
-          .then(count => {
-            // Dataset must have exactly two items
-            expect(count).to.equal(2);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const fieldAdded = await fieldController.addField(field);
+
+    const count = await Field.countDocuments();
+
+    // Dataset must have exactly two items
+    expect(count).to.equal(2);
+
+    expect(fieldAdded).to.not.be.null;
+    expect(fieldAdded.name).to.equal(field.name);
+    expect(fieldAdded.email).to.equal(field.email);
+    expect(fieldAdded.description).to.equal(field.description);
+    expect(fieldAdded.address).to.equal(field.address);
+    expect(fieldAdded.city).to.equal(field.city);
+    expect(fieldAdded.state).to.equal(field.state);
+    expect(fieldAdded.postalCode).to.equal(field.postalCode);
+    expect(fieldAdded.events.length).to.equal(field.events.length);
+    expect(fieldAdded.client.toString()).to.equal(field.client.toString());
+    expect(fieldAdded.active).to.be.true;
+    expect(fieldAdded.createdAt).to.be.an("date");
+    expect(fieldAdded.updatedAt).to.be.an("date");
   });
 
   it("getAllFields - Exists 1 field - Must return 1 field", async () => {
@@ -106,15 +111,10 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await fieldController
-      .getAllFields()
-      .then(fields => {
-        // Must return exactly one field
-        expect(fields.length).to.equal(1);
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const fields = await fieldController.getAllFields();
+
+    // Must return exactly one field
+    expect(fields.length).to.equal(1);
   });
 
   it("getFieldById - Adds field before fetching - Must return exact field", async () => {
@@ -122,36 +122,24 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await fieldController
-      .getAllFields()
-      .then(async fields => {
-        const field = fields[0];
+    const fields = await fieldController.getAllFields();
 
-        await fieldController
-          .getFieldById(field.id)
-          .then(async fieldFound => {
-            // returned field must be exactly the existing one
-            expect(field.id.toString()).to.equal(fieldFound.id.toString());
-            expect(field.name).to.equal(fieldFound.name);
-            expect(field.email).to.equal(fieldFound.email);
-            expect(field.description).to.equal(fieldFound.description);
-            expect(field.address).to.equal(fieldFound.address);
-            expect(field.city).to.equal(fieldFound.city);
-            expect(field.state).to.equal(fieldFound.state);
-            expect(field.postalCode).to.equal(fieldFound.postalCode);
-            expect(field.events.length).to.equal(fieldFound.events.length);
-            expect(field.client.toString()).to.equal(
-              fieldFound.client.toString()
-            );
-            expect(field.active).to.equal(fieldFound.active);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const field = fields[0];
+
+    const fieldFound = await fieldController.getFieldById(field.id);
+
+    // returned field must be exactly the existing one
+    expect(field.id.toString()).to.equal(fieldFound.id.toString());
+    expect(field.name).to.equal(fieldFound.name);
+    expect(field.email).to.equal(fieldFound.email);
+    expect(field.description).to.equal(fieldFound.description);
+    expect(field.address).to.equal(fieldFound.address);
+    expect(field.city).to.equal(fieldFound.city);
+    expect(field.state).to.equal(fieldFound.state);
+    expect(field.postalCode).to.equal(fieldFound.postalCode);
+    expect(field.events.length).to.equal(fieldFound.events.length);
+    expect(field.client.toString()).to.equal(fieldFound.client.toString());
+    expect(field.active).to.equal(fieldFound.active);
   });
 
   it("updateField - Updates all attributes - Must succeed", async () => {
@@ -159,48 +147,43 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await fieldController
-      .getAllFields()
-      .then(async fields => {
-        const field = fields[0];
+    const fields = await fieldController.getAllFields();
 
-        field.name = "Small Field of the south SA";
-        field.email = "nick@email.com";
-        field.description = "Last field of the south";
-        field.address = "Street 2";
-        field.city = "Smallville";
-        field.state = "Alagoas";
-        field.postalCode = "20000-123";
-        field.events = [];
-        field.client = guid.new();
-        field.active = false;
+    const field = fields[0];
 
-        await fieldController.updateField(field).then(async updatedField => {
-          // must have received new values
-          expect(updatedField.id.toString()).to.equal(field.id.toString());
-          expect(updatedField.name).to.equal(field.name);
-          expect(updatedField.email).to.equal(field.email);
-          expect(updatedField.description).to.equal(field.description);
-          expect(updatedField.address).to.equal(field.address);
-          expect(updatedField.city).to.equal(field.city);
-          expect(updatedField.state).to.equal(field.state);
-          expect(updatedField.postalCode).to.equal(field.postalCode);
-          expect(updatedField.events.length).to.equal(field.events.length);
-          expect(updatedField.active).to.equal(field.active);
+    field.name = "Small Field of the south SA";
+    field.email = "nick@email.com";
+    field.description = "Last field of the south";
+    field.address = "Street 2";
+    field.city = "Smallville";
+    field.state = "Alagoas";
+    field.postalCode = "20000-123";
+    field.events = [];
+    field.client = guid.new();
+    field.active = false;
 
-          // must have not received new values
-          expect(updatedField.client.toString()).to.not.equal(
-            field.client.toString(),
-            "Owner of the field must never change"
-          );
-        });
+    const updatedField = await fieldController.updateField(field);
 
-        cnt = await Field.countDocuments();
-        expect(cnt).to.equal(1);
-      })
-      .catch(err => {
-        throw err;
-      });
+    // must have received new values
+    expect(updatedField.id.toString()).to.equal(field.id.toString());
+    expect(updatedField.name).to.equal(field.name);
+    expect(updatedField.email).to.equal(field.email);
+    expect(updatedField.description).to.equal(field.description);
+    expect(updatedField.address).to.equal(field.address);
+    expect(updatedField.city).to.equal(field.city);
+    expect(updatedField.state).to.equal(field.state);
+    expect(updatedField.postalCode).to.equal(field.postalCode);
+    expect(updatedField.events.length).to.equal(field.events.length);
+    expect(updatedField.active).to.equal(field.active);
+
+    // must have not received new values
+    expect(updatedField.client.toString()).to.not.equal(
+      field.client.toString(),
+      "Owner of the field must never change"
+    );
+
+    cnt = await Field.countDocuments();
+    expect(cnt).to.equal(1);
   });
 
   it("updateFieldStatus - Tries to update all attributes - Must update status only", async () => {
@@ -208,51 +191,44 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await fieldController
-      .getAllFields()
-      .then(async fields => {
-        const previousStatus = fields[0].active;
+    const fields = await fieldController.getAllFields();
 
-        const field = new Field();
-        field.id = fields[0].id;
-        field.name = "Medium Field of the east SA";
-        field.email = "east@email.com";
-        field.description = "Medium field of the east";
-        field.address = "Street 3";
-        field.city = "Midville";
-        field.state = "Pernambuco";
-        field.postalCode = "30000-456";
-        field.events = [guid.new()];
-        field.client = guid.new();
-        field.active = !previousStatus;
+    const previousStatus = fields[0].active;
 
-        await fieldController
-          .updateFieldStatus(field)
-          .then(async updatedField => {
-            // must have not received new values
-            expect(updatedField.id.toString()).to.equal(field.id.toString());
-            expect(updatedField.name).to.not.equal(field.name);
-            expect(updatedField.email).to.not.equal(field.email);
-            expect(updatedField.description).to.not.equal(field.description);
-            expect(updatedField.address).to.not.equal(field.address);
-            expect(updatedField.city).to.not.equal(field.city);
-            expect(updatedField.state).to.not.equal(field.state);
-            expect(updatedField.postalCode).to.not.equal(field.postalCode);
-            expect(updatedField.events.length).to.not.equal(
-              field.events.length,
-              "Field's events must not have been changed"
-            );
-            expect(updatedField.client.toString()).to.not.equal(
-              field.client.toString(),
-              "Owner of the field must never change"
-            );
+    const field = new Field();
+    field.id = fields[0].id;
+    field.name = "Medium Field of the east SA";
+    field.email = "east@email.com";
+    field.description = "Medium field of the east";
+    field.address = "Street 3";
+    field.city = "Midville";
+    field.state = "Pernambuco";
+    field.postalCode = "30000-456";
+    field.events = [guid.new()];
+    field.client = guid.new();
+    field.active = !previousStatus;
 
-            // must have changed
-            expect(updatedField.active).to.not.equal(previousStatus);
-          });
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedField = await fieldController.updateFieldStatus(field);
+
+    // must have not received new values
+    expect(updatedField.id.toString()).to.equal(field.id.toString());
+    expect(updatedField.name).to.not.equal(field.name);
+    expect(updatedField.email).to.not.equal(field.email);
+    expect(updatedField.description).to.not.equal(field.description);
+    expect(updatedField.address).to.not.equal(field.address);
+    expect(updatedField.city).to.not.equal(field.city);
+    expect(updatedField.state).to.not.equal(field.state);
+    expect(updatedField.postalCode).to.not.equal(field.postalCode);
+    expect(updatedField.events.length).to.not.equal(
+      field.events.length,
+      "Field's events must not have been changed"
+    );
+    expect(updatedField.client.toString()).to.not.equal(
+      field.client.toString(),
+      "Owner of the field must never change"
+    );
+
+    // must have changed
+    expect(updatedField.active).to.not.equal(previousStatus);
   });
 });
