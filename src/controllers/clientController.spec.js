@@ -58,12 +58,10 @@ beforeEach(done => {
     .then(async () => {
       done();
     })
-    .catch(err => {
-      throw new Error(err);
-    });
+    .catch(err => done(err));
 });
 
-describe("Client controller", () => {
+describe("clientController", () => {
   it("clientController - Add client - Must succeed", async () => {
     const cnt = await Client.countDocuments();
 
@@ -81,21 +79,25 @@ describe("Client controller", () => {
     client.postalCode = "12000-123";
     client.email = "john.doe@domain.com";
 
-    await clientController
-      .addClient(client)
-      .then(async () => {
-        await Client.countDocuments()
-          .then(count => {
-            // Dataset must have exactly two items
-            expect(count).to.equal(2);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const clientAdded = await clientController.addClient(client);
+
+    const count = await Client.countDocuments();
+
+    // Dataset must have exactly two items
+    expect(count).to.equal(2);
+
+    expect(clientAdded).to.not.be.null;
+    expect(clientAdded.firstName).to.equal(client.firstName);
+    expect(clientAdded.lastName).to.equal(client.lastName);
+    expect(clientAdded.company).to.equal(client.company);
+    expect(clientAdded.address).to.equal(client.address);
+    expect(clientAdded.city).to.equal(client.city);
+    expect(clientAdded.state).to.equal(client.state);
+    expect(clientAdded.postalCode).to.equal(client.postalCode);
+    expect(clientAdded.email).to.equal(client.email);
+    expect(clientAdded.active).to.be.true;
+    expect(clientAdded.createdAt).to.be.an("date");
+    expect(clientAdded.updatedAt).to.be.an("date");
   });
 
   it("clientController - Get all clients - Must return 1 client", async () => {
@@ -103,15 +105,10 @@ describe("Client controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(clients => {
-        // Must return exactly one client
-        expect(clients.length).to.equal(1);
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const clients = await clientController.getAllClients();
+
+    // Must return exactly one client
+    expect(clients.length).to.equal(1);
   });
 
   it("clientController - Get client by Id - Must return exact client", async () => {
@@ -119,33 +116,23 @@ describe("Client controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(async clients => {
-        const client = clients[0];
+    const clients = await clientController.getAllClients();
 
-        await clientController
-          .getClientById(client.id)
-          .then(async clientFound => {
-            // returned client must be exactly the existing one
-            expect(client.id.toString()).to.equal(clientFound.id.toString());
-            expect(client.firstName).to.equal(clientFound.firstName);
-            expect(client.lastName).to.equal(clientFound.lastName);
-            expect(client.company).to.equal(clientFound.company);
-            expect(client.address).to.equal(clientFound.address);
-            expect(client.city).to.equal(clientFound.city);
-            expect(client.state).to.equal(clientFound.state);
-            expect(client.postalCode).to.equal(clientFound.postalCode);
-            expect(client.email).to.equal(clientFound.email);
-            expect(client.active).to.equal(clientFound.active);
-          })
-          .catch(err => {
-            throw new Error(err);
-          });
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
+    const client = clients[0];
+
+    const clientFound = await clientController.getClientById(client.id);
+
+    // returned client must be exactly the existing one
+    expect(client.id.toString()).to.equal(clientFound.id.toString());
+    expect(client.firstName).to.equal(clientFound.firstName);
+    expect(client.lastName).to.equal(clientFound.lastName);
+    expect(client.company).to.equal(clientFound.company);
+    expect(client.address).to.equal(clientFound.address);
+    expect(client.city).to.equal(clientFound.city);
+    expect(client.state).to.equal(clientFound.state);
+    expect(client.postalCode).to.equal(clientFound.postalCode);
+    expect(client.email).to.equal(clientFound.email);
+    expect(client.active).to.equal(clientFound.active);
   });
 
   it("clientController - Update client - Must succeed", async () => {
@@ -153,42 +140,35 @@ describe("Client controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(async clients => {
-        const client = clients[0];
+    const clients = await clientController.getAllClients();
 
-        client.firstName = "New First Name";
-        client.lastName = "New Last Name";
-        client.company = "New Company SA";
-        client.address = "Street 2";
-        client.city = "London";
-        client.state = "Alagoas";
-        client.postalCode = "12000-001";
-        client.email = "new@domain.com";
-        client.active = false;
+    const client = clients[0];
 
-        await clientController
-          .updateClient(client)
-          .then(async updatedClient => {
-            expect(updatedClient.id.toString()).to.equal(client.id.toString());
-            expect(updatedClient.firstName).to.equal(client.firstName);
-            expect(updatedClient.lastName).to.equal(client.lastName);
-            expect(updatedClient.company).to.equal(client.company);
-            expect(updatedClient.address).to.equal(client.address);
-            expect(updatedClient.city).to.equal(client.city);
-            expect(updatedClient.state).to.equal(client.state);
-            expect(updatedClient.postalCode).to.equal(client.postalCode);
-            expect(updatedClient.email).to.equal(client.email);
-            expect(updatedClient.active).to.equal(client.active);
-          });
+    client.firstName = "New First Name";
+    client.lastName = "New Last Name";
+    client.company = "New Company SA";
+    client.address = "Street 2";
+    client.city = "London";
+    client.state = "Alagoas";
+    client.postalCode = "12000-001";
+    client.email = "new@domain.com";
+    client.active = false;
 
-        cnt = await Client.countDocuments();
-        expect(cnt).to.equal(1);
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedClient = await clientController.updateClient(client);
+
+    expect(updatedClient.id.toString()).to.equal(client.id.toString());
+    expect(updatedClient.firstName).to.equal(client.firstName);
+    expect(updatedClient.lastName).to.equal(client.lastName);
+    expect(updatedClient.company).to.equal(client.company);
+    expect(updatedClient.address).to.equal(client.address);
+    expect(updatedClient.city).to.equal(client.city);
+    expect(updatedClient.state).to.equal(client.state);
+    expect(updatedClient.postalCode).to.equal(client.postalCode);
+    expect(updatedClient.email).to.equal(client.email);
+    expect(updatedClient.active).to.equal(client.active);
+
+    cnt = await Client.countDocuments();
+    expect(cnt).to.equal(1);
   });
 
   it("clientController - Update client status - Must succeed", async () => {
@@ -196,43 +176,36 @@ describe("Client controller", () => {
 
     expect(cnt).to.equal(1);
 
-    await clientController
-      .getAllClients()
-      .then(async clients => {
-        const previousStatus = clients[0].active;
+    const clients = await clientController.getAllClients();
 
-        const client = new Client();
-        client.id = clients[0].id;
-        client.firstName = "New First Name";
-        client.lastName = "New Last Name";
-        client.company = "New Company SA";
-        client.address = "Street 2";
-        client.city = "London";
-        client.state = "Alagoas";
-        client.postalCode = "12000-001";
-        client.email = "new@domain.com";
-        client.active = !previousStatus;
+    const previousStatus = clients[0].active;
 
-        await clientController
-          .updateClientStatus(client)
-          .then(async updatedClient => {
-            // must have not received new values
-            expect(updatedClient.id.toString()).to.equal(client.id.toString());
-            expect(updatedClient.firstName).to.not.equal(client.firstName);
-            expect(updatedClient.lastName).to.not.equal(client.lastName);
-            expect(updatedClient.company).to.not.equal(client.company);
-            expect(updatedClient.address).to.not.equal(client.address);
-            expect(updatedClient.city).to.not.equal(client.city);
-            expect(updatedClient.state).to.not.equal(client.state);
-            expect(updatedClient.postalCode).to.not.equal(client.postalCode);
-            expect(updatedClient.email).to.not.equal(client.email);
+    const client = new Client();
+    client.id = clients[0].id;
+    client.firstName = "New First Name";
+    client.lastName = "New Last Name";
+    client.company = "New Company SA";
+    client.address = "Street 2";
+    client.city = "London";
+    client.state = "Alagoas";
+    client.postalCode = "12000-001";
+    client.email = "new@domain.com";
+    client.active = !previousStatus;
 
-            // must have changed
-            expect(updatedClient.active).to.not.equal(previousStatus);
-          });
-      })
-      .catch(err => {
-        throw err;
-      });
+    const updatedClient = await clientController.updateClientStatus(client);
+
+    // must have not received new values
+    expect(updatedClient.id.toString()).to.equal(client.id.toString());
+    expect(updatedClient.firstName).to.not.equal(client.firstName);
+    expect(updatedClient.lastName).to.not.equal(client.lastName);
+    expect(updatedClient.company).to.not.equal(client.company);
+    expect(updatedClient.address).to.not.equal(client.address);
+    expect(updatedClient.city).to.not.equal(client.city);
+    expect(updatedClient.state).to.not.equal(client.state);
+    expect(updatedClient.postalCode).to.not.equal(client.postalCode);
+    expect(updatedClient.email).to.not.equal(client.email);
+
+    // must have changed
+    expect(updatedClient.active).to.not.equal(previousStatus);
   });
 });
