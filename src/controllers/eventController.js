@@ -38,13 +38,12 @@ const eventController = {
   async addAndAttach(event) {
     const eventAdded = await eventController.addEvent(event);
     return new Promise(async (resolve, reject) => {
-      let eventUpdated;
       try {
-        eventUpdated = await fieldController.attachEventToField(eventAdded);
+        await fieldController.attachEventToField(eventAdded);
       } catch (error) {
         return reject(error);
       }
-      return resolve(eventUpdated);
+      return resolve(eventAdded);
     });
   },
 

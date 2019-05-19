@@ -126,7 +126,6 @@ const fieldController = {
       }
 
       const fieldToBeUpdated = foundField;
-
       fieldToBeUpdated.name = field.name;
       fieldToBeUpdated.email = field.email;
       fieldToBeUpdated.description = field.description;
@@ -137,15 +136,15 @@ const fieldController = {
       fieldToBeUpdated.events = field.events;
       fieldToBeUpdated.active = field.active;
 
-      await Field.updateOne(
-        { id: fieldToBeUpdated.id },
-        fieldToBeUpdated,
-        err => {
-          if (err) return reject(err);
-          return resolve(fieldToBeUpdated);
-        }
+      const result = await Field.updateOne(
+        { _id: fieldToBeUpdated.id },
+        fieldToBeUpdated
       );
-      return resolve(fieldToBeUpdated);
+
+      if (result.nModified && result.nModified === 1) {
+        return resolve(fieldToBeUpdated);
+      }
+      return reject(new Error("Field was not able to be modified"));
     });
   },
 
@@ -161,9 +160,10 @@ const fieldController = {
       if (event.field == null) {
         return reject(new Error("Field ID is required"));
       }
-      const field = await this.getFieldById(event.field);
-      field.events.push(event);
-      return field(field);
+      let field = await this.getFieldById(event.field);
+      field.events.push(event.id);
+      field = await fieldController.updateField(field);
+      return resolve(field);
     });
   }
 };
