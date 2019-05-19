@@ -1,5 +1,5 @@
 # DafaServer
-Backend side of the DAFA App built in NodeJS, ES6, MongoDB and configured to be automatically deployed with AWS Elastic Beanstalk.
+Backend side of the DAFA App built in Node.js, ES8, MongoDB and configured to be automatically deployed with AWS Elastic Beanstalk.
 
 ## Environment Variables required to execute in dev (and in AWS Elastic Beanstalk)
 
@@ -10,7 +10,13 @@ PORT = `defaults to 3000 if not set`<br/>
 
 ## Development server
 
-Run `npm start` for a dev server. Navigate to `http://localhost:3000/`.
+Run `npm start` to start the dev server. Navigate to `http://localhost:3000/`.
+
+## Testing
+
+Unit tests and integration tests were created using Mocha, Chai and mongodb-memory-server.
+Run `npm test` to execute all unit and integration tests.
+Run `npm run testDebug` to execute all unit and integration tests in debug mode. 
 
 ## Deploy
 
