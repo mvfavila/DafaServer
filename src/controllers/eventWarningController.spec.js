@@ -9,9 +9,18 @@ use(chaiHttp);
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/EventWarning");
+require("../models/Event");
+require("../models/Field");
+require("../models/Client");
 const eventWarningController = require("./eventWarningController");
+const eventController = require("./eventController");
+const fieldController = require("./fieldController");
+const clientController = require("./clientController");
 
 const EventWarning = mongoose.model("EventWarning");
+const Event = mongoose.model("Event");
+const Field = mongoose.model("Field");
+const Client = mongoose.model("Client");
 const { guid } = require("../util/guid");
 
 let mongoServer;
@@ -100,14 +109,66 @@ describe("EventWarning controller", () => {
     expect(eventWarnings.length).to.equal(1);
   });
 
-  it("getEventWarningsFields - Exists 1 eventWarning - Must return 1 eventWarning", async () => {
+  it("getEventWarningsFields - Exists 1 eventWarning (with client, field and event) - Must return 1 eventWarning", async () => {
+    // Arrange
     const cnt = await EventWarning.countDocuments();
 
     expect(cnt).to.equal(1);
 
+    const client = new Client();
+    client.firstName = "John";
+    client.lastName = "Doe";
+    client.company = "Company name Doe";
+    client.address = "Street Doe";
+    client.city = "Paris Doe";
+    client.state = "Alagoas";
+    client.postalCode = "12000-123";
+    client.email = "john.doe@domain.com";
+
+    const clientAdded = await clientController.addClient(client);
+
+    const field = new Field();
+    field.name = "Small Field of the south SA";
+    field.email = "nick@email.com";
+    field.description = "Last field of the south";
+    field.address = "Street 2";
+    field.city = "Smallville";
+    field.state = "Alagoas";
+    field.postalCode = "20000-123";
+    field.events = [];
+    field.client = clientAdded.id;
+
+    const fieldAdded = await fieldController.addField(field);
+
+    const event = new Event();
+    event.date = new Date();
+    event.eventType = guid.new();
+    event.field = fieldAdded.id;
+
+    const eventAdded = await eventController.addAndAttach(event);
+
+    // removes all existing eventWarnings from repository
+    await EventWarning.deleteMany({}, () => {});
+
+    // adds a valid eventWarning to the repository
+    let eventWarning = new EventWarning();
+
+    eventWarning.event = eventAdded.id;
+
+    await eventWarningController.addEventWarning(eventWarning);
+
+    // Act
     const eventWarnings = await eventWarningController.getEventWarningsFields();
 
-    // Must return exactly one eventWarning
-    expect(eventWarnings.length).to.equal(1);
+    // Assert
+    expect(eventWarnings.length).to.equal(
+      1,
+      "There should be a single eventWarning in the repository"
+    );
+
+    [eventWarning] = eventWarnings;
+    expect(eventWarning.event).to.not.be.null;
+    expect(eventWarning.event.field).to.not.be.null;
+    expect(eventWarning.event.field.client).to.not.be.null;
   });
 });
