@@ -77,7 +77,7 @@ const eventTypeController = {
       eventTypeToBeUpdated.active = eventType.active;
 
       await EventType.updateOne(
-        { id: eventTypeToBeUpdated.id },
+        { _id: eventTypeToBeUpdated.id },
         eventTypeToBeUpdated,
         err => {
           if (err) return reject(err);

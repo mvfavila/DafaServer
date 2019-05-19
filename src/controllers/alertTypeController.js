@@ -56,7 +56,7 @@ const alertTypeController = {
       alertTypeToBeUpdated.active = alertType.active;
 
       await AlertType.updateOne(
-        { id: alertTypeToBeUpdated.id },
+        { _id: alertTypeToBeUpdated.id },
         alertTypeToBeUpdated,
         err => {
           if (err) return reject(err);
@@ -92,7 +92,7 @@ const alertTypeController = {
       alertTypeToBeUpdated.active = alertType.active;
 
       AlertType.updateOne(
-        { id: alertTypeToBeUpdated.id },
+        { _id: alertTypeToBeUpdated.id },
         alertTypeToBeUpdated,
         err => {
           if (err) return reject(err);

@@ -95,7 +95,7 @@ const clientController = {
       clientToBeUpdated.active = client.active;
 
       await Client.updateOne(
-        { id: clientToBeUpdated.id },
+        { _id: clientToBeUpdated.id },
         clientToBeUpdated,
         err => {
           if (err) return reject(err);
@@ -136,7 +136,7 @@ const clientController = {
       clientToBeUpdated.active = client.active;
 
       await Client.updateOne(
-        { id: clientToBeUpdated.id },
+        { _id: clientToBeUpdated.id },
         clientToBeUpdated,
         err => {
           if (err) return reject(err);

@@ -97,7 +97,7 @@ const fieldController = {
       fieldToBeUpdated.active = field.active;
 
       await Field.updateOne(
-        { id: fieldToBeUpdated.id },
+        { _id: fieldToBeUpdated.id },
         fieldToBeUpdated,
         err => {
           if (err) return reject(err);
