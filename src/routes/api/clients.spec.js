@@ -1,7 +1,7 @@
 // During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
-const { use, should, request } = require("chai");
+const { use, expect, request } = require("chai");
 const chaiHttp = require("chai-http");
 
 use(chaiHttp);
@@ -32,20 +32,14 @@ after(() => {
 });
 
 describe("Clients API - Integration", () => {
-  // beforeEach((done) => {
-
-  // });
-
-  describe("Health Check", () => {
-    it("Should return ok", done => {
-      request(httpServer)
-        .get("api/clients/healthcheck")
-        .end((err, res) => {
-          should.not.exist(err);
-          should.exist(res);
-          res.should.have.status(200);
-        });
-      done();
-    });
+  it("getHealthcheck - Make request - Should return ok", done => {
+    request(httpServer)
+      .get("api/clients/healthcheck")
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.not.be.null;
+        expect(res.status).to.equal(200, "Response status should be 200");
+      });
+    done();
   });
 });
