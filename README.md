@@ -14,8 +14,8 @@ Run `npm start` to start the dev server. Navigate to `http://localhost:3000/`.
 
 ## Testing
 
-Unit tests and integration tests were created using Mocha, Chai and mongodb-memory-server.
-Run `npm test` to execute all unit and integration tests.
+Unit tests and integration tests were created using Mocha, Chai and mongodb-memory-server.<br/>
+Run `npm test` to execute all unit and integration tests.<br/>
 Run `npm run testDebug` to execute all unit and integration tests in debug mode. 
 
 ## Deploy
