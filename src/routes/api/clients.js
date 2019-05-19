@@ -5,32 +5,34 @@ const Client = mongoose.model("Client");
 const auth = require("../auth");
 const clientController = require("../../controllers/clientController");
 const { httpStatus } = require("../../util/util");
+const { guid } = require("../../util/guid");
 
 /*
     GET
     Health check for the Client endpoint
 */
 function getHealthCheck(req, res) {
-  return res.sendStatus(httpStatus.SUCCESS);
+  return res.status(httpStatus.SUCCESS).send("Healthy");
 }
 
 /*
     GET
     Get client by id
 */
-function getClientById(req, res, next) {
-  clientController
-    .getClientById(req.params.clientId)
-    .then(client => {
-      if (!client) {
-        return res
-          .status(httpStatus.UNAUTHORIZED)
-          .send({ error: "No client found" });
-      }
+async function getClientById(req, res) {
+  if (!req.params.clientId || !guid.isGuid(req.params.clientId)) {
+    return res
+      .status(httpStatus.UNPROCESSABLE_ENTITY)
+      .send({ error: "Invalid argument. Request can not be processed" });
+  }
+  const client = await clientController.getClientById(req.params.clientId);
+  if (!client) {
+    return res
+      .status(httpStatus.UNAUTHORIZED)
+      .send({ error: "No client found" });
+  }
 
-      return res.json({ client: client.toAuthJSON() });
-    })
-    .catch(next);
+  return res.status(httpStatus.SUCCESS).json({ client: client.toAuthJSON() });
 }
 
 /*

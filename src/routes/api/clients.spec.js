@@ -8,7 +8,8 @@ use(chaiHttp);
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
-const httpServer = require("../../bin/www");
+require("../../bin/www");
+const { guid } = require("../../util/guid");
 
 let mongoServer;
 
@@ -31,15 +32,42 @@ after(() => {
   mongoServer.stop();
 });
 
-describe("Clients API - Integration", () => {
-  it("getHealthcheck - Make request - Should return ok", done => {
-    request(httpServer)
-      .get("api/clients/healthcheck")
-      .end((err, res) => {
-        expect(err).to.be.null;
-        expect(res).to.not.be.null;
-        expect(res.status).to.equal(200, "Response status should be 200");
-      });
-    done();
+describe("clients API - Integration", () => {
+  it("getHealthCheck - Make request - Should return ok", async () => {
+    const res = await request("http://localhost:3000/").get(
+      "api/clients/healthcheck"
+    );
+    expect(res).to.not.be.null;
+    expect(res.status).to.equal(200, "Response status should be 200");
   });
+
+  it("getClientById - Make request - Should return ok", async () => {
+    const res = await request("http://localhost:3000/").get(
+      `api/clients/${guid.new().toString()}`
+    );
+    expect(res).to.not.be.null;
+    expect(res.status).to.equal(401, "Response status should be 401");
+  });
+
+  // it("updateClientStatus - Make request - Should return ok", done => {
+  //   request(httpServer)
+  //     .patch(`api/clients/${guid.new()}`)
+  //     .end((err, res) => {
+  //       should.not.exist(err);
+  //       should.exist(res);
+  //       res.should.have.status(200);
+  //     });
+  //   done();
+  // });
+
+  // it("getFieldsByClient - Make request - Should return ok", async done => {
+  //   await request(httpServer)
+  //     .get(`api/clients/${guid.new()}/field`)
+  //     .end((err, res) => {
+  //       should.not.exist(err);
+  //       should.exist(res);
+  //       res.should.have.status(200);
+  //     });
+  //   done();
+  // });
 });
