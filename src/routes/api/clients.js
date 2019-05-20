@@ -110,24 +110,30 @@ function createClient(req, res, next) {
     PATCH
     Updates client's status (active|inactive)
 */
-function updateClientStatus(req, res, next) {
+async function updateClientStatus(req, res) {
+  if (
+    !req.params.clientId ||
+    !guid.isGuid(req.params.clientId) ||
+    !req.body.client
+  ) {
+    return res
+      .status(httpStatus.UNPROCESSABLE_ENTITY)
+      .send({ error: "Invalid argument. Request can not be processed" });
+  }
   const client = new Client();
 
   client.clientId = req.params.clientId;
   client.active = req.body.client.active;
 
-  clientController
-    .updateClientStatus(client)
-    .then(foundClient => {
-      if (!foundClient) {
-        return res
-          .status(httpStatus.UNAUTHORIZED)
-          .send({ error: "No client found" });
-      }
+  const foundClient = await clientController.updateClientStatus(client);
 
-      return res.json({ client: client.toAuthJSON() });
-    })
-    .catch(next);
+  if (!foundClient) {
+    return res
+      .status(httpStatus.UNAUTHORIZED)
+      .send({ error: "No client found" });
+  }
+
+  return res.json({ client: client.toAuthJSON() });
 }
 
 /*
