@@ -19,6 +19,7 @@ const clientController = {
       } catch (err) {
         return reject(err);
       }
+      if (!client) return reject(new Error("Client not found"));
       return resolve(client);
     });
   },
@@ -88,6 +89,9 @@ const clientController = {
         return reject(new Error("Invalid argument 'client'"));
       }
       const foundClient = await this.getClientById(client.id);
+      if (!foundClient) {
+        return reject(new Error("Invalid client id"));
+      }
 
       const clientToBeUpdated = foundClient;
 

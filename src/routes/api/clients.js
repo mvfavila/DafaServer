@@ -126,6 +126,11 @@ async function updateClientStatus(req, res) {
   client.active = req.body.client.active;
 
   const foundClient = await clientController.updateClientStatus(client);
+  if (foundClient instanceof Error) {
+    return res
+      .status(httpStatus.UNAUTHORIZED)
+      .send({ error: "No client found" });
+  }
 
   if (!foundClient) {
     return res
@@ -133,7 +138,7 @@ async function updateClientStatus(req, res) {
       .send({ error: "No client found" });
   }
 
-  return res.json({ client: client.toAuthJSON() });
+  return res.status(httpStatus.SUCCESS).json({ client: client.toAuthJSON() });
 }
 
 /*

@@ -10,7 +10,6 @@ const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../../bin/www");
 require("../../models/Client");
-const { guid } = require("../../util/guid");
 const { httpStatus } = require("../../util/util");
 
 const Client = mongoose.model("Client");
@@ -19,6 +18,7 @@ const clientController = require("../../controllers/clientController");
 const baseUrl = "http://localhost:3000/";
 
 let mongoServer;
+let client;
 let clientId;
 
 before(done => {
@@ -47,7 +47,7 @@ beforeEach(done => {
   Client.deleteMany({}, () => {});
 
   // adds a sample client to the repository
-  const client = new Client();
+  client = new Client();
 
   client.firstName = "First Name";
   client.lastName = "Last Name";
@@ -58,7 +58,7 @@ beforeEach(done => {
   client.postalCode = "12000-000";
   client.email = "email@domain.com";
 
-  clientId = client.id;
+  clientId = client.id.toString();
 
   clientController
     .addClient(client)
@@ -76,26 +76,37 @@ describe("clients API - Integration", () => {
   });
 
   it("getClientById - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get(
-      `api/clients/${guid.new().toString()}`
-    );
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(401, "Response status should be 401");
-  });
-
-  it("updateClientStatus - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).patch(`api/clients/${guid.new()}`);
+    const res = await request(baseUrl).get(`api/clients/${clientId}`);
     expect(res).to.not.be.null;
     expect(res.status).to.equal(
-      httpStatus.UNPROCESSABLE_ENTITY,
-      `Response status should be ${httpStatus.UNPROCESSABLE_ENTITY}`
+      httpStatus.SUCCESS,
+      `Response status should be ${httpStatus.SUCCESS}`
     );
+    const responseClient = res.body.client;
+    expect(responseClient.firstName).to.equal(client.firstName);
   });
 
+  // it("updateClientStatus - Make request - Should return ok", async () => {
+  //   // Arrange
+  //   client.active = false;
+
+  //   // Act
+  //   const res = await request(baseUrl)
+  //     .patch(`api/clients/${clientId}`)
+  //     .send({ client: client.toAuthJSON() });
+
+  //   // Assert
+  //   expect(res).to.not.be.null;
+  //   expect(res.status).to.equal(
+  //     httpStatus.SUCCESS,
+  //     `Response status should be ${httpStatus.SUCCESS}`
+  //   );
+  //   const responseClient = res.body.client;
+  //   expect(responseClient.active).to.be.false;
+  // });
+
   it("getFieldsByClient - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get(
-      `api/clients/${clientId.toString()}/fields`
-    );
+    const res = await request(baseUrl).get(`api/clients/${clientId}/fields`);
     expect(res).to.not.be.null;
     expect(res.status).to.equal(
       httpStatus.SUCCESS,
