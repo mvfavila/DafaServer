@@ -13,12 +13,8 @@ const clientController = {
    */
   async getClientById(clientId) {
     return new Promise(async (resolve, reject) => {
-      let client;
-      try {
-        client = await Client.findById(clientId).populate("fields");
-      } catch (err) {
-        return reject(err);
-      }
+      const client = await Client.findById(clientId).populate("fields");
+
       if (!client) return reject(new Error("Client not found"));
       return resolve(client);
     });
@@ -120,7 +116,6 @@ const clientController = {
       if (!client || !client.id) {
         return reject(new Error("Invalid argument 'client'"));
       }
-
       const foundClient = await this.getClientById(client.id);
 
       if (foundClient == null) {

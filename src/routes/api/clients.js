@@ -25,7 +25,9 @@ async function getClientById(req, res) {
       .status(httpStatus.UNPROCESSABLE_ENTITY)
       .send({ error: "Invalid argument. Request can not be processed" });
   }
+
   const client = await clientController.getClientById(req.params.clientId);
+
   if (!client) {
     return res
       .status(httpStatus.UNAUTHORIZED)
@@ -122,7 +124,7 @@ async function updateClientStatus(req, res) {
   }
   const client = new Client();
 
-  client.clientId = req.params.clientId;
+  client.id = req.params.clientId;
   client.active = req.body.client.active;
 
   const foundClient = await clientController.updateClientStatus(client);

@@ -58,11 +58,10 @@ beforeEach(done => {
   client.postalCode = "12000-000";
   client.email = "email@domain.com";
 
-  clientId = client.id.toString();
-
   clientController
     .addClient(client)
     .then(async () => {
+      clientId = client.id.toString();
       done();
     })
     .catch(err => done(err));
@@ -86,24 +85,29 @@ describe("clients API - Integration", () => {
     expect(responseClient.firstName).to.equal(client.firstName);
   });
 
-  // it("updateClientStatus - Make request - Should return ok", async () => {
-  //   // Arrange
-  //   client.active = false;
+  it("updateClientStatus - Make request - Should return ok", async () => {
+    // Arrange
+    client.active = false;
+    let res;
 
-  //   // Act
-  //   const res = await request(baseUrl)
-  //     .patch(`api/clients/${clientId}`)
-  //     .send({ client: client.toAuthJSON() });
+    // Act
+    try {
+      res = await request(baseUrl)
+        .patch(`api/clients/${clientId}`)
+        .send({ client: client.toAuthJSON() });
+    } catch (error) {
+      expect(false);
+    }
 
-  //   // Assert
-  //   expect(res).to.not.be.null;
-  //   expect(res.status).to.equal(
-  //     httpStatus.SUCCESS,
-  //     `Response status should be ${httpStatus.SUCCESS}`
-  //   );
-  //   const responseClient = res.body.client;
-  //   expect(responseClient.active).to.be.false;
-  // });
+    // Assert
+    expect(res).to.not.be.null;
+    expect(res.status).to.equal(
+      httpStatus.SUCCESS,
+      `Response status should be ${httpStatus.SUCCESS}`
+    );
+    const responseClient = res.body.client;
+    expect(responseClient.active).to.be.false;
+  });
 
   it("getFieldsByClient - Make request - Should return ok", async () => {
     const res = await request(baseUrl).get(`api/clients/${clientId}/fields`);
