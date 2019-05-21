@@ -11,11 +11,10 @@ const MongoMemoryServer = require("mongodb-memory-server");
 require("../../bin/www");
 require("../../models/Client");
 const { httpStatus } = require("../../util/util");
+const { baseUrl } = require("../../util/util");
 
 const Client = mongoose.model("Client");
 const clientController = require("../../controllers/clientController");
-
-const baseUrl = "http://localhost:3000/";
 
 let mongoServer;
 let client;
