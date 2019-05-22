@@ -1,10 +1,12 @@
-"use strict";
+let passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const mongoose = require("mongoose");
 
-module.exports = function(app, passport) {
-  var passport = require("passport");
-  const LocalStrategy = require("passport-local").Strategy;
-  const mongoose = require("mongoose");
+module.exports = (app, p) => {
   const User = mongoose.model("User");
+  if (p) {
+    passport = p;
+  }
 
   passport.use(
     new LocalStrategy(
@@ -12,9 +14,9 @@ module.exports = function(app, passport) {
         usernameField: "user[email]",
         passwordField: "user[password]"
       },
-      function(email, password, done) {
-        User.findOne({ email: email })
-          .then(function(user) {
+      (email, password, done) => {
+        User.findOne({ email })
+          .then(user => {
             if (!user || !user.validPassword(password)) {
               return done(null, false, {
                 errors: { "email or password": "is invalid" }
