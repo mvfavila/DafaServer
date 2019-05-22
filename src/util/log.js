@@ -18,7 +18,7 @@ function getTodayDate() {
  * @param {string} level Log level.
  */
 function writeLog(message, level) {
-  const fileName = `anagramApp_${getTodayDate()}.log`;
+  const fileName = `DafaServer_${getTodayDate()}.log`;
   log(`${level}: ${message}`, fileName);
 }
 
