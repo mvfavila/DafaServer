@@ -1,39 +1,38 @@
-"use strict";
-
-var express = require("express"); // create our app w/ express
-var path = require("path");
-var cookieParser = require("cookie-parser"); // TODO: try to remove
-var logger = require("morgan"); // log requests to the console (express4)
-var bodyParser = require("body-parser"); // pull information from HTML POST (express4)
-var methodOverride = require("method-override"); // simulate DELETE and PUT (express4)
-var cors = require("cors"); // allows AJAX requests to access resources from remote hosts
-var session = require("express-session");
-var MongoDBStore = require("connect-mongodb-session")(session);
-var errorhandler = require("errorhandler"); // development-only error handler middleware
-var passport = require("passport");
-var compression = require("compression");
-var util = require("./util/util");
-var presentableErrorCodes = util.presentableErrorCodes;
-var httpStatus = util.httpStatus;
+const express = require("express"); // create our app w/ express
+const path = require("path");
+const cookieParser = require("cookie-parser"); // TODO: try to remove
+const logger = require("morgan"); // log requests to the console (express4)
+const bodyParser = require("body-parser"); // pull information from HTML POST (express4)
+const methodOverride = require("method-override"); // simulate DELETE and PUT (express4)
+const cors = require("cors"); // allows AJAX requests to access resources from remote hosts
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+const errorhandler = require("errorhandler"); // development-only error handler middleware
+const passport = require("passport");
+const compression = require("compression");
+const mongoose = require("mongoose"); // mongoose for mongodb
+const { presentableErrorCodes, httpStatus } = require("./util/util");
+const log = require("./util/log");
 
 // Create global app object
-var app = express();
+const app = express();
 
 app.use(compression());
 
-var store = new MongoDBStore(
+const store = new MongoDBStore(
   {
     uri: process.env.MONGODB_URI,
     collection: "mySessions"
   },
-  function(error) {
-    // Should have gotten an error
+  error => {
+    log.error(`Error while creating DB Store: ${error}`);
   }
 );
 
-store.on("error", function(error) {
-  assert.ifError(error);
-  assert.ok(false);
+store.on("error", error => {
+  if (error) {
+    log.error(`DB Store error: ${error}`);
+  }
 });
 
 app.use(cors());
@@ -53,34 +52,27 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
     },
-    store: store,
+    store,
     resave: false,
     saveUninitialized: false
   })
 );
 
-var isProduction = process.env.NODE_ENV === "production";
-var isTest = process.env.NODE_ENV === "test";
+const isProduction = process.env.NODE_ENV === "production";
+const isTest = process.env.NODE_ENV === "test";
 
 if (!isProduction) {
   app.use(errorhandler());
 }
 
 if (!isTest) {
-  var mongoose = require("mongoose"); // mongoose for mongodb
   const options = { useNewUrlParser: true, useCreateIndex: true };
   if (isProduction) {
-    mongoose.connect(
-      process.env.MONGODB_URI,
-      options
-    );
+    mongoose.connect(process.env.MONGODB_URI, options);
   } else {
     // Configuration
     if (process.env.MONGODB_URI) {
-      mongoose.connect(
-        process.env.MONGODB_URI,
-        options
-      );
+      mongoose.connect(process.env.MONGODB_URI, options);
     } else {
       mongoose.connect(
         "mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb",
@@ -92,7 +84,7 @@ if (!isTest) {
   }
 }
 
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "DELETE, PUT");
   res.header(
@@ -110,22 +102,23 @@ require("./models/Event");
 require("./models/EventType");
 require("./models/AlertType");
 require("./models/EventWarning");
-require("./models/LogEntry");
+const LogEntry = require("./models/LogEntry");
+
+const requestsLogger = require("./middleware/requestsLogger");
 
 if (!isTest) {
-  console.log("Adding requests logger middleware");
-  const requestsLogger = require("./middleware/requestsLogger");
   app.use(requestsLogger);
 }
 
-var indexRouter = require("./routes/index");
+const indexRouter = require("./routes/index");
+
 app.use("/", indexRouter);
 
 app.use(require("./routes"));
 
-/// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error("Not Found");
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  const err = new Error("Not Found");
   err.status = httpStatus.NOT_FOUND;
   next(err);
 });
@@ -134,13 +127,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./config/passport")(passport);
 
-/// error handlers
+// error handlers
 
 // development error handler
 // will print stacktrace
 if (!isProduction) {
-  app.use(function(err, req, res, next) {
-    console.log(err.stack);
+  app.use((err, req, res) => {
+    log.error(err.stack);
 
     res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR);
 
@@ -153,18 +146,26 @@ if (!isProduction) {
   });
 }
 
-function createStackTraceLog(stackTrace, creatorId, next) {
-  var logEntry = new LogEntry();
+/**
+ * Creates a stack trace log entry in the repository.
+ * @param {string} stackTrace String that represents the error stacktrace.
+ * @param {*} creatorId Id of the user who was logged in when the error happened.
+ */
+function createStackTraceLog(stackTrace, creatorId) {
+  const logEntry = new LogEntry();
   logEntry.message = creatorId;
   logEntry.level = "ERROR";
   logEntry.createdAt = new Date();
   logEntry.payload = stackTrace;
+
+  log.error(`Error StackTrace: \n${logEntry.toAuthJSON()}`);
+
   logEntry.save();
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use((err, req, res) => {
   res.status(err.status || httpStatus.INTERNAL_SERVER_ERROR);
 
   const message = `Something failed! Please contact the administrator and attach request id [${
@@ -172,6 +173,11 @@ app.use(function(err, req, res, next) {
   }]`;
   const isPresentable = presentableErrorCodes.indexOf(err.status) >= 0;
 
+  log.error(
+    `Error:\n
+    isPresentable = ${isPresentable}\n
+    Original error message: ${err.message}`
+  );
   res.json({
     errors: {
       message: isPresentable ? err.message : message,
@@ -179,7 +185,7 @@ app.use(function(err, req, res, next) {
     }
   });
 
-  if (err.status == httpStatus.INTERNAL_SERVER_ERROR) {
+  if (err.status === httpStatus.INTERNAL_SERVER_ERROR) {
     createStackTraceLog(err.stack, res.requestId);
   }
 });
