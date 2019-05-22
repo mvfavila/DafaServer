@@ -104,7 +104,7 @@ require("./models/AlertType");
 require("./models/EventWarning");
 const LogEntry = require("./models/LogEntry");
 
-const requestsLogger = require("./middleware/requestsLogger");
+const { requestsLogger } = require("./middleware/requestsLogger");
 
 if (!isTest) {
   app.use(requestsLogger);
