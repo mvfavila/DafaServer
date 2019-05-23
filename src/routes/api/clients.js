@@ -218,3 +218,4 @@ module.exports = clientController => {
 
   return router;
 };
+module.exports.clientApi = clientApi;
