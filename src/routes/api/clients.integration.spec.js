@@ -14,7 +14,7 @@ const { httpStatus } = require("../../util/util");
 const { baseUrl } = require("../../util/util");
 
 const Client = mongoose.model("Client");
-const clientController = require("../../controllers/clientController");
+const { clientController } = require("../../config/bootstrap");
 
 let mongoServer;
 let client;

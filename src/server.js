@@ -109,7 +109,6 @@ const { requestsLogger } = require("./middleware/requestsLogger");
 if (!isTest) {
   app.use(requestsLogger);
 }
-
 const indexRouter = require("./routes/index");
 
 app.use("/", indexRouter);

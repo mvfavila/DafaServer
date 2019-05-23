@@ -1,8 +1,11 @@
 const router = require("express").Router();
 const { httpStatus } = require("../../util/util");
 
+const { clientController } = require("../../config/bootstrap");
+const clientsRouter = require("./clients")(clientController);
+
+router.use("/", clientsRouter);
 router.use("/", require("./users"));
-router.use("/", require("./clients"));
 router.use("/", require("./fields"));
 router.use("/", require("./alertTypes"));
 router.use("/", require("./events"));
