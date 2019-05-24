@@ -10,8 +10,7 @@ const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../../bin/www");
 require("../../models/Client");
-const { httpStatus } = require("../../util/util");
-const { baseUrl } = require("../../util/util");
+const { baseUrl, httpStatus } = require("../../util/util");
 
 const Client = mongoose.model("Client");
 const { clientController } = require("../../config/bootstrap");
