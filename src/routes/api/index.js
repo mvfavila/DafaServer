@@ -3,16 +3,18 @@ const { httpStatus } = require("../../util/util");
 
 const {
   alertTypeController,
-  clientController
+  clientController,
+  eventController
 } = require("../../config/bootstrap");
 const alertTypesRouter = require("./alertTypes")(alertTypeController);
 const clientsRouter = require("./clients")(clientController);
+const eventsRouter = require("./events")(eventController);
 
 router.use("/", alertTypesRouter);
 router.use("/", clientsRouter);
+router.use("/", eventsRouter);
 router.use("/", require("./users"));
 router.use("/", require("./fields"));
-router.use("/", require("./events"));
 router.use("/", require("./eventTypes"));
 router.use("/", require("./eventWarnings"));
 router.use("/", require("./logs"));
