@@ -61,13 +61,19 @@ beforeEach(done => {
 
 describe("alertTypes API - Integration", () => {
   it("getHealthCheck - Make request - Should return ok", async () => {
+    // Act
     const res = await request(baseUrl).get("api/alertTypes/healthcheck");
+
+    // Assert
     expect(res).to.not.be.null;
     expect(res.status).to.equal(200, "Response status should be 200");
   });
 
   it("getAlertTypeById - Make request - Should return ok", async () => {
+    // Act
     const res = await request(baseUrl).get(`api/alertTypes/${alertTypeId}`);
+
+    // Assert
     expect(res).to.not.be.null;
     expect(res.status).to.equal(
       httpStatus.SUCCESS,
@@ -78,7 +84,10 @@ describe("alertTypes API - Integration", () => {
   });
 
   it("getAllActiveAlertTypes - Make request - Should return ok", async () => {
+    // Act
     const res = await request(baseUrl).get(`api/alertTypes`);
+
+    // Assert
     expect(res).to.not.be.null;
     expect(res.status).to.equal(
       httpStatus.SUCCESS,
@@ -86,5 +95,29 @@ describe("alertTypes API - Integration", () => {
     );
     const responseAlertTypes = res.body.alertTypes;
     expect(responseAlertTypes.length).to.equal(1);
+  });
+
+  it("createAlertType - Make request - Should return ok", async () => {
+    // Arrange
+    alertType.active = false;
+    let res;
+
+    // Act
+    try {
+      res = await request(baseUrl)
+        .post(`api/alertTypes`)
+        .send({ alertType: alertType.toAuthJSON() });
+    } catch (error) {
+      expect(false);
+    }
+
+    // Assert
+    expect(res).to.not.be.null;
+    expect(res.status).to.equal(
+      httpStatus.SUCCESS,
+      `Response status should be ${httpStatus.SUCCESS}`
+    );
+    const responseAlertType = res.body.alertType;
+    expect(responseAlertType.active).to.be.true;
   });
 });
