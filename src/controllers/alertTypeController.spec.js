@@ -48,7 +48,9 @@ beforeEach(done => {
 
   alertTypeController
     .addAlertType(alertType)
-    .then(done())
+    .then(async () => {
+      done();
+    })
     .catch(err => done(err));
 });
 

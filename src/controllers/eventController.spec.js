@@ -38,11 +38,11 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(async () => {
+beforeEach(done => {
   // Setup
 
   // removes all existing events from repository
-  await Event.deleteMany({}, () => {});
+  Event.deleteMany({}, () => {});
 
   // adds a sample event to the repository
   const event = new Event();
@@ -51,14 +51,12 @@ beforeEach(async () => {
   event.eventType = guid.new();
   event.field = guid.new();
 
-  return new Promise(async (resolve, reject) => {
-    try {
-      await eventController.addEvent(event);
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+  eventController
+    .addEvent(event)
+    .then(async () => {
+      done();
+    })
+    .catch(err => done(err));
 });
 
 describe("Event controller", () => {

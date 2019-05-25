@@ -9,7 +9,7 @@ use(chaiHttp);
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/EventType");
-const alertTypeController = require("./alertTypeController");
+const { alertTypeController } = require("../config/bootstrap");
 const eventTypeController = require("./eventTypeController");
 
 const AlertType = mongoose.model("AlertType");
@@ -37,40 +37,36 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(async () => {
+beforeEach(done => {
   // Setup
 
   // removes all existing eventTypes and alertTypes from repository
-  await EventType.deleteMany({}, () => {});
-  await AlertType.deleteMany({}, () => {});
+  EventType.deleteMany({}, () => {})
+    .then(AlertType.deleteMany({}, () => {}))
+    .then(() => {
+      // adds a sample alertType to the repository
+      const alertType = new AlertType();
 
-  // adds a sample alertType to the repository
-  const alertType = new AlertType();
+      alertType.name = "60 days before";
+      alertType.numberOfDaysToWarning = 60;
 
-  alertType.name = "60 days before";
-  alertType.numberOfDaysToWarning = 60;
+      alertTypeId = alertType.id;
 
-  alertTypeId = alertType.id;
+      // adds a sample eventType to the repository
+      const eventType = new EventType();
 
-  // adds a sample eventType to the repository
-  const eventType = new EventType();
-
-  eventType.name = "IBAMA";
-  eventType.description = "Licenciamento do IBAMA";
-  eventType.alertTypes = alertTypeId;
-
-  return new Promise(async (resolve, reject) => {
-    try {
-      await alertTypeController.addAlertType(alertType);
-      await eventTypeController.addEventType(eventType);
-      resolve();
-    } catch (err) {
-      reject(err);
-    }
-  });
+      eventType.name = "IBAMA";
+      eventType.description = "Licenciamento do IBAMA";
+      eventType.alertTypes = alertTypeId;
+      alertTypeController
+        .addAlertType(alertType)
+        .then(eventTypeController.addEventType(eventType))
+        .then(done());
+    })
+    .catch(err => done(err));
 });
 
-describe("eventTypeController", () => {
+describe("EventType controller", () => {
   it("addEventType - Valid eventType - Must succeed", async () => {
     const cnt = await EventType.countDocuments();
 
