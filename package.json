@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon ./src/bin/www",
     "serve": "node ./src/bin/www",
-    "test": "mocha --timeout 60000 ./src/**/*.spec.js --exit",
+    "test": "nyc mocha --timeout 60000 ./src/**/*.spec.js --exit",
     "testDebug": "mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "mocha": "^5.2.0",
     "mongodb-memory-server": "^2.9.3",
     "nock": "^10.0.6",
+    "nyc": "^14.1.1",
     "prettier": "^1.16.1",
     "sinon": "^7.2.2"
   }
