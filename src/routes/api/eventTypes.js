@@ -23,56 +23,49 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
      * (GET) Get Event Type by id.
      * @param {Object} req Request object.
      * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
      */
-    getEventTypeById(req, res, next) {
-      eventTypeController
-        .getEventTypeById(req.params.eventTypeId)
-        .then(eventType => {
-          if (!eventType) {
-            return res
-              .status(httpStatus.UNAUTHORIZED)
-              .send({ error: "No Event Type found" });
-          }
+    async getEventTypeById(req, res) {
+      const eventType = await eventTypeController.getEventTypeById(
+        req.params.eventTypeId
+      );
 
-          return res.json({ eventType: eventType.toAuthJSON() });
-        })
-        .catch(next);
+      if (!eventType) {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No Event Type found" });
+      }
+
+      return res.json({ eventType: eventType.toAuthJSON() });
     },
 
     /**
      * (GET) Get all active Event Types.
      * @param {Object} req Request object.
      * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
      */
-    getAllActiveEventTypes(req, res, next) {
-      eventTypeController
-        .getAllActiveEventTypes()
-        .then(eventTypes => {
-          if (!eventTypes) {
-            return res
-              .status(httpStatus.UNAUTHORIZED)
-              .send({ error: "No Event Type found" });
-          }
+    async getAllActiveEventTypes(req, res) {
+      const eventTypes = await eventTypeController.getAllActiveEventTypes();
 
-          const eventTypesJson = [];
-          eventTypes.forEach(eventType => {
-            eventTypesJson.push(eventType.toJSON());
-          });
+      if (!eventTypes) {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No Event Type found" });
+      }
 
-          return res.json({ eventTypes: eventTypesJson });
-        })
-        .catch(next);
+      const eventTypesJson = [];
+      eventTypes.forEach(eventType => {
+        eventTypesJson.push(eventType.toJSON());
+      });
+
+      return res.json({ eventTypes: eventTypesJson });
     },
 
     /**
      * (POST) Creates a new Event Type.
      * @param {Object} req Request object.
      * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
      */
-    createEventType(req, res, next) {
+    async createEventType(req, res) {
       const eventType = new EventType();
 
       eventType.name = req.body.eventType.name;
@@ -80,10 +73,9 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
       eventType.alertTypes = req.body.eventType.alertTypes;
       eventType.active = true;
 
-      eventTypeController
-        .addEventType(eventType)
-        .then(() => res.json({ eventType: eventType.toAuthJSON() }))
-        .catch(next);
+      await eventTypeController.addEventType(eventType);
+
+      return res.json({ eventType: eventType.toAuthJSON() });
     }
   };
 };
