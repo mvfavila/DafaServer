@@ -196,25 +196,23 @@ const clientApi = function clientApi(clientController) {
 };
 
 module.exports = clientController => {
+  const api = clientApi(clientController);
+
   // Routers
-  router
-    .route("/clients/healthcheck")
-    .get(clientApi(clientController).getHealthCheck);
+  router.route("/clients/healthcheck").get(api.getHealthCheck);
 
   router
     .route("/clients/:clientId", auth.required)
-    .get(clientApi(clientController).getClientById)
-    .patch(clientApi(clientController).updateClientStatus);
+    .get(api.getClientById)
+    .patch(api.updateClientStatus);
 
-  router
-    .route("/clients/:clientId/fields")
-    .get(clientApi(clientController).getFieldsByClient);
+  router.route("/clients/:clientId/fields").get(api.getFieldsByClient);
 
   router
     .route("/clients", auth.required)
-    .get(clientApi(clientController).getAll)
-    .post(clientApi(clientController).createClient)
-    .put(clientApi(clientController).updateClient);
+    .get(api.getAll)
+    .post(api.createClient)
+    .put(api.updateClient);
 
   return router;
 };

@@ -89,19 +89,19 @@ const alertTypeApi = function alertTypeApi(alertTypeController) {
 };
 
 module.exports = alertTypeController => {
+  const api = alertTypeApi(alertTypeController);
+
   // Routers
-  router
-    .route("/alertTypes/healthcheck")
-    .get(alertTypeApi(alertTypeController).getHealthCheck);
+  router.route("/alertTypes/healthcheck").get(api.getHealthCheck);
 
   router
     .route("/alertTypes/:alertTypeId", auth.required)
-    .get(alertTypeApi(alertTypeController).getAlertTypeById);
+    .get(api.getAlertTypeById);
 
   router
     .route("/alertTypes", auth.required)
-    .get(alertTypeApi(alertTypeController).getAllActiveAlertTypes)
-    .post(alertTypeApi(alertTypeController).createAlertType);
+    .get(api.getAllActiveAlertTypes)
+    .post(api.createAlertType);
 
   return router;
 };

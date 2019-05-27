@@ -62,15 +62,15 @@ const eventApi = function eventApi(eventController) {
 };
 
 module.exports = eventController => {
+  const api = eventApi(eventController);
+
   // Routers
-  router
-    .route("/events/healthcheck")
-    .get(eventApi(eventController).getHealthCheck);
+  router.route("/events/healthcheck").get(api.getHealthCheck);
 
   router
     .route("/events", auth.required)
-    .get(eventApi(eventController).getEvents)
-    .post(eventApi(eventController).createEvent);
+    .get(api.getEvents)
+    .post(api.createEvent);
 
   return router;
 };

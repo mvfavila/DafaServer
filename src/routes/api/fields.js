@@ -106,23 +106,21 @@ const fieldApi = function fieldApi(fieldController) {
 };
 
 module.exports = fieldController => {
-  // Routers
-  router
-    .route("/fields/healthcheck")
-    .get(fieldApi(fieldController).getHealthCheck);
+  const api = fieldApi(fieldController);
 
-  router
-    .route("/fields/:fieldId", auth.required)
-    .get(fieldApi(fieldController).getFieldById);
+  // Routers
+  router.route("/fields/healthcheck").get(api.getHealthCheck);
+
+  router.route("/fields/:fieldId", auth.required).get(api.getFieldById);
 
   router
     .route("/fields", auth.required)
-    .get(fieldApi(fieldController).getAll)
-    .post(fieldApi(fieldController).createField);
+    .get(api.getAll)
+    .post(api.createField);
 
   router
     .route("/fields/:fieldId/events", auth.required)
-    .get(fieldApi(fieldController).getEventsByField);
+    .get(api.getEventsByField);
 
   return router;
 };

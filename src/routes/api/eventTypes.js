@@ -81,19 +81,19 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
 };
 
 module.exports = eventTypeController => {
+  const api = eventTypeApi(eventTypeController);
+
   // Routers
-  router
-    .route("/eventTypes/healthcheck")
-    .get(eventTypeApi(eventTypeController).getHealthCheck);
+  router.route("/eventTypes/healthcheck").get(api.getHealthCheck);
 
   router
     .route("/eventTypes/:eventTypeId", auth.required)
-    .get(eventTypeApi(eventTypeController).getEventTypeById);
+    .get(api.getEventTypeById);
 
   router
     .route("/eventTypes", auth.required)
-    .get(eventTypeApi(eventTypeController).getAllActiveEventTypes)
-    .post(eventTypeApi(eventTypeController).createEventType);
+    .get(api.getAllActiveEventTypes)
+    .post(api.createEventType);
 
   return router;
 };
