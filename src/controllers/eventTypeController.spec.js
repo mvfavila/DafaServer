@@ -9,6 +9,7 @@ use(chaiHttp);
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/EventType");
+require("../models/EventWarning");
 const { alertTypeController } = require("../config/bootstrap");
 const eventTypeController = require("./eventTypeController");
 
@@ -37,33 +38,30 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(done => {
+beforeEach(async () => {
   // Setup
 
   // removes all existing eventTypes and alertTypes from repository
-  EventType.deleteMany({}, () => {})
-    .then(AlertType.deleteMany({}, () => {}))
-    .then(() => {
-      // adds a sample alertType to the repository
-      const alertType = new AlertType();
+  await EventType.deleteMany({}, () => {});
+  await AlertType.deleteMany({}, () => {});
 
-      alertType.name = "60 days before";
-      alertType.numberOfDaysToWarning = 60;
+  // adds a sample alertType to the repository
+  const alertType = new AlertType();
 
-      alertTypeId = alertType.id;
+  alertType.name = "60 days before";
+  alertType.numberOfDaysToWarning = 60;
 
-      // adds a sample eventType to the repository
-      const eventType = new EventType();
+  alertTypeId = alertType.id;
 
-      eventType.name = "IBAMA";
-      eventType.description = "Licenciamento do IBAMA";
-      eventType.alertTypes = alertTypeId;
-      alertTypeController
-        .addAlertType(alertType)
-        .then(eventTypeController.addEventType(eventType))
-        .then(done());
-    })
-    .catch(err => done(err));
+  // adds a sample eventType to the repository
+  const eventType = new EventType();
+
+  eventType.name = "IBAMA";
+  eventType.description = "Licenciamento do IBAMA";
+  eventType.alertTypes = alertTypeId;
+
+  await alertTypeController.addAlertType(alertType);
+  await eventTypeController.addEventType(eventType);
 });
 
 describe("EventType controller", () => {

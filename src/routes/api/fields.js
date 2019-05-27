@@ -3,25 +3,30 @@ const router = require("express").Router();
 
 const Field = mongoose.model("Field");
 const auth = require("../auth");
-const fieldController = require("../../controllers/fieldController");
 const { httpStatus } = require("../../util/util");
 
-/*
-    GET
-    Health check for the Field endpoint
-*/
-function getHealthCheck(req, res) {
-  return res.sendStatus(httpStatus.SUCCESS);
-}
+/**
+ * Represents the field API with it's methods.
+ */
+const fieldApi = function fieldApi(fieldController) {
+  return {
+    /**
+     * (GET) Health check for the Field endpoint.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    getHealthCheck(req, res) {
+      return res.sendStatus(httpStatus.SUCCESS);
+    },
 
-/*
-    GET
-    Get field by id
-*/
-function getFieldById(req, res, next) {
-  fieldController
-    .getFieldById(req.params.fieldId)
-    .then(field => {
+    /**
+     * (GET) Get field by id.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async getFieldById(req, res) {
+      const field = await fieldController.getFieldById(req.params.fieldId);
+
       if (!field) {
         return res
           .status(httpStatus.UNAUTHORIZED)
@@ -29,18 +34,16 @@ function getFieldById(req, res, next) {
       }
 
       return res.json({ field: field.toAuthJSON() });
-    })
-    .catch(next);
-}
+    },
 
-/*
-    GET
-    Get all active fields
-*/
-function getAll(req, res, next) {
-  fieldController
-    .getAllFields()
-    .then(fields => {
+    /**
+     * (GET) Get all active fields.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async getAll(req, res) {
+      const fields = await fieldController.getAllFields();
+
       if (!fields) {
         return res
           .status(httpStatus.UNAUTHORIZED)
@@ -53,18 +56,16 @@ function getAll(req, res, next) {
       });
 
       return res.json({ fields: fieldsJson });
-    })
-    .catch(next);
-}
+    },
 
-/*
-    GET
-    Get all active Events of a Field
-*/
-function getEventsByField(req, res, next) {
-  fieldController
-    .getEventsByField(req.params.fieldId)
-    .then(events => {
+    /**
+     * (GET) Get all active Events of a Field.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async getEventsByField(req, res) {
+      const events = await fieldController.getEventsByField(req.params.fieldId);
+
       if (!events) {
         return res
           .status(httpStatus.UNAUTHORIZED)
@@ -77,43 +78,53 @@ function getEventsByField(req, res, next) {
       });
 
       return res.json({ events: eventsJson });
-    })
-    .catch(next);
-}
+    },
 
-/*
-    POST
-    Creates a new field
-*/
-function createField(req, res, next) {
-  const field = new Field();
+    /**
+     * (POST) Creates a new field.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async createField(req, res) {
+      const field = new Field();
 
-  field.name = req.body.field.name;
-  field.description = req.body.field.description;
-  field.email = req.body.field.email;
-  field.address = req.body.field.address;
-  field.city = req.body.field.city;
-  field.state = req.body.field.state;
-  field.postalCode = req.body.field.postalCode;
-  field.client = req.body.field.client;
-  field.active = true;
+      field.name = req.body.field.name;
+      field.description = req.body.field.description;
+      field.email = req.body.field.email;
+      field.address = req.body.field.address;
+      field.city = req.body.field.city;
+      field.state = req.body.field.state;
+      field.postalCode = req.body.field.postalCode;
+      field.client = req.body.field.client;
+      field.active = true;
 
-  fieldController
-    .addField(field)
-    .then(() => res.json({ field: field.toAuthJSON() }))
-    .catch(next);
-}
+      await fieldController.addField(field);
 
-// Routers
-router.route("/fields/healthcheck").get(getHealthCheck);
+      return res.json({ field: field.toAuthJSON() });
+    }
+  };
+};
 
-router.route("/fields/:fieldId", auth.required).get(getFieldById);
+module.exports = fieldController => {
+  // Routers
+  router
+    .route("/fields/healthcheck")
+    .get(fieldApi(fieldController).getHealthCheck);
 
-router
-  .route("/fields", auth.required)
-  .get(getAll)
-  .post(createField);
+  router
+    .route("/fields/:fieldId", auth.required)
+    .get(fieldApi(fieldController).getFieldById);
 
-router.route("/fields/:fieldId/events", auth.required).get(getEventsByField);
+  router
+    .route("/fields", auth.required)
+    .get(fieldApi(fieldController).getAll)
+    .post(fieldApi(fieldController).createField);
 
-module.exports = router;
+  router
+    .route("/fields/:fieldId/events", auth.required)
+    .get(fieldApi(fieldController).getEventsByField);
+
+  return router;
+};
+
+module.exports.fieldApi = fieldApi;
