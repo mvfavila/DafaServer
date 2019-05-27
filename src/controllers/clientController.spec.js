@@ -35,11 +35,11 @@ after(() => {
   mongoServer.stop();
 });
 
-beforeEach(done => {
+beforeEach(async () => {
   // Setup
 
   // removes all existing clients from repository
-  Client.deleteMany({}, () => {});
+  await Client.deleteMany({}, () => {});
 
   // adds a sample client to the repository
   const client = new Client();
@@ -53,12 +53,7 @@ beforeEach(done => {
   client.postalCode = "12000-000";
   client.email = "email@domain.com";
 
-  clientController
-    .addClient(client)
-    .then(async () => {
-      done();
-    })
-    .catch(err => done(err));
+  await clientController.addClient(client);
 });
 
 describe("clientController", () => {

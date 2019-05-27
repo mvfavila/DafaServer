@@ -59,18 +59,16 @@ const eventWarningApi = function eventWarningApi(eventWarningController) {
 };
 
 module.exports = eventWarningController => {
-  // Routers
-  router
-    .route("/eventWarnings/healthcheck")
-    .get(eventWarningApi(eventWarningController).getHealthCheck);
+  const api = eventWarningApi(eventWarningController);
 
-  router
-    .route("/eventWarnings", auth.required)
-    .post(eventWarningApi(eventWarningController).createEventWarning);
+  // Routers
+  router.route("/eventWarnings/healthcheck").get(api.getHealthCheck);
+
+  router.route("/eventWarnings", auth.required).post(api.createEventWarning);
 
   router
     .route("/eventWarningsFields", auth.required)
-    .get(eventWarningApi(eventWarningController).getEventWarningsFields);
+    .get(api.getEventWarningsFields);
 
   return router;
 };
