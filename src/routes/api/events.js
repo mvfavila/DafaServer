@@ -23,35 +23,30 @@ const eventApi = function eventApi(eventController) {
      * (GET) Get all active events.
      * @param {Object} req Request object.
      * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
      */
-    getEvents(req, res, next) {
-      eventController
-        .getEvents()
-        .then(event => {
-          if (!event) {
-            return res
-              .status(httpStatus.UNAUTHORIZED)
-              .send({ error: "No event found" });
-          }
+    async getEvents(req, res) {
+      const event = await eventController.getEvents();
 
-          const eventJson = [];
-          event.forEach(e => {
-            eventJson.push(e);
-          });
+      if (!event) {
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No event found" });
+      }
 
-          return res.json({ events: eventJson });
-        })
-        .catch(next);
+      const eventJson = [];
+      event.forEach(e => {
+        eventJson.push(e);
+      });
+
+      return res.json({ events: eventJson });
     },
 
     /**
      * (POST) Creates a new Event.
      * @param {Object} req Request object.
      * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
      */
-    createEvent(req, res, next) {
+    async createEvent(req, res) {
       const event = new Event();
 
       event.date = req.body.event.date;
@@ -59,10 +54,9 @@ const eventApi = function eventApi(eventController) {
       event.field = req.body.event.field;
       event.active = true;
 
-      eventController
-        .addEvent(event)
-        .then(() => res.json({ event: event.toAuthJSON() }))
-        .catch(next);
+      await eventController.addEvent(event);
+
+      return res.json({ event: event.toAuthJSON() });
     }
   };
 };
