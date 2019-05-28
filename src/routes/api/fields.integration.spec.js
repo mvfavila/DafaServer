@@ -10,10 +10,12 @@ const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../../bin/www");
 require("../../models/Field");
+require("../../models/Event");
 const { baseUrl, httpStatus } = require("../../util/util");
 
 const Field = mongoose.model("Field");
-const { fieldController } = require("../../config/bootstrap");
+const Event = mongoose.model("Event");
+const { fieldController, eventController } = require("../../config/bootstrap");
 const { guid } = require("../../util/guid");
 
 let mongoServer;
@@ -60,6 +62,18 @@ beforeEach(async () => {
   fieldId = field.id.toString();
 
   await fieldController.addField(field);
+
+  // removes all existing events from repository
+  await Event.deleteMany({}, () => {});
+
+  // adds a sample event to the repository
+  const event = new Event();
+
+  event.date = new Date();
+  event.eventType = guid.new();
+  event.field = field.id;
+
+  await eventController.addEvent(event);
 });
 
 describe("fields API - Integration", () => {
@@ -78,6 +92,19 @@ describe("fields API - Integration", () => {
     );
     const responseField = res.body.field;
     expect(responseField.name).to.equal(field.name);
+  });
+
+  it("getEventsByField - Make request - Should return ok", async () => {
+    const res = await request(baseUrl).get(`api/fields/${fieldId}/events`);
+    expect(res).to.not.be.null;
+    expect(res.status).to.equal(
+      httpStatus.SUCCESS,
+      `Response status should be ${httpStatus.SUCCESS}`
+    );
+    const responseEvents = res.body.events;
+    expect(responseEvents.length).to.equal(1);
+    expect(responseEvents[0].field).to.not.be.null;
+    expect(responseEvents[0].field.date).to.be.not.null;
   });
 
   it("getFields - Make request - Should return ok", async () => {
