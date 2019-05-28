@@ -51,7 +51,7 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} res Response object.
      * @param {Object} next Method to be called next.
      */
-    getAll(req, res, next) {
+    getActiveClients(req, res, next) {
       clientController
         .getAllClients()
         .then(clients => {
@@ -210,7 +210,7 @@ module.exports = clientController => {
 
   router
     .route("/clients", auth.required)
-    .get(api.getAll)
+    .get(api.getActiveClients)
     .post(api.createClient)
     .put(api.updateClient);
 

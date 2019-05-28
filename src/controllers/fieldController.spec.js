@@ -106,12 +106,12 @@ describe("Field controller", () => {
     expect(fieldAdded.updatedAt).to.be.an("date");
   });
 
-  it("getAllFields - Exists 1 field - Must return 1 field", async () => {
+  it("getFields - Exists 1 field - Must return 1 field", async () => {
     const cnt = await Field.countDocuments();
 
     expect(cnt).to.equal(1);
 
-    const fields = await fieldController.getAllFields();
+    const fields = await fieldController.getFields();
 
     // Must return exactly one field
     expect(fields.length).to.equal(1);
@@ -122,7 +122,7 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    const fields = await fieldController.getAllFields();
+    const fields = await fieldController.getFields();
 
     const field = fields[0];
 
@@ -147,7 +147,7 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    const fields = await fieldController.getAllFields();
+    const fields = await fieldController.getFields();
 
     const field = fields[0];
 
@@ -191,7 +191,7 @@ describe("Field controller", () => {
 
     expect(cnt).to.equal(1);
 
-    const fields = await fieldController.getAllFields();
+    const fields = await fieldController.getFields();
 
     const previousStatus = fields[0].active;
 

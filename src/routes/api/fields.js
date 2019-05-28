@@ -41,8 +41,8 @@ const fieldApi = function fieldApi(fieldController) {
      * @param {Object} req Request object.
      * @param {Object} res Response object.
      */
-    async getAll(req, res) {
-      const fields = await fieldController.getAllFields();
+    async getFields(req, res) {
+      const fields = await fieldController.getFields();
 
       if (!fields) {
         return res
@@ -115,7 +115,7 @@ module.exports = fieldController => {
 
   router
     .route("/fields", auth.required)
-    .get(api.getAll)
+    .get(api.getFields)
     .post(api.createField);
 
   router

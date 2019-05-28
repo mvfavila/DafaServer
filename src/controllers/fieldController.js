@@ -28,7 +28,7 @@ const fieldController = {
   /**
    * Gets all existing fields
    */
-  async getAllFields() {
+  async getFields() {
     return new Promise(async (resolve, reject) => {
       let fields;
       try {
