@@ -4,7 +4,7 @@ process.env.NODE_ENV = "test";
 const { expect } = require("chai");
 
 const httpMocks = require("node-mocks-http");
-const { decodeFromReq } = require("./requestsLogger");
+const { decodeFromReq, isEmptyObject } = require("./requestsLogger");
 
 describe("requestLogger", () => {
   it("decodeFromReq - Pass coded request header - Should decode request header", async () => {
@@ -24,5 +24,42 @@ describe("requestLogger", () => {
     expect(decodedValue.greetings).to.equal("Hello there");
     expect(decodedValue.id).to.equal(123);
     expect(decodedValue.valid).to.be.true;
+  });
+
+  it("isEmptyObject - Pass {} - Should return true", async () => {
+    // Arrange
+    const obj = {};
+
+    // Act
+    const result = isEmptyObject(obj);
+
+    // Assert
+    expect(result).to.not.be.null;
+    expect(result).to.be.true;
+  });
+
+  it("isEmptyObject - Pass 'new Object()' - Should return true", async () => {
+    // Arrange
+    // eslint-disable-next-line no-new-object
+    const obj = new Object();
+
+    // Act
+    const result = isEmptyObject(obj);
+
+    // Assert
+    expect(result).to.not.be.null;
+    expect(result).to.be.true;
+  });
+
+  it("isEmptyObject - Pass 'Object' - Should return false", async () => {
+    // Arrange
+    const obj = "Object";
+
+    // Act
+    const result = isEmptyObject(obj);
+
+    // Assert
+    expect(result).to.not.be.null;
+    expect(result).to.be.false;
   });
 });

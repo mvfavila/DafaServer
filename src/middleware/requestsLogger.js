@@ -42,5 +42,6 @@ function requestsLogger(req, res, next) {
   next();
 }
 
+module.exports.isEmptyObject = isEmptyObject;
 module.exports.decodeFromReq = decodeFromReq;
 module.exports.requestsLogger = requestsLogger;
