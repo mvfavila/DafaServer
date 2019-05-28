@@ -46,9 +46,9 @@ const alertTypeApi = function alertTypeApi(alertTypeController) {
      * @param {Object} res Response object.
      * @param {Object} next Method to be called next.
      */
-    getAllActiveAlertTypes(req, res, next) {
+    getActiveAlertTypes(req, res, next) {
       alertTypeController
-        .getAllActiveAlertTypes()
+        .getActiveAlertTypes()
         .then(alertTypes => {
           if (!alertTypes) {
             return res
@@ -100,7 +100,7 @@ module.exports = alertTypeController => {
 
   router
     .route("/alertTypes", auth.required)
-    .get(api.getAllActiveAlertTypes)
+    .get(api.getActiveAlertTypes)
     .post(api.createAlertType);
 
   return router;

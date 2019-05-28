@@ -21,7 +21,7 @@ const alertTypeController = {
   /**
    * Gets all active alert types
    */
-  getAllActiveAlertTypes() {
+  getActiveAlertTypes() {
     return AlertType.find({ active: true }, () => {});
   },
 

@@ -83,7 +83,7 @@ describe("alertTypes API - Integration", () => {
     expect(responseAlertType.firstName).to.equal(alertType.firstName);
   });
 
-  it("getAllActiveAlertTypes - Make request - Should return ok", async () => {
+  it("getActiveAlertTypes - Make request - Should return ok", async () => {
     // Act
     const res = await request(baseUrl).get(`api/alertTypes`);
 

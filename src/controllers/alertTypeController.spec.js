@@ -88,7 +88,7 @@ describe("alertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
+    const alertTypes = await alertTypeController.getActiveAlertTypes();
     // Must return exactly one alertType
     expect(alertTypes.length).to.equal(1);
   });
@@ -98,7 +98,7 @@ describe("alertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
+    const alertTypes = await alertTypeController.getActiveAlertTypes();
 
     const alertType = alertTypes[0];
 
@@ -120,7 +120,7 @@ describe("alertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
+    const alertTypes = await alertTypeController.getActiveAlertTypes();
 
     const alertType = alertTypes[0];
 
@@ -148,7 +148,7 @@ describe("alertTypeController", () => {
 
     expect(cnt).to.equal(1);
 
-    const alertTypes = await alertTypeController.getAllActiveAlertTypes();
+    const alertTypes = await alertTypeController.getActiveAlertTypes();
 
     const previousStatus = alertTypes[0].active;
 
