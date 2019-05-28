@@ -42,4 +42,5 @@ function requestsLogger(req, res, next) {
   next();
 }
 
+module.exports.decodeFromReq = decodeFromReq;
 module.exports.requestsLogger = requestsLogger;
