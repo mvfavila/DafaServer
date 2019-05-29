@@ -7,7 +7,8 @@ const {
   eventController,
   eventTypeController,
   eventWarningController,
-  fieldController
+  fieldController,
+  userController
 } = require("../../config/bootstrap");
 const alertTypesRouter = require("./alertTypes")(alertTypeController);
 const clientsRouter = require("./clients")(clientController);
@@ -15,6 +16,7 @@ const eventsRouter = require("./events")(eventController);
 const eventTypesRouter = require("./eventTypes")(eventTypeController);
 const eventWarningsRouter = require("./eventWarnings")(eventWarningController);
 const fieldsRouter = require("./fields")(fieldController);
+const usersRouter = require("./users")(userController);
 
 router.use("/", eventWarningsRouter);
 router.use("/", alertTypesRouter);
@@ -22,7 +24,7 @@ router.use("/", clientsRouter);
 router.use("/", eventsRouter);
 router.use("/", eventTypesRouter);
 router.use("/", fieldsRouter);
-router.use("/", require("./users"));
+router.use("/", usersRouter);
 router.use("/", require("./logs"));
 
 router.use((err, req, res, next) => {

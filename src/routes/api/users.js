@@ -5,27 +5,46 @@ const passport = require("passport");
 const User = mongoose.model("User");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
-const { dafaRoles } = require("../../config");
 
-router.get("/users/healthcheck", (req, res) =>
-  res.sendStatus(httpStatus.SUCCESS)
-);
+/**
+ * Represents the user API with it's methods.
+ */
+const userApi = function userApi(userController) {
+  return {
+    /**
+     * (GET) Health check for the user endpoint.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    getHealthCheck(req, res) {
+      return res.sendStatus(httpStatus.SUCCESS);
+    },
 
-router.get("/user", auth.required, (req, res, next) => {
-  User.findById(req.payload.id)
-    .then(user => {
+    /**
+     * (GET) Get user by id.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async getUserById(req, res) {
+      const user = await userController.getUserById(req.params.userId);
+
       if (!user) {
-        return res.sendStatus(httpStatus.NOT_FOUND);
+        return res
+          .status(httpStatus.UNAUTHORIZED)
+          .send({ error: "No user found" });
       }
 
       return res.json({ user: user.toAuthJSON() });
-    })
-    .catch(next);
-});
+    },
 
-router.put("/user", auth.required, (req, res, next) => {
-  User.findById(req.payload.id)
-    .then(user => {
+    /**
+     * (PUT) Updates user.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async updateUser(req, res) {
+      const user = await User.findById(req.payload.id);
+
       if (!user) {
         return res.sendStatus(httpStatus.NOT_FOUND);
       }
@@ -43,76 +62,104 @@ router.put("/user", auth.required, (req, res, next) => {
         usr.setPassword(req.body.user.password);
       }
 
-      return usr.save().then(() => res.json({ token: usr.generateJWT() }));
-    })
-    .catch(next);
-});
+      const updatedUser = await userController.updateUser(usr);
 
-router.post("/users/login", (req, res, next) => {
-  if (!req.body.user.email) {
-    return res
-      .status(httpStatus.UNPROCESSABLE_ENTITY)
-      .json({ errors: { email: "can't be blank" } });
-  }
+      return res.json({ user: updatedUser.toAuthJSON() });
+    },
 
-  if (!req.body.user.password) {
-    return res
-      .status(httpStatus.UNPROCESSABLE_ENTITY)
-      .json({ errors: { password: "can't be blank" } });
-  }
-
-  return passport.authenticate(
-    "local",
-    { session: false },
-    (err, user, info) => {
-      if (err) {
-        return next(err);
+    /**
+     * (POST) Login to application.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async login(req, res) {
+      if (!req.body.user.email) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { email: "can't be blank" } });
       }
 
-      if (user) {
-        return res.json({ token: user.generateJWT() });
+      if (!req.body.user.password) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { password: "can't be blank" } });
       }
-      return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
+
+      return passport.authenticate(
+        "local",
+        { session: false },
+        (err, user, info) => {
+          if (err) {
+            return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(err);
+          }
+
+          if (user) {
+            return res.json({ token: user.generateJWT() });
+          }
+          return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
+        }
+      )(req, res);
+    },
+
+    /**
+     * (POST) Creates a new user.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     */
+    async createUser(req, res) {
+      const user = new User();
+
+      if (!req.body.user) {
+        return res
+          .status(httpStatus.BAD_REQUEST)
+          .json({ errors: { message: "Bad request" } });
+      }
+
+      if (!req.body.user.email) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { email: "can't be blank" } });
+      }
+
+      if (!req.body.user.username) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { username: "can't be blank" } });
+      }
+
+      if (!req.body.user.password) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { password: "can't be blank" } });
+      }
+
+      user.username = req.body.user.username;
+      user.email = req.body.user.email;
+      user.setPassword(req.body.user.password);
+
+      await userController.createUser(user);
+
+      return res.json({ token: user.generateJWT() });
     }
-  )(req, res, next);
-});
+  };
+};
 
-router.post("/users", (req, res, next) => {
-  const user = new User();
+module.exports = userController => {
+  const api = userApi(userController);
 
-  if (!req.body.user) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ errors: { message: "Bad request" } });
-  }
+  // Routers
+  router.route("/users/healthcheck").get(api.getHealthCheck);
 
-  if (!req.body.user.email) {
-    return res
-      .status(httpStatus.UNPROCESSABLE_ENTITY)
-      .json({ errors: { email: "can't be blank" } });
-  }
+  router
+    .route("/users/:userId", auth.required)
+    .get(api.getUserById)
+    .put(api.updateUser);
 
-  if (!req.body.user.username) {
-    return res
-      .status(httpStatus.UNPROCESSABLE_ENTITY)
-      .json({ errors: { password: "can't be blank" } });
-  }
+  router.route("/users", auth.required).post(api.createUser);
 
-  if (!req.body.user.password) {
-    return res
-      .status(httpStatus.UNPROCESSABLE_ENTITY)
-      .json({ errors: { password: "can't be blank" } });
-  }
+  router.route("/users/login", auth.optional).post(api.login);
 
-  user.username = req.body.user.username;
-  user.email = req.body.user.email;
-  user.roles = [dafaRoles.BASIC];
-  user.setPassword(req.body.user.password);
+  return router;
+};
 
-  return user
-    .save()
-    .then(() => res.json({ token: user.generateJWT() }))
-    .catch(next);
-});
-
-module.exports = router;
+module.exports.userApi = userApi;
