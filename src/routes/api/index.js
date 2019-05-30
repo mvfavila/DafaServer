@@ -8,7 +8,8 @@ const {
   eventTypeController,
   eventWarningController,
   fieldController,
-  userController
+  userController,
+  logEntryController
 } = require("../../config/bootstrap");
 const alertTypesRouter = require("./alertTypes")(alertTypeController);
 const clientsRouter = require("./clients")(clientController);
@@ -17,6 +18,7 @@ const eventTypesRouter = require("./eventTypes")(eventTypeController);
 const eventWarningsRouter = require("./eventWarnings")(eventWarningController);
 const fieldsRouter = require("./fields")(fieldController);
 const usersRouter = require("./users")(userController);
+const logsRouter = require("./logs")(logEntryController);
 
 router.use("/", eventWarningsRouter);
 router.use("/", alertTypesRouter);
@@ -25,7 +27,7 @@ router.use("/", eventsRouter);
 router.use("/", eventTypesRouter);
 router.use("/", fieldsRouter);
 router.use("/", usersRouter);
-router.use("/", require("./logs"));
+router.use("/", logsRouter);
 
 router.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
