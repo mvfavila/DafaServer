@@ -126,14 +126,7 @@ const userController = {
       }
 
       const userToBeUpdated = foundUser;
-      userToBeUpdated.name = user.name;
-      userToBeUpdated.email = user.email;
-      userToBeUpdated.description = user.description;
-      userToBeUpdated.address = user.address;
-      userToBeUpdated.city = user.city;
-      userToBeUpdated.state = user.state;
-      userToBeUpdated.postalCode = user.postalCode;
-      userToBeUpdated.events = user.events;
+      userToBeUpdated.username = user.username;
       userToBeUpdated.active = user.active;
 
       const result = await User.updateOne(
