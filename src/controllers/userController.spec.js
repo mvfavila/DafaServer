@@ -125,49 +125,33 @@ describe("User controller", () => {
     expect(cnt).to.equal(1);
   });
 
-  //   it("updateUserStatus - Tries to update all attributes - Must update status only", async () => {
-  //     const cnt = await User.countDocuments();
+  it("updateUserStatus - Tries to update all attributes - Must update status only", async () => {
+    const cnt = await User.countDocuments();
 
-  //     expect(cnt).to.equal(1);
+    expect(cnt).to.equal(1);
 
-  //     const users = await userController.getUsers();
+    const users = await userController.getUsers();
 
-  //     const previousStatus = users[0].active;
+    const previousStatus = users[0].active;
 
-  //     const user = new User();
-  //     user.id = users[0].id;
-  //     user.name = "Medium User of the east SA";
-  //     user.email = "east@email.com";
-  //     user.description = "Medium user of the east";
-  //     user.address = "Street 3";
-  //     user.city = "Midville";
-  //     user.state = "Pernambuco";
-  //     user.postalCode = "30000-456";
-  //     user.events = [guid.new()];
-  //     user.client = guid.new();
-  //     user.active = !previousStatus;
+    const user = new User();
+    user.id = users[0].id;
+    user.email = "user2@email.com";
+    user.username = "nickname2";
+    user.password = "Abc123!!";
+    user.active = !previousStatus;
 
-  //     const updatedUser = await userController.updateUserStatus(user);
+    const updatedUser = await userController.updateUserStatus(user);
 
-  //     // must have not received new values
-  //     expect(updatedUser.id.toString()).to.equal(user.id.toString());
-  //     expect(updatedUser.name).to.not.equal(user.name);
-  //     expect(updatedUser.email).to.not.equal(user.email);
-  //     expect(updatedUser.description).to.not.equal(user.description);
-  //     expect(updatedUser.address).to.not.equal(user.address);
-  //     expect(updatedUser.city).to.not.equal(user.city);
-  //     expect(updatedUser.state).to.not.equal(user.state);
-  //     expect(updatedUser.postalCode).to.not.equal(user.postalCode);
-  //     expect(updatedUser.events.length).to.not.equal(
-  //       user.events.length,
-  //       "User's events must not have been changed"
-  //     );
-  //     expect(updatedUser.client.toString()).to.not.equal(
-  //       user.client.toString(),
-  //       "Owner of the user must never change"
-  //     );
+    // must have not received new values
+    expect(updatedUser.id.toString()).to.equal(user.id.toString());
+    expect(updatedUser.email).to.not.equal(user.email);
+    expect(updatedUser.username).to.not.equal(user.username);
 
-  //     // must have changed
-  //     expect(updatedUser.active).to.not.equal(previousStatus);
-  //   });
+    // must not have been returned
+    expect(updatedUser.password).to.be.undefined;
+
+    // must have changed
+    expect(updatedUser.active).to.not.equal(previousStatus);
+  });
 });
