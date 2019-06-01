@@ -1,6 +1,7 @@
 require("../models/LogEntry");
 const mongoose = require("mongoose"); // mongoose for mongodb
 const jwt = require("jsonwebtoken");
+const { logEntryController } = require("../config/bootstrap");
 
 const LogEntry = mongoose.model("LogEntry");
 
@@ -28,7 +29,7 @@ function getPayload(requestBody) {
   return JSON.stringify(requestBody);
 }
 
-function requestsLogger(req, res, next) {
+async function requestsLogger(req) {
   const token = decodeFromReq(req);
 
   const logEntry = new LogEntry();
@@ -38,8 +39,8 @@ function requestsLogger(req, res, next) {
   logEntry.ip = req.headers["x-forwarded-for"];
   logEntry.createdAt = new Date();
   logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
-  logEntry.save().catch(next);
-  next();
+
+  await logEntryController.createLogEntry(logEntry);
 }
 
 module.exports.isEmptyObject = isEmptyObject;
