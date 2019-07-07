@@ -1,7 +1,6 @@
 require("../models/LogEntry");
-const mongoose = require("mongoose"); // mongoose for mongodb
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const { logEntryController } = require("../config/bootstrap");
 
 const LogEntry = mongoose.model("LogEntry");
 
@@ -29,7 +28,7 @@ function getPayload(requestBody) {
   return JSON.stringify(requestBody);
 }
 
-async function requestsLogger(req) {
+function requestsLogger(req, res, next) {
   const token = decodeFromReq(req);
 
   const logEntry = new LogEntry();
@@ -40,7 +39,8 @@ async function requestsLogger(req) {
   logEntry.createdAt = new Date();
   logEntry.payload = isLoggable(req) ? getPayload(req.body) : null;
 
-  await logEntryController.createLogEntry(logEntry);
+  logEntry.save().catch(next);
+  next();
 }
 
 module.exports.isEmptyObject = isEmptyObject;
