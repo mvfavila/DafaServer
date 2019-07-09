@@ -69,5 +69,4 @@ typings/
 .serverless/
 
 # Environment files
-!src/config/environment/sample.dev.env
 src/config/environment/*.env

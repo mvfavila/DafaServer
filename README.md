@@ -18,6 +18,16 @@ Unit tests and integration tests were created using Mocha, Chai and mongodb-memo
 Run `npm test` to execute all unit and integration tests.<br/>
 Run `npm run testDebug` to execute all unit and integration tests in debug mode.
 
+## Running Locally
+
+> serverless offline start --skipCacheInvalidation
+
+## Logging
+
+To run the live logging in a terminal:<br/>
+
+> serverless logs -f [FUNCTION NAME] -t
+
 ## Deploy
 
 If the configuration bellow has already been made the only thing you need to do to deploy to the dev/qa/prod environment is:
@@ -26,6 +36,12 @@ If the configuration bellow has already been made the only thing you need to do 
    > serverless deploy function -f dafa-server
 2. If 'serverless.yml' file has not been changed:
    > serverless deploy
+
+## Teardown
+
+If you want to remove the existing stack:
+
+> serverless remove --stage dev --region us-east-1
 
 ## Deploy configuration
 
