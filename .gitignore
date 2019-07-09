@@ -65,5 +65,9 @@ typings/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Dependency directories
+# Serverless Files
 .serverless/
+
+# Environment files
+!src/config/environment/sample.dev.env
+src/config/environment/*.env
