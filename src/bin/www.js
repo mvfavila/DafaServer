@@ -2,10 +2,14 @@
  * Module dependencies.
  */
 const http = require("http");
+const serverless = require("serverless-http");
 const log = require("../util/log");
 
 log.info("Starting server...");
 
+require("dotenv").config({
+  path: "src/config/environment/dev.env"
+});
 const server = require("../server");
 
 /**
@@ -76,8 +80,9 @@ function onListening() {
 /**
  * Listen on provided port, on all network interfaces.
  */
-httpServer.listen(port);
+// httpServer.listen(port);
 httpServer.on("error", onError);
 httpServer.on("listening", onListening);
 
 module.exports = httpServer; // for testing
+module.exports.handler = serverless(server);
