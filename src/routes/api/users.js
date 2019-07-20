@@ -115,15 +115,23 @@ const userApi = function userApi(userController) {
         { session: false },
         (err, user, info) => {
           if (err) {
-            log.warn(`Login can't be processed. Error: ${err}`);
+            log.warn(
+              `Login can't be processed. Error: ${JSON.stringify(info)}`
+            );
             return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(err);
           }
 
           if (user) {
             log.info(`Login succeeded`);
-            return res.json({ token: user.generateJWT() });
+            return res.json({
+              email: user.email,
+              token: user.generateJWT(),
+              expiresIn: 604800 // 7 days
+            });
           }
-          log.warn(`Login can't be processed. Warning: ${info}`);
+          log.warn(
+            `Login can't be processed. Warning: ${JSON.stringify(info)}`
+          );
           return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
         }
       )(req, res);
