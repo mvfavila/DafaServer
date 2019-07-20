@@ -5,6 +5,18 @@ const passport = require("passport");
 const User = mongoose.model("User");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
+const log = require("../../util/log");
+
+/**
+ * Gets the email property of a request.
+ * @param {Request} req Request object.
+ */
+function getEmailFromRequest(req) {
+  if (req.body.user && req.body.user.email) {
+    return `'${req.body.user.email}'`;
+  }
+  return "";
+}
 
 /**
  * Represents the user API with it's methods.
@@ -73,13 +85,26 @@ const userApi = function userApi(userController) {
      * @param {Object} res Response object.
      */
     async login(req, res) {
+      log.info(`Login requested. ${getEmailFromRequest(req)}`);
+
+      if (!req.body.user) {
+        log.info(`Login can't be processed: No 'user' field in the body`);
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ errors: { model: "can't be processed" } });
+      }
+
       if (!req.body.user.email) {
+        log.info(`Login can't be processed: No 'email' field in the body.user`);
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
           .json({ errors: { email: "can't be blank" } });
       }
 
       if (!req.body.user.password) {
+        log.info(
+          `Login can't be processed: No 'email' field in the body.password`
+        );
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
           .json({ errors: { password: "can't be blank" } });
@@ -90,12 +115,15 @@ const userApi = function userApi(userController) {
         { session: false },
         (err, user, info) => {
           if (err) {
+            log.warn(`Login can't be processed. Error: ${err}`);
             return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(err);
           }
 
           if (user) {
+            log.info(`Login succeeded`);
             return res.json({ token: user.generateJWT() });
           }
+          log.warn(`Login can't be processed. Warning: ${info}`);
           return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
         }
       )(req, res);

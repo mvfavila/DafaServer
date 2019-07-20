@@ -36,6 +36,15 @@ const logger = {
   },
 
   /**
+   * Warning level log function.
+   * @param {string} message Message to be logged.
+   */
+  warn(message) {
+    const level = "WARN";
+    writeLog(message, level);
+  },
+
+  /**
    * Debug level log function.
    * @param {string} message Message to be logged.
    */

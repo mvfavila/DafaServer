@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./src/bin/www",
+    "start": "serverless offline start --skipCacheInvalidation",
     "serve": "node ./src/bin/www",
     "test": "nyc mocha --timeout 60000 ./src/**/*.spec.js --exit",
     "testDebug": "mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit"
