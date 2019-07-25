@@ -35,8 +35,6 @@ store.on("error", error => {
   }
 });
 
-app.use(cors());
-
 app.use(logger("dev")); // log every request to the console
 app.use(bodyParser.urlencoded({ extended: "false" })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
@@ -84,15 +82,31 @@ if (!isTest) {
   }
 }
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "DELETE, PUT");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// CORS configuration
+// TODO: make this list dynamic
+const whitelist = ["https://dafa-web.firebaseapp.com"];
+if (!isProduction) {
+  whitelist.push("http://localhost:4200");
+}
+const corsOptions = {
+  origin(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1 || (!isProduction && !origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  allowHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "authorization"
+  ],
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST"]
+};
+app.options("*", cors());
+app.use(cors(corsOptions));
 
 // require models
 require("./models/User");
