@@ -8,6 +8,17 @@ provider:
   memorySize: 128
 
 functions:
+  verify-token:
+    handler: src/middleware/VerifyToken.auth
+
+  anonymous:
+    handler: src/bin/www.handler
+    events:
+      - http:
+          path: /api/users/login
+          method: ANY
+          cors: true
+
   app:
     handler: src/bin/www.handler
     events:
@@ -15,10 +26,12 @@ functions:
           path: /
           method: ANY
           cors: true
+          authorizer: verify-token
       - http:
           path: /{proxy+}
           method: ANY
           cors: true
+          authorizer: verify-token
 
 plugins:
   - serverless-offline
