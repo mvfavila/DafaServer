@@ -19,6 +19,15 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/src/bin/www"
+    },
+    {
+      "name": "Debug",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "debug"],
+      "port": 9229
     }
   ]
 }
