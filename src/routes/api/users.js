@@ -6,6 +6,7 @@ const User = mongoose.model("User");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
 const log = require("../../util/log");
+const { tokenSecondsToExpiration } = require("../../config");
 
 /**
  * Gets the email property of a request.
@@ -126,7 +127,7 @@ const userApi = function userApi(userController) {
             return res.json({
               email: user.email,
               token: user.generateJWT(),
-              expiresIn: 604800 // 7 days
+              expiresIn: tokenSecondsToExpiration
             });
           }
           log.warn(

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const { secret } = require("../config");
+const { secret, tokenSecondsToExpiration } = require("../config");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -60,7 +60,11 @@ UserSchema.methods.setPassword = function setPassword(password) {
 UserSchema.methods.generateJWT = function generateJWT() {
   const today = new Date();
   const exp = new Date(today);
-  exp.setDate(today.getDate() + 60);
+  let timeInDays = Math.floor(tokenSecondsToExpiration / 86400);
+  if (timeInDays < 1) {
+    timeInDays = 1;
+  }
+  exp.setDate(today.getDate() + timeInDays);
   const radix = 10;
 
   return jwt.sign(
