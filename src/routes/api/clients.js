@@ -206,7 +206,9 @@ module.exports = clientController => {
     .get(api.getClientById)
     .patch(api.updateClientStatus);
 
-  router.route("/clients/:clientId/fields").get(api.getFieldsByClient);
+  router
+    .route("/clients/:clientId/fields", auth.required)
+    .get(api.getFieldsByClient);
 
   router
     .route("/clients", auth.required)
