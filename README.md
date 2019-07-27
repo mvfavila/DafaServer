@@ -35,7 +35,7 @@ This server has been configured to be deployed with the `Serverless Framework CL
 
 In the terminal, execute:<br/>
 
-> npm install -g serverless
+> npm install -g serverless<br/>
 > serverless login
 
 Configure your serverless framework using your [AWS Credentials](https://www.youtube.com/watch?v=tgb_MRVylWw).<br/>
