@@ -105,8 +105,7 @@ const corsOptions = {
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST"]
 };
-app.options("*", cors());
-app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // require models
 require("./models/User");
