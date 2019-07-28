@@ -93,7 +93,7 @@ const corsOptions = {
     if (whitelist.indexOf(origin) !== -1 || (!isProduction && !origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Origin not allowed by CORS"));
     }
   },
   allowHeaders: [
@@ -106,6 +106,11 @@ const corsOptions = {
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST"]
 };
 app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 // require models
 require("./models/User");
