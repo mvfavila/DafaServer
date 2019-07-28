@@ -108,7 +108,8 @@ const corsOptions = {
     "XKey",
     "authorization"
   ],
-  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
+  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  credentials: true
 };
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
