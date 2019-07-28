@@ -3,9 +3,6 @@
  */
 const http = require("http");
 const serverless = require("serverless-http");
-const middy = require("middy");
-const { cors } = require("middy/middlewares");
-
 const log = require("../util/log");
 
 log.info("Starting server...");
@@ -87,7 +84,5 @@ function onListening() {
 httpServer.on("error", onError);
 httpServer.on("listening", onListening);
 
-const handler = middy(serverless(server)).use(cors());
-
 module.exports = httpServer; // for testing
-module.exports.handler = handler;
+module.exports.handler = serverless(server);
