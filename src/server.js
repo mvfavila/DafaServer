@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser"); // TODO: try to remove
 const logger = require("morgan"); // log requests to the console (express4)
 const bodyParser = require("body-parser"); // pull information from HTML POST (express4)
 const methodOverride = require("method-override"); // simulate DELETE and PUT (express4)
-const cors = require("cors"); // allows AJAX requests to access resources from remote hosts
+// const cors = require("cors"); // allows AJAX requests to access resources from remote hosts
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const errorhandler = require("errorhandler"); // development-only error handler middleware
@@ -82,36 +82,36 @@ if (!isTest) {
   }
 }
 
-// CORS configuration
-// TODO: make this list dynamic
-const whitelist = ["https://dafa-web.firebaseapp.com"];
-if (!isProduction) {
-  whitelist.push("http://localhost:4200");
-}
-const corsOptions = {
-  origin(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || (!isProduction && !origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Origin not allowed by CORS"));
-    }
-  },
-  allowHeaders: [
-    "Origin",
-    "X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "authorization"
-  ],
-  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST"]
-};
-app.options("*", cors(corsOptions));
-app.use(cors(corsOptions));
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
+// // CORS configuration
+// // TODO: make this list dynamic
+// const whitelist = ["https://dafa-web.firebaseapp.com"];
+// if (!isProduction) {
+//   whitelist.push("http://localhost:4200");
+// }
+// const corsOptions = {
+//   origin(origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1 || (!isProduction && !origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Origin not allowed by CORS"));
+//     }
+//   },
+//   allowHeaders: [
+//     "Origin",
+//     "X-Requested-With",
+//     "Content-Type",
+//     "Accept",
+//     "authorization"
+//   ],
+//   methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST"]
+// };
+// app.options("*", cors(corsOptions));
+// app.use(cors(corsOptions));
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader("Access-Control-Allow-Credentials", true);
+//   next();
+// });
 
 // require models
 require("./models/User");
