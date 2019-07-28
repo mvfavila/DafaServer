@@ -104,6 +104,7 @@ const corsOptions = {
     "Content-Type",
     "Access-Control-Request-Method",
     "Access-Control-Request-Headers",
+    "Access-Control-Allow-Credentials",
     "X-Access-Token",
     "XKey",
     "authorization"
