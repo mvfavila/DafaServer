@@ -6,7 +6,8 @@
     "start": "serverless offline start --skipCacheInvalidation",
     "debug": "SET SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline",
     "test": "nyc mocha --timeout 60000 ./src/**/*.spec.js --exit",
-    "testDebug": "mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit"
+    "testDebug": "mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit",
+    "deploy": "serverless deploy"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
