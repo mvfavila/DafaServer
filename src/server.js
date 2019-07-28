@@ -103,12 +103,13 @@ const corsOptions = {
     "Accept",
     "authorization"
   ],
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST"]
+  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST"]
 };
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
 

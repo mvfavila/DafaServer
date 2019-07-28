@@ -27,30 +27,12 @@ functions:
       - http:
           path: /
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-             allowCredentials: true
+          cors: true
           authorizer: verify-token
       - http:
           path: /{proxy+}
           method: ANY
-          cors:
-            origin: '*'
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: true
+          cors: true
           authorizer: verify-token
 
 plugins:
@@ -59,12 +41,12 @@ plugins:
 resources:
   Resources:
     GatewayResponseDefault4XX:
-      Type: 'AWS::ApiGateway::GatewayResponse'
+      Type: "AWS::ApiGateway::GatewayResponse"
       Properties:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'OPTIONS,GET,HEAD,PUT,PATCH,POST'"
         ResponseType: DEFAULT_4XX
         RestApiId:
-          Ref: 'ApiGatewayRestApi'
+          Ref: "ApiGatewayRestApi"
