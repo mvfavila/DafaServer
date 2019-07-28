@@ -5,6 +5,7 @@ const Client = mongoose.model("Client");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
 const { guid } = require("../../util/guid");
+const log = require("../../util/log");
 
 /**
  * Represents the client API with it's methods.
@@ -17,6 +18,7 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} res Response object.
      */
     getHealthCheck(req, res) {
+      log.info("Client API is Healthy");
       return res.status(httpStatus.SUCCESS).send("Healthy");
     },
 
@@ -26,7 +28,13 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} res Response object.
      */
     async getClientById(req, res) {
+      log.info("Get Client By Id started");
       if (!req.params.clientId || !guid.isGuid(req.params.clientId)) {
+        log.info(
+          `Client Id does not exist or is invalid. Value [${JSON.stringify(
+            req.params.clientId
+          )}]. Returning ${httpStatus.UNPROCESSABLE_ENTITY}.`
+        );
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
           .send({ error: "Invalid argument. Request can not be processed" });
@@ -35,11 +43,17 @@ const clientApi = function clientApi(clientController) {
       const client = await clientController.getClientById(req.params.clientId);
 
       if (!client) {
+        log.info(
+          `Client not found. Value [${JSON.stringify(
+            req.params.clientId
+          )}]. Returning ${httpStatus.UNAUTHORIZED}.`
+        );
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No client found" });
       }
 
+      log.info(`Client found. Returning ${httpStatus.SUCCESS}.`);
       return res
         .status(httpStatus.SUCCESS)
         .json({ client: client.toAuthJSON() });
@@ -52,10 +66,13 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} next Method to be called next.
      */
     getActiveClients(req, res, next) {
+      log.info("Get Active Clients started");
       clientController
         .getAllClients()
         .then(clients => {
           if (!clients) {
+            log.info(`No Client found. Returning ${httpStatus.UNAUTHORIZED}.`);
+            res.setHeader("Access-Control-Allow-Origin", "*");
             return res
               .status(httpStatus.UNAUTHORIZED)
               .send({ error: "No client found" });
@@ -66,9 +83,22 @@ const clientApi = function clientApi(clientController) {
             clientsJson.push(client.toJSON());
           });
 
+          log.info(
+            `Clients found [${clientsJson.length}]. Returning ${
+              httpStatus.SUCCESS
+            }.`
+          );
+          res.setHeader("Access-Control-Allow-Origin", "*");
           return res.json({ clients: clientsJson });
         })
-        .catch(next);
+        .catch(err => {
+          log.error(
+            `Unexpected error in Get Active Clients. Err: ${JSON.stringify(
+              err
+            )}.<br/>Callind next()`
+          );
+          next();
+        });
     },
 
     /**
@@ -78,10 +108,12 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} next Method to be called next.
      */
     getFieldsByClient(req, res, next) {
+      log.info("Get Fields by Client started");
       clientController
         .getFieldsByClient(req.params.clientId)
         .then(fields => {
           if (!fields) {
+            log.info(`No Field found. Returning ${httpStatus.UNAUTHORIZED}.`);
             return res
               .status(httpStatus.UNAUTHORIZED)
               .send({ error: "No field found" });
@@ -92,9 +124,23 @@ const clientApi = function clientApi(clientController) {
             fieldsJson.push(e);
           });
 
+          log.info(
+            `Fields [${
+              fieldsJson.length
+            }] found for the Client [${JSON.stringify(
+              req.params.clientId
+            )}]. Returning ${httpStatus.SUCCESS}.`
+          );
           return res.json({ fields: fieldsJson });
         })
-        .catch(next);
+        .catch(err => {
+          log.error(
+            `Unexpected error in Get Fields by Client. Err: ${JSON.stringify(
+              err
+            )}.<br/>Callind next()`
+          );
+          next();
+        });
     },
 
     /**
@@ -104,6 +150,7 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} next Method to be called next.
      */
     createClient(req, res, next) {
+      log.info("Create Client started");
       const client = new Client();
 
       client.firstName = req.body.client.firstName;
@@ -118,8 +165,19 @@ const clientApi = function clientApi(clientController) {
 
       clientController
         .addClient(client)
-        .then(() => res.json({ client: client.toAuthJSON() }))
-        .catch(next);
+        .then(() => {
+          log.info(`Client created. Returning ${httpStatus.SUCCESS}.`);
+          res.json({ client: client.toAuthJSON() });
+        })
+        .catch(err => {
+          log.error(
+            `Unexpected error in Create Client. Err: ${JSON.stringify(
+              err
+            )}.<br/>Callind next()`
+          );
+          // TODO: check if should pass err to next()
+          next();
+        });
     },
 
     /**
@@ -128,11 +186,15 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} res Response object.
      */
     async updateClientStatus(req, res) {
+      log.info("Update Client Status started");
       if (
         !req.params.clientId ||
         !guid.isGuid(req.params.clientId) ||
         !req.body.client
       ) {
+        log.info(
+          `Invalid request. Returning ${httpStatus.UNPROCESSABLE_ENTITY}.`
+        );
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
           .send({ error: "Invalid argument. Request can not be processed" });
@@ -144,17 +206,24 @@ const clientApi = function clientApi(clientController) {
 
       const foundClient = await clientController.updateClientStatus(client);
       if (foundClient instanceof Error) {
+        log.info(
+          `It was not possible to update client. Err: ${JSON.stringify(
+            foundClient
+          )}.<br/>Returning ${httpStatus.UNAUTHORIZED}.`
+        );
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No client found" });
       }
 
       if (!foundClient) {
+        log.info(`Client not found. Returning ${httpStatus.UNAUTHORIZED}.`);
         return res
           .status(httpStatus.UNAUTHORIZED)
           .send({ error: "No client found" });
       }
 
+      log.info(`Client updated. Returning ${httpStatus.SUCCESS}.`);
       return res
         .status(httpStatus.SUCCESS)
         .json({ client: client.toAuthJSON() });
@@ -167,6 +236,7 @@ const clientApi = function clientApi(clientController) {
      * @param {Object} next Method to be called next.
      */
     async updateClient(req, res, next) {
+      log.info("Update Client started");
       const client = new Client();
 
       client.id = req.body.client.id;
@@ -182,13 +252,22 @@ const clientApi = function clientApi(clientController) {
 
       await clientController
         .updateClient(client)
-        .then(() => res.json({ client: client.toAuthJSON() }))
+        .then(() => {
+          log.info(`Client updated. Returning ${httpStatus.SUCCESS}.`);
+          res.json({ client: client.toAuthJSON() });
+        })
         .catch(err => {
           if (err.message === "Client not found") {
+            log.info(`Client not found. Returning ${httpStatus.UNAUTHORIZED}.`);
             return res
               .status(httpStatus.UNAUTHORIZED)
               .send({ error: "No client found" });
           }
+          log.error(
+            `Unexpected error in Update Client. Err: ${JSON.stringify(
+              err
+            )}.<br/>Callind next()`
+          );
           return next(err);
         });
     }
