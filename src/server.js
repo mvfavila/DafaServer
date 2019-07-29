@@ -84,7 +84,7 @@ if (!isTest) {
 
 // // CORS configuration
 // // TODO: make this list dynamic
-const whitelist = ["https://dafa-web.firebaseapp.com"];
+const whitelist = ["https://dafa-web2.firebaseapp.com"];
 // if (!isProduction) {
 //   whitelist.push("http://localhost:4200");
 // }
