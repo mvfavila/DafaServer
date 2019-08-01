@@ -33,7 +33,7 @@ function getTokenFromHeader(authorizationToken) {
   return null;
 }
 
-module.exports.auth = (event, context, callback) => {
+module.exports.authorizer = (event, context, callback) => {
   // check header or url parameters or post parameters for token
   const token = getTokenFromHeader(event.authorizationToken);
 

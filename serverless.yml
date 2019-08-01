@@ -10,8 +10,8 @@ provider:
     NODE_ENV: production
 
 functions:
-  verify-token:
-    handler: src/middleware/VerifyToken.auth
+  authorizer:
+    handler: src/middleware/VerifyToken.authorizer
 
   anonymous:
     handler: src/bin/www.handler
@@ -27,11 +27,11 @@ functions:
       - http:
           path: /
           method: ANY
-          authorizer: verify-token
+          authorizer: authorizer
       - http:
           path: /{proxy+}
           method: ANY
-          authorizer: verify-token
+          authorizer: authorizer
 
 plugins:
   - serverless-offline
