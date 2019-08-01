@@ -95,17 +95,7 @@ const corsOptions = {
   },
   methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
 };
-const optionsRequestOptions = {
-  allowHeaders: [
-    "Content-Type",
-    "X-Amz-Date",
-    "authorization",
-    "X-Api-Key",
-    "X-Amz-Security-Token",
-    "access-control-allow-credentials"
-  ]
-};
-app.options("*", cors(optionsRequestOptions));
+app.options("*", cors());
 app.use(cors(corsOptions));
 
 // require models
