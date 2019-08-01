@@ -84,15 +84,9 @@ if (!isTest) {
 
 // // CORS configuration
 // // TODO: make this list dynamic
-const whitelist = ["https://dafa-web.firebaseapp.com"];
+// const whitelist = ["https://dafa-web.firebaseapp.com"];
 const corsOptions = {
-  origin(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Origin not allowed by CORS"));
-    }
-  },
+  origin: "*",
   methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
 };
 app.options("*", cors());
