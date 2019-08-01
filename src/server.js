@@ -84,10 +84,7 @@ if (!isTest) {
 
 // // CORS configuration
 // // TODO: make this list dynamic
-const whitelist = ["https://dafa-web2.firebaseapp.com"];
-// if (!isProduction) {
-//   whitelist.push("http://localhost:4200");
-// }
+const whitelist = ["https://dafa-web.firebaseapp.com"];
 const corsOptions = {
   origin(origin, callback) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -96,49 +93,10 @@ const corsOptions = {
       callback(new Error("Origin not allowed by CORS"));
     }
   },
-  allowHeaders: [
-    "Access-Control-Allow-Headers",
-    "Origin",
-    "Accept",
-    "X-Requested-With",
-    "Content-Type",
-    "Access-Control-Request-Method",
-    "Access-Control-Request-Headers",
-    "Access-Control-Allow-Credentials",
-    "X-Access-Token",
-    "XKey",
-    "authorization"
-  ],
-  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-  credentials: true
+  methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
 };
-app.options("*", cors(corsOptions));
+app.options("*", cors());
 app.use(cors(corsOptions));
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader("Access-Control-Allow-Credentials", true);
-//   next();
-// });
-
-app.use((req, res, next) => {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "*");
-
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,authorization"
-  );
-
-  // Pass to next layer of middleware
-  next();
-});
 
 // require models
 require("./models/User");
