@@ -11,7 +11,7 @@ provider:
 
 functions:
   authorizer:
-    handler: src/middleware/VerifyToken.authorizer
+    handler: src/middleware/verifyToken.authorizer
 
   anonymous:
     handler: src/bin/www.handler
