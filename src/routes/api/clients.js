@@ -298,9 +298,6 @@ module.exports = clientController => {
     .route("/clients/:clientId/fields", auth.required)
     .get(api.getFieldsByClient);
 
-  // TODO: check if this is necessary
-  router.route("/clients").options(api.getHealthCheck);
-
   router
     .route("/clients", auth.required)
     .get(api.getActiveClients)
