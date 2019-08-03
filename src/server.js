@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser"); // TODO: try to remove
 const logger = require("morgan"); // log requests to the console (express4)
 const bodyParser = require("body-parser"); // pull information from HTML POST (express4)
 const methodOverride = require("method-override"); // simulate DELETE and PUT (express4)
-// const cors = require("cors"); // allows AJAX requests to access resources from remote hosts
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const errorhandler = require("errorhandler"); // development-only error handler middleware
@@ -84,20 +83,10 @@ if (!isTest) {
   }
 }
 
-// // CORS configuration
-// // TODO: make this list dynamic
-// const whitelist = ["https://dafa-web.firebaseapp.com"];
-// const corsOptions = {
-//   origin: "*",
-//   methods: ["OPTIONS", "GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
-// };
-// app.options("*", cors());
-// app.use(cors(corsOptions));
-
+// TODO: check if this middleware is necessary. If it is, move it to it's own file
 // eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
   log.info(`Request: ${stringify(req, null, 2)}`);
-  log.info(`Request method: ${req.method}`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",

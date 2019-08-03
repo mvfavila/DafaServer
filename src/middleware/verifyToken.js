@@ -37,29 +37,29 @@ function getTokenFromHeader(authorizationToken) {
 module.exports.authorizer = (event, context, callback) => {
   log.info("Authorizing...");
 
-  return callback(null, generatePolicy("123", "Allow", event.methodArn));
-  // // check header or url parameters or post parameters for token
-  // const token = getTokenFromHeader(event.authorizationToken);
+  // check header or url parameters or post parameters for token
+  const token = getTokenFromHeader(event.authorizationToken);
 
-  // if (event.requestContext && event.requestContext.httpMethod === "OPTIONS") {
-  //   log.info("OPTIONS request. Returning OK.");
-  //   return callback(null, generatePolicy(null, "Allow", event.methodArn));
-  // }
+  // TODO: check if this if is necessary
+  if (event.requestContext && event.requestContext.httpMethod === "OPTIONS") {
+    log.info("OPTIONS request. Returning OK.");
+    return callback(null, generatePolicy(null, "Allow", event.methodArn));
+  }
 
-  // if (!token) {
-  //   log.info("Token not found in request.");
-  //   return callback(null, generatePolicy("user", "Deny", event.methodArn));
-  // }
+  if (!token) {
+    log.info("Token not found in request.");
+    return callback(null, generatePolicy("user", "Deny", event.methodArn));
+  }
 
-  // // verifies secret and checks exp
-  // return jwt.verify(token, secret, (err, decoded) => {
-  //   if (err) {
-  //     log.info(`Token is not valid: ${stringify(err, null, 2)}`);
-  //     return callback(null, generatePolicy("user", "Deny", event.methodArn));
-  //   }
+  // verifies secret and checks exp
+  return jwt.verify(token, secret, (err, decoded) => {
+    if (err) {
+      log.info(`Token is not valid: ${stringify(err, null, 2)}`);
+      return callback(null, generatePolicy("user", "Deny", event.methodArn));
+    }
 
-  //   // if everything is good, save to request for use in other routes
-  //   log.info(`Token is valid`);
-  //   return callback(null, generatePolicy(decoded.id, "Allow", event.methodArn));
-  // });
+    // if everything is good, save to request for use in other routes
+    log.info(`Token is valid`);
+    return callback(null, generatePolicy(decoded.id, "Allow", event.methodArn));
+  });
 };

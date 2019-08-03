@@ -29,8 +29,8 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: "*" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
+            origin: "*"
+            headers:
               - Content-Type
               - X-Amz-Date
               - Authorization
@@ -43,8 +43,8 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: "*" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
+            origin: "*"
+            headers:
               - Content-Type
               - X-Amz-Date
               - Authorization
