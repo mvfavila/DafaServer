@@ -19,7 +19,12 @@ function getTodayDate() {
  */
 function writeLog(message, level) {
   const fileName = `DafaServer_${getTodayDate()}.log`;
-  log(`${level}: ${message}`, fileName);
+  if (process.env.NODE_ENV === "production") {
+    // eslint-disable-next-line no-console
+    console.log(`${level}: ${message}`);
+  } else {
+    log(`${level}: ${message}`, fileName);
+  }
 }
 
 /**
