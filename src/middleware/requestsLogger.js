@@ -1,6 +1,7 @@
 require("../models/LogEntry");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const { stringify } = require("flatted");
 
 const LogEntry = mongoose.model("LogEntry");
 
@@ -25,7 +26,7 @@ function isEmptyObject(obj) {
 
 function getPayload(requestBody) {
   if (isEmptyObject(requestBody)) return null;
-  return JSON.stringify(requestBody);
+  return stringify(requestBody, null, 2);
 }
 
 function requestsLogger(req, res, next) {

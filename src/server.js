@@ -11,6 +11,8 @@ const errorhandler = require("errorhandler"); // development-only error handler 
 const passport = require("passport");
 const compression = require("compression");
 const mongoose = require("mongoose"); // mongoose for mongodb
+const { stringify } = require("flatted");
+
 const { presentableErrorCodes, httpStatus } = require("./util/util");
 const log = require("./util/log");
 
@@ -94,7 +96,7 @@ if (!isTest) {
 
 // eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
-  log.info(JSON.stringify(req, null, 2));
+  log.info(stringify(req, null, 2));
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",

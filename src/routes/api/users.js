@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const router = require("express").Router();
 const passport = require("passport");
+const { stringify } = require("flatted");
 
 const User = mongoose.model("User");
 const auth = require("../auth");
@@ -117,7 +118,7 @@ const userApi = function userApi(userController) {
         (err, user, info) => {
           if (err) {
             log.warn(
-              `Login can't be processed. Error: ${JSON.stringify(info)}`
+              `Login can't be processed. Error: ${stringify(info, null, 2)}`
             );
             return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(err);
           }
@@ -131,7 +132,7 @@ const userApi = function userApi(userController) {
             });
           }
           log.warn(
-            `Login can't be processed. Warning: ${JSON.stringify(info)}`
+            `Login can't be processed. Warning: ${stringify(info, null, 2)}`
           );
           return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
         }

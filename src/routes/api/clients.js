@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const router = require("express").Router();
+const { stringify } = require("flatted");
 
 const Client = mongoose.model("Client");
 const auth = require("../auth");
@@ -31,7 +32,7 @@ const clientApi = function clientApi(clientController) {
       log.info("Get Client By Id started");
       if (!req.params.clientId || !guid.isGuid(req.params.clientId)) {
         log.info(
-          `Client Id does not exist or is invalid. Value [${JSON.stringify(
+          `Client Id does not exist or is invalid. Value [${stringify(
             req.params.clientId
           )}]. Returning ${httpStatus.UNPROCESSABLE_ENTITY}.`
         );
@@ -44,7 +45,7 @@ const clientApi = function clientApi(clientController) {
 
       if (!client) {
         log.info(
-          `Client not found. Value [${JSON.stringify(
+          `Client not found. Value [${stringify(
             req.params.clientId
           )}]. Returning ${httpStatus.UNAUTHORIZED}.`
         );
@@ -93,8 +94,10 @@ const clientApi = function clientApi(clientController) {
         })
         .catch(err => {
           log.error(
-            `Unexpected error in Get Active Clients. Err: ${JSON.stringify(
-              err
+            `Unexpected error in Get Active Clients. Err: ${stringify(
+              err,
+              null,
+              2
             )}.<br/>Callind next()`
           );
           next();
@@ -125,9 +128,7 @@ const clientApi = function clientApi(clientController) {
           });
 
           log.info(
-            `Fields [${
-              fieldsJson.length
-            }] found for the Client [${JSON.stringify(
+            `Fields [${fieldsJson.length}] found for the Client [${stringify(
               req.params.clientId
             )}]. Returning ${httpStatus.SUCCESS}.`
           );
@@ -135,8 +136,10 @@ const clientApi = function clientApi(clientController) {
         })
         .catch(err => {
           log.error(
-            `Unexpected error in Get Fields by Client. Err: ${JSON.stringify(
-              err
+            `Unexpected error in Get Fields by Client. Err: ${stringify(
+              err,
+              null,
+              2
             )}.<br/>Callind next()`
           );
           next();
@@ -171,8 +174,10 @@ const clientApi = function clientApi(clientController) {
         })
         .catch(err => {
           log.error(
-            `Unexpected error in Create Client. Err: ${JSON.stringify(
-              err
+            `Unexpected error in Create Client. Err: ${stringify(
+              err,
+              null,
+              2
             )}.<br/>Callind next()`
           );
           // TODO: check if should pass err to next()
@@ -207,8 +212,10 @@ const clientApi = function clientApi(clientController) {
       const foundClient = await clientController.updateClientStatus(client);
       if (foundClient instanceof Error) {
         log.info(
-          `It was not possible to update client. Err: ${JSON.stringify(
-            foundClient
+          `It was not possible to update client. Err: ${stringify(
+            foundClient,
+            null,
+            2
           )}.<br/>Returning ${httpStatus.UNAUTHORIZED}.`
         );
         return res
@@ -264,8 +271,10 @@ const clientApi = function clientApi(clientController) {
               .send({ error: "No client found" });
           }
           log.error(
-            `Unexpected error in Update Client. Err: ${JSON.stringify(
-              err
+            `Unexpected error in Update Client. Err: ${stringify(
+              err,
+              null,
+              2
             )}.<br/>Callind next()`
           );
           return next(err);

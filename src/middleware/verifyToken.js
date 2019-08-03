@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { stringify } = require("flatted");
 
 const { secret } = require("../config");
 const log = require("../util/log");
@@ -51,7 +52,7 @@ module.exports.authorizer = (event, context, callback) => {
   // verifies secret and checks exp
   return jwt.verify(token, secret, (err, decoded) => {
     if (err) {
-      log.info(`Token is not valid: ${JSON.stringify(err)}`);
+      log.info(`Token is not valid: ${stringify(err, null, 2)}`);
       return callback(null, generatePolicy("user", "Deny", event.methodArn));
     }
 
