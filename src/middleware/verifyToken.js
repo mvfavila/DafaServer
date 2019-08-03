@@ -40,12 +40,6 @@ module.exports.authorizer = (event, context, callback) => {
   // check header or url parameters or post parameters for token
   const token = getTokenFromHeader(event.authorizationToken);
 
-  // TODO: check if this if is necessary
-  if (event.requestContext && event.requestContext.httpMethod === "OPTIONS") {
-    log.info("OPTIONS request. Returning OK.");
-    return callback(null, generatePolicy(null, "Allow", event.methodArn));
-  }
-
   if (!token) {
     log.info("Token not found in request.");
     return callback(null, generatePolicy("user", "Deny", event.methodArn));
