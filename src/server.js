@@ -96,7 +96,8 @@ if (!isTest) {
 
 // eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
-  log.info(stringify(req, null, 2));
+  log.info(`Request: ${stringify(req, null, 2)}`);
+  log.info(`Request method: ${req.method}`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
