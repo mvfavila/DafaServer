@@ -10,10 +10,10 @@ const errorhandler = require("errorhandler"); // development-only error handler 
 const passport = require("passport");
 const compression = require("compression");
 const mongoose = require("mongoose"); // mongoose for mongodb
-const { stringify } = require("flatted");
 
 const { presentableErrorCodes, httpStatus } = require("./util/util");
 const log = require("./util/log");
+const { corsSetter } = require("./middleware/corsSetter");
 
 // Create global app object
 const app = express();
@@ -83,25 +83,8 @@ if (!isTest) {
   }
 }
 
-// TODO: check if this middleware is necessary. If it is, move it to it's own file
-// eslint-disable-next-line consistent-return
-app.use((req, res, next) => {
-  log.info(`Request: ${stringify(req, null, 2)}`);
-  res.header("Access-Control-Allow-Origin", "https://dafa-web.firebaseapp.com");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Request-With, Content-Type, Accept, Authorization, X-Amz-Date, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent, Access-Control-Allow-Credentials"
-  );
-  if (req.method === "OPTIONS") {
-    log.info(`OPTIONS request detected. Returning 200.`);
-    res.header(
-      "Access-Control-Allow-Methods",
-      "PUT, POST, PATCH, DELETE, GET, HEAD"
-    );
-    return res.status(200).send({});
-  }
-  next();
-});
+// CORS - config response headers
+app.use(corsSetter);
 
 // require models
 require("./models/User");
