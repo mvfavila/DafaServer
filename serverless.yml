@@ -8,6 +8,7 @@ provider:
   memorySize: 128
   environment:
     NODE_ENV: production
+    # SECRET:
 
 functions:
   authorizer:
@@ -29,7 +30,7 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: "*"
+            origin: "https://dafa-web.firebaseapp.com"
             headers:
               - Content-Type
               - X-Amz-Date
@@ -43,7 +44,7 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: "*"
+            origin: "https://dafa-web.firebaseapp.com"
             headers:
               - Content-Type
               - X-Amz-Date
