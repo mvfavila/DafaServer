@@ -10,6 +10,7 @@ provider:
     NODE_ENV: ${env:NODE_ENV}
     SECRET: ${env:SECRET}
     CLIENT_SIDE_URL: ${env:CLIENT_SIDE_URL}
+    MONGODB_URI: ${env:MONGODB_URI}
 
 functions:
   authorizer:

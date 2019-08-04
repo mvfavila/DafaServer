@@ -14,14 +14,22 @@ const mongoose = require("mongoose"); // mongoose for mongodb
 const { presentableErrorCodes, httpStatus } = require("./util/util");
 const log = require("./util/log");
 const { corsSetter } = require("./middleware/corsSetter");
+const {
+  port,
+  environments,
+  secret,
+  currentEnvironment,
+  databaseUri,
+  isDebugModeOn
+} = require("./config");
 
 log.info(`
   Environment variables status:
-  MONGODB_URI: ${process.env.MONGODB_URI ? "OK" : "FAIL"}
-  PORT: ${process.env.PORT}
-  SECRET: ${process.env.SECRET ? "OK" : "FAIL"}
-  NODE_ENV: ${process.env.NODE_ENV}
-  DEBUG: ${process.env.DEBUG ? "true" : "false"}
+  MONGODB_URI: ${databaseUri ? "OK" : "FAIL"}
+  PORT: ${port}
+  SECRET: ${secret ? "OK" : "FAIL"}
+  NODE_ENV: ${currentEnvironment}
+  DEBUG: ${isDebugModeOn}
 `);
 
 // Create global app object
@@ -56,7 +64,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
-    secret: process.env.SECRET,
+    secret,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
     },
@@ -66,8 +74,8 @@ app.use(
   })
 );
 
-const isProduction = process.env.NODE_ENV === "production";
-const isTest = process.env.NODE_ENV === "test";
+const isProduction = currentEnvironment === environments.PROD;
+const isTest = currentEnvironment === environments.TEST;
 
 if (!isProduction) {
   app.use(errorhandler());
@@ -76,16 +84,13 @@ if (!isProduction) {
 if (!isTest) {
   const options = { useNewUrlParser: true, useCreateIndex: true };
   if (isProduction) {
-    mongoose.connect(process.env.MONGODB_URI, options);
+    mongoose.connect(databaseUri, options);
   } else {
     // Configuration
-    if (process.env.MONGODB_URI) {
-      mongoose.connect(process.env.MONGODB_URI, options);
+    if (databaseUri) {
+      mongoose.connect(databaseUri, options);
     } else {
-      mongoose.connect(
-        "mongodb://firstUser:Abc123!@ds121652.mlab.com:21652/dafadb",
-        options
-      );
+      throw new Error("Database URI not set. Server can not be started.");
     }
 
     mongoose.set("debug", true);

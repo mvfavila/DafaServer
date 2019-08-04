@@ -3,8 +3,15 @@
  */
 const http = require("http");
 const serverless = require("serverless-http");
-const log = require("../util/log");
 
+const log = require("../util/log");
+const { port, environments, currentEnvironment } = require("../config");
+
+if (currentEnvironment === environments.DEV) {
+  log.info(
+    "======================================================================================"
+  );
+}
 log.info("Starting server...");
 
 require("dotenv").config({
@@ -13,29 +20,8 @@ require("dotenv").config({
 const server = require("../server");
 
 /**
- * Normalize a port into a number, string, or false.
- * @param {String} val
- */
-function normalizePort(val) {
-  const port = parseInt(val, 10);
-
-  if (Number.isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
-
-/**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || "3000");
 server.set("port", port);
 
 /**

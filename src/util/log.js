@@ -1,5 +1,11 @@
 const log = require("log-to-file");
 
+const {
+  currentEnvironment,
+  environments,
+  isDebugModeOn
+} = require("../config");
+
 /**
  * Auxiliary function to get current date.
  */
@@ -19,7 +25,7 @@ function getTodayDate() {
  */
 function writeLog(message, level) {
   const fileName = `DafaServer_${getTodayDate()}.log`;
-  if (process.env.NODE_ENV === "production") {
+  if (currentEnvironment === environments.PROD) {
     // eslint-disable-next-line no-console
     console.log(`${level}: ${message}`);
   } else {
@@ -54,8 +60,6 @@ const logger = {
    * @param {string} message Message to be logged.
    */
   debug(message) {
-    const isDebugModeOn =
-      (process.env.DEBUG || "false").toLowerCase() === "true";
     const level = "DEBUG";
 
     if (isDebugModeOn) {
