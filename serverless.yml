@@ -7,7 +7,7 @@ provider:
   region: us-east-1
   memorySize: 128
   environment:
-    NODE_ENV: production
+    NODE_ENV: ${env:NODE_ENV}
     SECRET: ${env:SECRET}
     CLIENT_SIDE_URL: ${env:CLIENT_SIDE_URL}
 

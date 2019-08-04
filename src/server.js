@@ -15,6 +15,15 @@ const { presentableErrorCodes, httpStatus } = require("./util/util");
 const log = require("./util/log");
 const { corsSetter } = require("./middleware/corsSetter");
 
+log.info(`
+  Environment variables status:
+  MONGODB_URI: ${process.env.MONGODB_URI ? "OK" : "FAIL"}
+  PORT: ${process.env.PORT}
+  SECRET: ${process.env.SECRET ? "OK" : "FAIL"}
+  NODE_ENV: ${process.env.NODE_ENV}
+  DEBUG: ${process.env.DEBUG ? "true" : "false"}
+`);
+
 // Create global app object
 const app = express();
 
@@ -22,7 +31,7 @@ app.use(compression());
 
 const store = new MongoDBStore(
   {
-    uri: process.env.MONGODB_URI,
+    uri: "mongodb://db-user-dev:Lt2xBUQ6XrxMp6K@ds121652.mlab.com:21652/dafadb",
     collection: "mySessions"
   },
   error => {
@@ -83,9 +92,11 @@ if (!isTest) {
   }
 }
 
+log.info(`Adding CORS middleware`);
 // CORS - config response headers
 app.use(corsSetter);
 
+log.info(`Adding models`);
 // require models
 require("./models/User");
 require("./models/Client");
@@ -99,9 +110,11 @@ const LogEntry = require("./models/LogEntry");
 const { requestsLogger } = require("./middleware/requestsLogger");
 
 if (!isTest) {
+  log.info(`Not in test mode. Adding requestLogger middleware.`);
   app.use(requestsLogger);
 }
 
+log.info(`Adding Routes`);
 app.use(require("./routes"));
 
 // catch 404 and forward to error handler
@@ -161,11 +174,11 @@ app.use((err, req, res) => {
   }]`;
   const isPresentable = presentableErrorCodes.indexOf(err.status) >= 0;
 
-  log.error(
-    `Error:\n
-    isPresentable = ${isPresentable}\n
-    Original error message: ${err.message}`
-  );
+  log.error(`
+    Error:
+    isPresentable = ${isPresentable}
+    Original error message: ${err.message}
+  `);
   res.json({
     errors: {
       message: isPresentable ? err.message : message,
