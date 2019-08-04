@@ -1,9 +1,4 @@
-const { stringify } = require("flatted");
-
-const log = require("../util/log");
-
 function corsSetter(req, res, next) {
-  log.info(`Request: ${stringify(req, null, 2)}`);
   // TODO: move url to environment variable
   res.header("Access-Control-Allow-Origin", "https://dafa-web.firebaseapp.com");
   res.header(
