@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const log = require("../util/log");
 
 const Client = mongoose.model("Client");
 const Field = mongoose.model("Field");
@@ -24,6 +25,7 @@ const clientController = {
    * Gets all existing clients
    */
   async getAllClients() {
+    log.info(`About to getAllClients`);
     return new Promise(async (resolve, reject) => {
       let clients;
       try {
@@ -31,6 +33,7 @@ const clientController = {
       } catch (err) {
         return reject(err);
       }
+      log.info(`Found [${clients.length}] clients.`);
       return resolve(clients);
     });
   },

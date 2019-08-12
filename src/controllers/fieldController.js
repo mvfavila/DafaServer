@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 require("../models/Event");
+const log = require("../util/log");
 
 const Field = mongoose.model("Field");
 const Event = mongoose.model("Event");
@@ -29,6 +30,7 @@ const fieldController = {
    * Gets all existing fields
    */
   async getFields() {
+    log.info(`About to getFields.`);
     return new Promise(async (resolve, reject) => {
       let fields;
       try {
@@ -36,6 +38,7 @@ const fieldController = {
       } catch (err) {
         return reject(err);
       }
+      log.info(`Found [${fields.length}] fields.`);
       return resolve(fields);
     });
   },
