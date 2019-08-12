@@ -54,6 +54,19 @@ module.exports.authorizer = (event, context, callback) => {
 
     // if everything is good, save to request for use in other routes
     log.info(`Token is valid`);
-    return callback(null, generatePolicy(decoded.id, "Allow", event.methodArn));
+    log.info(`Resources: ${stringify(event.methodArn, null, 2)}`);
+    log.info(`event: ${stringify(event, null, 2)}`);
+    log.info(`context: ${stringify(context, null, 2)}`);
+    return callback(
+      null,
+      generatePolicy(
+        decoded.id,
+        "Allow",
+        `${event.methodArn
+          .split("/")
+          .slice(0, 2)
+          .join("/")}/*`
+      )
+    );
   });
 };
