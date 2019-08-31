@@ -30,6 +30,7 @@
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "serverless": "^1.51.0",
     "serverless-api-gateway-caching": "^1.4.0",
     "serverless-http": "^2.0.2"
   },

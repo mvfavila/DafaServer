@@ -9,6 +9,14 @@ const { guid } = require("../../util/guid");
 const log = require("../../util/log");
 
 /**
+ * Gets the id value from the object sent in the request body.
+ */
+function getObjectId(client) {
+  // eslint-disable-next-line no-underscore-dangle
+  return client.id || client._id;
+}
+
+/**
  * Represents the client API with it's methods.
  */
 const clientApi = function clientApi(clientController) {
@@ -246,7 +254,9 @@ const clientApi = function clientApi(clientController) {
       log.info("Update Client started");
       const client = new Client();
 
-      client.id = req.body.client.id;
+      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
+
+      client.id = getObjectId(req.body.client);
       client.firstName = req.body.client.firstName;
       client.lastName = req.body.client.lastName;
       client.company = req.body.client.company;
@@ -306,4 +316,5 @@ module.exports = clientController => {
 
   return router;
 };
+
 module.exports.clientApi = clientApi;

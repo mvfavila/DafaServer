@@ -26,7 +26,8 @@ function isEmptyObject(obj) {
 
 function getPayload(requestBody) {
   if (isEmptyObject(requestBody)) return null;
-  return stringify(requestBody, null, 2);
+  const requestBodyCopy = { ...requestBody };
+  return stringify(requestBodyCopy, null, 2);
 }
 
 function requestsLogger(req, res, next) {
