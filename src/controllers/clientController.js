@@ -97,6 +97,9 @@ const clientController = {
       // the status must be the only thing that gets updated
       clientToBeUpdated.active = client.active;
 
+      // updatedAt must always be updated when the model is modified
+      clientToBeUpdated.updatedAt = new Date();
+
       await Client.updateOne(
         { _id: clientToBeUpdated.id },
         clientToBeUpdated,
@@ -136,6 +139,9 @@ const clientController = {
       clientToBeUpdated.postalCode = client.postalCode;
       clientToBeUpdated.email = client.email;
       clientToBeUpdated.active = client.active;
+
+      // updatedAt must always be updated when the model is modified
+      clientToBeUpdated.updatedAt = new Date();
 
       await Client.updateOne(
         { _id: clientToBeUpdated.id },

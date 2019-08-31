@@ -55,6 +55,9 @@ const alertTypeController = {
       // the status must be the only thing that gets updated
       alertTypeToBeUpdated.active = alertType.active;
 
+      // updatedAt must always be updated when the model is modified
+      alertTypeToBeUpdated.updatedAt = new Date();
+
       await AlertType.updateOne(
         { _id: alertTypeToBeUpdated.id },
         alertTypeToBeUpdated,
@@ -90,6 +93,9 @@ const alertTypeController = {
       alertTypeToBeUpdated.numberOfDaysToWarning =
         alertType.numberOfDaysToWarning;
       alertTypeToBeUpdated.active = alertType.active;
+
+      // updatedAt must always be updated when the model is modified
+      alertTypeToBeUpdated.updatedAt = new Date();
 
       AlertType.updateOne(
         { _id: alertTypeToBeUpdated.id },

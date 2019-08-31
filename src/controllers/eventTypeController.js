@@ -76,6 +76,9 @@ const eventTypeController = {
       eventTypeToBeUpdated.alertTypes = eventType.alertTypes;
       eventTypeToBeUpdated.active = eventType.active;
 
+      // updatedAt must always be updated when the model is modified
+      eventTypeToBeUpdated.updatedAt = new Date();
+
       await EventType.updateOne(
         { _id: eventTypeToBeUpdated.id },
         eventTypeToBeUpdated,

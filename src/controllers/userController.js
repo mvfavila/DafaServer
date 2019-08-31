@@ -96,6 +96,9 @@ const userController = {
       // the status must be the only thing that gets updated
       userToBeUpdated.active = user.active;
 
+      // updatedAt must always be updated when the model is modified
+      userToBeUpdated.updatedAt = new Date();
+
       await User.updateOne(
         { _id: userToBeUpdated.id },
         userToBeUpdated,
@@ -128,6 +131,9 @@ const userController = {
       const userToBeUpdated = foundUser;
       userToBeUpdated.username = user.username;
       userToBeUpdated.active = user.active;
+
+      // updatedAt must always be updated when the model is modified
+      userToBeUpdated.updatedAt = new Date();
 
       const result = await User.updateOne(
         { _id: userToBeUpdated.id },

@@ -99,6 +99,9 @@ const fieldController = {
       // the status must be the only thing that gets updated
       fieldToBeUpdated.active = field.active;
 
+      // updatedAt must always be updated when the model is modified
+      fieldToBeUpdated.updatedAt = new Date();
+
       await Field.updateOne(
         { _id: fieldToBeUpdated.id },
         fieldToBeUpdated,
@@ -138,6 +141,9 @@ const fieldController = {
       fieldToBeUpdated.postalCode = field.postalCode;
       fieldToBeUpdated.events = field.events;
       fieldToBeUpdated.active = field.active;
+
+      // updatedAt must always be updated when the model is modified
+      fieldToBeUpdated.updatedAt = new Date();
 
       const result = await Field.updateOne(
         { _id: fieldToBeUpdated.id },
