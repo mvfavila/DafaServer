@@ -164,6 +164,8 @@ const clientApi = function clientApi(clientController) {
       log.info("Create Client started");
       const client = new Client();
 
+      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
+
       client.firstName = req.body.client.firstName;
       client.lastName = req.body.client.lastName;
       client.company = req.body.client.company;
@@ -172,7 +174,6 @@ const clientApi = function clientApi(clientController) {
       client.state = req.body.client.state;
       client.postalCode = req.body.client.postalCode;
       client.email = req.body.client.email;
-      client.active = true;
 
       clientController
         .addClient(client)

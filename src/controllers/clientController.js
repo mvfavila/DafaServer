@@ -69,7 +69,12 @@ const clientController = {
    */
   addClient(client) {
     const clientToAdd = client;
+
+    const currentDateTime = new Date();
+    clientToAdd.createdAt = currentDateTime;
+    clientToAdd.updatedAt = currentDateTime;
     clientToAdd.active = true;
+
     return new Promise(async (resolve, reject) => {
       await clientToAdd.save(async (err, clientAdded) => {
         if (err) return reject(err);
