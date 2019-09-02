@@ -2,6 +2,8 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
+const regexMask = require("../util/regex");
+
 const LogEntrySchema = new mongoose.Schema(
   {
     message: {
@@ -13,7 +15,7 @@ const LogEntrySchema = new mongoose.Schema(
       type: String,
       lowercase: false,
       required: [true, "can't be blank"],
-      match: [/^[a-zA-Z0-9]+$/, "is invalid"]
+      match: [regexMask.TEXT_NO_EMPTY_SPACE, "is invalid"]
     },
     user: { type: mongoose.Schema.Types.ObjectId },
     payload: { type: String },

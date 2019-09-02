@@ -16,7 +16,7 @@ const AlertTypeSchema = new mongoose.Schema(
     numberOfDaysToWarning: {
       type: Number,
       required: [true, "can't be blank"],
-      match: [/^[0-9]+$/, "is invalid"]
+      match: [regexMask.INTEGER, "is invalid"]
     },
     createdAt: { type: mongoose.Schema.Types.Date },
     updatedAt: { type: mongoose.Schema.Types.Date },

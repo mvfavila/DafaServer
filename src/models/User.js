@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
       required: [true, "can't be blank"],
-      match: [/^[a-zA-Z0-9]+$/, "is invalid"],
+      match: [regexMask.TEXT_NO_EMPTY_SPACE, "is invalid"],
       index: true
     },
     email: {
