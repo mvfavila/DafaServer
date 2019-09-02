@@ -2,19 +2,21 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
+const regexMask = require("../util/regex");
+
 const FieldSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       lowercase: false,
       required: [true, "can't be blank"],
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"],
+      match: [regexMask.TEXT, "is invalid"],
       index: true
     },
     email: {
       type: String,
       lowercase: true,
-      match: [/\S+@\S+\.\S+/, "is invalid"]
+      match: [regexMask.EMAIL, "is invalid"]
     },
     description: {
       type: String,
@@ -23,22 +25,22 @@ const FieldSchema = new mongoose.Schema(
     address: {
       type: String,
       lowercase: false,
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+      match: [regexMask.TEXT, "is invalid"]
     },
     city: {
       type: String,
       lowercase: false,
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+      match: [regexMask.TEXT, "is invalid"]
     },
     state: {
       type: String,
       lowercase: false,
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+      match: [regexMask.TEXT, "is invalid"]
     },
     postalCode: {
       type: String,
       lowercase: false,
-      match: [/^[0-9]{5}[-][0-9]{3}$/, "is invalid"]
+      match: [regexMask.POSTAL_CODE, "is invalid"]
     },
     events: [
       {

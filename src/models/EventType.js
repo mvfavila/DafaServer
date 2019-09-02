@@ -2,19 +2,21 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
+const regexMask = require("../util/regex");
+
 const EventTypeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       lowercase: false,
       required: [true, "can't be blank"],
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"],
+      match: [regexMask.TEXT, "is invalid"],
       index: true
     },
     description: {
       type: String,
       lowercase: false,
-      match: [/^[a-zA-Z0-9 ]+$/, "is invalid"]
+      match: [regexMask.TEXT, "is invalid"]
     },
     alertTypes: [
       {

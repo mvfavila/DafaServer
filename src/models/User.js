@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+
 const { secret, tokenSecondsToExpiration } = require("../config");
+const regexMask = require("../util/regex");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -20,7 +22,7 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
       required: [true, "can't be blank"],
-      match: [/\S+@\S+\.\S+/, "is invalid"],
+      match: [regexMask.EMAIL, "is invalid"],
       index: true
     },
     hash: String,
