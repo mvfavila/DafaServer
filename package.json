@@ -7,7 +7,7 @@
     "debug": "SET NODE_ENV=dev&SET SLS_DEBUG=*&node --inspect ./node_modules/serverless/bin/serverless offline",
     "test": "SET NODE_ENV=test&nyc mocha --timeout 60000 ./src/**/*.spec.js --exit",
     "testDebug": "SET NODE_ENV=test&mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit",
-    "deploy": "SET NODE_ENV=production&serverless deploy"
+    "deploy": "SET NODE_ENV=production&SET AWS_CLIENT_TIMEOUT=900000&serverless deploy"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -30,7 +30,6 @@
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
-    "serverless": "^1.51.0",
     "serverless-api-gateway-caching": "^1.4.0",
     "serverless-http": "^2.0.2"
   },
