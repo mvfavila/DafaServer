@@ -121,6 +121,17 @@ const fieldApi = function fieldApi(fieldController) {
 
       log.debug(`Request body: ${stringify(req.body, null, 2)}`);
 
+      if (!guid.isGuid(req.body.field.client)) {
+        log.info(
+          `Client Id does not exist or is invalid. Value [${stringify(
+            req.body.field.client
+          )}]. Returning ${httpStatus.UNPROCESSABLE_ENTITY}.`
+        );
+        res.status(httpStatus.UNPROCESSABLE_ENTITY).send({
+          error: "Invalid request body. Request can not be processed"
+        });
+      }
+
       field.name = req.body.field.name;
       field.description = req.body.field.description;
       field.email = req.body.field.email;

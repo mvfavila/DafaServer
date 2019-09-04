@@ -21,6 +21,10 @@ const guid = {
       if (typeof stringValue !== "string") {
         stringValue = stringValue.toString();
       }
+      const isValidObjectId = mongoose.Types.ObjectId.isValid(stringValue);
+      if (!isValidObjectId) {
+        return false;
+      }
       const objectIdValue = new mongoose.Types.ObjectId(stringValue);
       return stringValue === objectIdValue.toString();
     }
