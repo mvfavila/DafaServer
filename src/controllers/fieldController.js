@@ -72,9 +72,14 @@ const fieldController = {
    * Adds a new field to the repository
    * @param {Field} field
    */
-  async addField(field) {
+  addField(field) {
     const fieldToAdd = field;
+
+    const currentDateTime = new Date();
+    fieldToAdd.createdAt = currentDateTime;
+    fieldToAdd.updatedAt = currentDateTime;
     fieldToAdd.active = true;
+
     return new Promise(async (resolve, reject) => {
       await fieldToAdd.save(async (err, fieldAdded) => {
         if (err) return reject(err);

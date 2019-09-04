@@ -66,14 +66,6 @@ const FieldSchema = new mongoose.Schema(
   { timestamps: true, _id: true, versionKey: false }
 );
 
-FieldSchema.virtual("id")
-  .get(function geId() {
-    return this._id;
-  })
-  .set(function setId(v) {
-    this._id = v;
-  });
-
 FieldSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 FieldSchema.methods.toAuthJSON = function parseToJSON() {
@@ -93,5 +85,13 @@ FieldSchema.methods.toAuthJSON = function parseToJSON() {
     active: this.active
   };
 };
+
+FieldSchema.virtual("id")
+  .get(function geId() {
+    return this._id;
+  })
+  .set(function setId(v) {
+    this._id = v;
+  });
 
 mongoose.model("Field", FieldSchema);
