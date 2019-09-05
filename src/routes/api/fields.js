@@ -11,9 +11,9 @@ const log = require("../../util/log");
 /**
  * Gets the id value from the object sent in the request body.
  */
-function getObjectId(field) {
+function getObjectId(obj) {
   // eslint-disable-next-line no-underscore-dangle
-  return field.id || field._id;
+  return obj.id || obj._id;
 }
 
 /**

@@ -145,6 +145,7 @@ const fieldController = {
       fieldToBeUpdated.state = field.state;
       fieldToBeUpdated.postalCode = field.postalCode;
       fieldToBeUpdated.events = field.events;
+      fieldToBeUpdated.client = field.client;
       fieldToBeUpdated.active = field.active;
 
       // updatedAt must always be updated when the model is modified
