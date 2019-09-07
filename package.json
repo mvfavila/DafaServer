@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "SET PORT=3000&SET NODE_ENV=dev& serverless offline start --skipCacheInvalidation",
-    "debug": "SET NODE_ENV=dev&SET SLS_DEBUG=*&node --inspect ./node_modules/serverless/bin/serverless offline",
+    "debug": "SET NODE_ENV=dev && SET SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline -s dev",
     "test": "SET NODE_ENV=test&nyc mocha --timeout 60000 ./src/**/*.spec.js --exit",
     "testDebug": "SET NODE_ENV=test&mocha --inspect-brk --timeout 60000 ./src/**/*.spec.js --exit",
     "deploy": "SET NODE_ENV=production&SET AWS_CLIENT_TIMEOUT=900000&serverless deploy"
@@ -47,6 +47,7 @@
     "node-mocks-http": "^1.7.5",
     "nyc": "^14.1.1",
     "prettier": "^1.16.1",
+    "serverless": "^1.51.0",
     "serverless-offline": "^5.7.2",
     "sinon": "^7.2.2"
   }

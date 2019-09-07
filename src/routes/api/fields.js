@@ -1,8 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const router = require("express").Router();
 const { stringify } = require("flatted");
 
 const Field = mongoose.model("Field");
+const Event = mongoose.model("Event");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
 const { guid } = require("../../util/guid");
@@ -12,8 +14,27 @@ const log = require("../../util/log");
  * Gets the id value from the object sent in the request body.
  */
 function getObjectId(obj) {
-  // eslint-disable-next-line no-underscore-dangle
   return obj.id || obj._id;
+}
+
+/**
+ * Get events from the request body
+ * @param {Event[]} events Unformatted Events object.
+ */
+function getEvents(events, fieldId) {
+  log.info(`Events received: ${stringify(events, null, 2)}`);
+  const formattedEvents = [];
+
+  events.forEach(event => {
+    const formattedEvent = new Event();
+    formattedEvent._id = event._id;
+    formattedEvent.date = event.date;
+    formattedEvent.eventType = event.eventType;
+    formattedEvent.field = fieldId;
+    formattedEvents.push(formattedEvent);
+  });
+
+  return formattedEvents;
 }
 
 /**
@@ -230,6 +251,7 @@ const fieldApi = function fieldApi(fieldController) {
       field.state = req.body.field.state;
       field.postalCode = req.body.field.postalCode;
       field.client = req.body.field.client;
+      field.events = getEvents(req.body.field.events);
       field.active = req.body.field.active;
 
       await fieldController

@@ -34,7 +34,7 @@ const fieldController = {
     return new Promise(async (resolve, reject) => {
       let fields;
       try {
-        fields = await Field.find({}, () => {});
+        fields = await Field.find({}, () => {}); // .populate("events");
       } catch (err) {
         return reject(err);
       }
