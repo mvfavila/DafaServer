@@ -38,14 +38,12 @@ In the terminal, execute:<br/>
 > npm install -g serverless<br/>
 > serverless login<br/>
 
-<br/>
+Configure your serverless framework using your [AWS Credentials](https://www.youtube.com/watch?v=tgb_MRVylWw).<br/>
 
 Serverless npm package should be installed both globally and as a dev requirement:<br/>
 
 1. Globally: for executing in dev and not making the deployment package increase in size
 2. Dev requirement: to be able to debug the code
-
-Configure your serverless framework using your [AWS Credentials](https://www.youtube.com/watch?v=tgb_MRVylWw).<br/>
 
 ## Deploy
 

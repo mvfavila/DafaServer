@@ -161,6 +161,7 @@ const fieldApi = function fieldApi(fieldController) {
       field.state = req.body.field.state;
       field.postalCode = req.body.field.postalCode;
       field.client = req.body.field.client;
+      field.events = req.body.field.events;
 
       fieldController
         .addField(field)

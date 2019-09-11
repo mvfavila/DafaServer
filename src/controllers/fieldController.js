@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 
 require("../models/Event");
@@ -18,7 +19,7 @@ const fieldController = {
     return new Promise(async (resolve, reject) => {
       let field;
       try {
-        field = await Field.findById(fieldId).populate("events");
+        field = await Field.findById(fieldId); // .populate("events");
       } catch (err) {
         return reject(err);
       }
@@ -34,7 +35,7 @@ const fieldController = {
     return new Promise(async (resolve, reject) => {
       let fields;
       try {
-        fields = await Field.find({}, () => {}); // .populate("events");
+        fields = await Field.find({}, () => {}).populate("events");
       } catch (err) {
         return reject(err);
       }
@@ -73,18 +74,122 @@ const fieldController = {
    * @param {Field} field
    */
   addField(field) {
+    log.info(`Creating new field: ${field.name}`);
     const fieldToAdd = field;
-
     const currentDateTime = new Date();
+
+    const eventsAddedCollection = [];
+    let errorWhileSavingEvent = null;
+    fieldToAdd.events.forEach(event => {
+      if (!errorWhileSavingEvent) {
+        log.info(`Creating new event: ${event._id}`);
+        const eventToAdd = event;
+        eventToAdd.createdAt = currentDateTime;
+        eventToAdd.updatedAt = currentDateTime;
+        eventToAdd.active = true;
+        eventToAdd.save(async (err, eventAdded) => {
+          if (err) {
+            errorWhileSavingEvent = err;
+          }
+          eventsAddedCollection.push(eventAdded);
+        });
+      }
+    });
+
+    if (errorWhileSavingEvent) {
+      log.error(
+        `Error while creating new event: ${JSON.stringify(
+          errorWhileSavingEvent
+        )}`
+      );
+      return new Promise(async (_, reject) => reject(errorWhileSavingEvent));
+    }
+
     fieldToAdd.createdAt = currentDateTime;
     fieldToAdd.updatedAt = currentDateTime;
     fieldToAdd.active = true;
 
+    log.info(`About to save new field: ${field.name}`);
     return new Promise(async (resolve, reject) => {
       await fieldToAdd.save(async (err, fieldAdded) => {
         if (err) return reject(err);
+        log.info(`New field created: ${field.name}`);
         return resolve(fieldAdded);
       });
+    });
+  },
+
+  /**
+   * Updates an existing field
+   * @param {Field} field
+   */
+  async updateField(field) {
+    log.info(`Updating field: ${field.name}`);
+    // TODO: this can be improved. I don't think I need to fetch the field before trying to update it
+    return new Promise(async (resolve, reject) => {
+      if (!field || !field.id) {
+        return reject(new Error("Invalid argument 'field'"));
+      }
+
+      const foundField = await this.getFieldById(field.id);
+
+      if (foundField == null) {
+        return reject(new Error("Field not found"));
+      }
+
+      const currentDateTime = new Date();
+      const eventsAddedCollection = [];
+      let errorWhileSavingEvent = null;
+      field.events.forEach(event => {
+        if (!errorWhileSavingEvent) {
+          log.info(`Updating event: ${event._id}`);
+          const eventToAdd = event;
+          eventToAdd.createdAt = currentDateTime;
+          eventToAdd.updatedAt = currentDateTime;
+          eventToAdd.active = true;
+          eventToAdd.save(async (err, eventAdded) => {
+            if (err) {
+              errorWhileSavingEvent = err;
+            }
+            eventsAddedCollection.push(eventAdded);
+          });
+        }
+      });
+
+      if (errorWhileSavingEvent) {
+        log.error(
+          `Error while creating new event: ${JSON.stringify(
+            errorWhileSavingEvent
+          )}`
+        );
+        return reject(errorWhileSavingEvent);
+      }
+
+      const fieldToBeUpdated = foundField;
+      fieldToBeUpdated.name = field.name;
+      fieldToBeUpdated.email = field.email;
+      fieldToBeUpdated.description = field.description;
+      fieldToBeUpdated.address = field.address;
+      fieldToBeUpdated.city = field.city;
+      fieldToBeUpdated.state = field.state;
+      fieldToBeUpdated.postalCode = field.postalCode;
+      fieldToBeUpdated.events = field.events;
+      fieldToBeUpdated.client = field.client;
+      fieldToBeUpdated.active = field.active;
+
+      // updatedAt must always be updated when the model is modified
+      fieldToBeUpdated.updatedAt = new Date();
+
+      const result = await Field.updateOne(
+        { _id: fieldToBeUpdated.id },
+        fieldToBeUpdated
+      );
+
+      if (result.nModified && result.nModified === 1) {
+        return resolve(fieldToBeUpdated);
+      }
+      log.error("Field was not able to be modified");
+      return reject(new Error("Field was not able to be modified"));
     });
   },
 
@@ -116,50 +221,6 @@ const fieldController = {
         }
       );
       return resolve(fieldToBeUpdated);
-    });
-  },
-
-  /**
-   * Updates an existing field
-   * @param {Field} field
-   */
-  async updateField(field) {
-    // TODO: this can be improved. I don't think I need to fetch the field before trying to update it
-    return new Promise(async (resolve, reject) => {
-      if (!field || !field.id) {
-        return reject(new Error("Invalid argument 'field'"));
-      }
-
-      const foundField = await this.getFieldById(field.id);
-
-      if (foundField == null) {
-        return reject(new Error("Field not found"));
-      }
-
-      const fieldToBeUpdated = foundField;
-      fieldToBeUpdated.name = field.name;
-      fieldToBeUpdated.email = field.email;
-      fieldToBeUpdated.description = field.description;
-      fieldToBeUpdated.address = field.address;
-      fieldToBeUpdated.city = field.city;
-      fieldToBeUpdated.state = field.state;
-      fieldToBeUpdated.postalCode = field.postalCode;
-      fieldToBeUpdated.events = field.events;
-      fieldToBeUpdated.client = field.client;
-      fieldToBeUpdated.active = field.active;
-
-      // updatedAt must always be updated when the model is modified
-      fieldToBeUpdated.updatedAt = new Date();
-
-      const result = await Field.updateOne(
-        { _id: fieldToBeUpdated.id },
-        fieldToBeUpdated
-      );
-
-      if (result.nModified && result.nModified === 1) {
-        return resolve(fieldToBeUpdated);
-      }
-      return reject(new Error("Field was not able to be modified"));
     });
   },
 
