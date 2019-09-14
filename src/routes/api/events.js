@@ -1,9 +1,29 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 const router = require("express").Router();
 
 const Event = mongoose.model("Event");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
+const { guid } = require("../../util/guid");
+const { validate } = require("../../util/validate");
+const log = require("../../util/log");
+
+function validateCreateRequest(req, res) {
+  validate.hasId(req.body.event, res, "Event");
+  validate.isId(req.body.event.eventType, res, "EventType");
+  validate.isId(req.body.event.field, res, "Field");
+}
+
+function createEventFromBody(eventBody) {
+  const event = new Event();
+  event.id = guid.getObjectId(eventBody);
+  event.date = eventBody.date;
+  event.eventType = eventBody.eventType;
+  event.field = eventBody.field;
+  event.active = true;
+  return event;
+}
 
 /**
  * Represents the event API with it's methods.
@@ -47,12 +67,11 @@ const eventApi = function eventApi(eventController) {
      * @param {Object} res Response object.
      */
     async createEvent(req, res) {
-      const event = new Event();
+      log.info("Create Event started");
 
-      event.date = req.body.event.date;
-      event.eventType = req.body.event.eventType;
-      event.field = req.body.event.field;
-      event.active = true;
+      validateCreateRequest(req, res);
+
+      const event = createEventFromBody(req.body.event);
 
       await eventController.addEvent(event);
 

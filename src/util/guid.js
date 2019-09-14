@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 
 const guid = {
@@ -27,6 +28,28 @@ const guid = {
       }
       const objectIdValue = new mongoose.Types.ObjectId(stringValue);
       return stringValue === objectIdValue.toString();
+    },
+
+    /**
+     * Gets the id value from the object sent in the request body.
+     */
+    getObjectId(obj) {
+      const valueFound = obj.id || obj._id;
+      if (!valueFound) {
+        throw new Error("Property 'Id' not found");
+      }
+      return valueFound;
+    },
+
+    /**
+     * Gets the id value from the object sent in the request body.
+     */
+    existsId(obj) {
+      const valueFound = obj.id || obj._id;
+      if (!valueFound) {
+        return false;
+      }
+      return true;
     }
   }
 };

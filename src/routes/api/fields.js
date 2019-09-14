@@ -8,13 +8,19 @@ const Event = mongoose.model("Event");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
 const { guid } = require("../../util/guid");
+const { validate } = require("../../util/validate");
 const log = require("../../util/log");
 
 /**
- * Gets the id value from the object sent in the request body.
+ * Gets an array of ids from an array of objects.
+ * @param {Object[]} arrayOfObjects Array of objects.
  */
-function getObjectId(obj) {
-  return obj.id || obj._id;
+function getArrayOfIds(arrayOfObjects) {
+  const arrayOfIds = [];
+  arrayOfObjects.forEach(obj => {
+    arrayOfIds.push(guid.getObjectId(obj));
+  });
+  return arrayOfIds;
 }
 
 /**
@@ -35,6 +41,26 @@ function getEvents(events, fieldId) {
   });
 
   return formattedEvents;
+}
+
+function validateCreateRequest(req, res) {
+  validate.hasId(req.body.field, res, "Field");
+  validate.isId(req.body.field.client, res, "Client");
+}
+
+function createFieldFromRequestBody(fieldFromBody) {
+  const field = new Field();
+  field.id = guid.getObjectId(fieldFromBody);
+  field.name = fieldFromBody.name;
+  field.description = fieldFromBody.description;
+  field.email = fieldFromBody.email;
+  field.address = fieldFromBody.address;
+  field.city = fieldFromBody.city;
+  field.state = fieldFromBody.state;
+  field.postalCode = fieldFromBody.postalCode;
+  field.client = fieldFromBody.client;
+  field.events = getArrayOfIds(fieldFromBody.events);
+  return field;
 }
 
 /**
@@ -138,30 +164,10 @@ const fieldApi = function fieldApi(fieldController) {
      */
     createField(req, res, next) {
       log.info("Create Field started");
-      const field = new Field();
 
-      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
+      validateCreateRequest(req, res);
 
-      if (!guid.isGuid(req.body.field.client)) {
-        log.info(
-          `Client Id does not exist or is invalid. Value [${stringify(
-            req.body.field.client
-          )}]. Returning ${httpStatus.UNPROCESSABLE_ENTITY}.`
-        );
-        res.status(httpStatus.UNPROCESSABLE_ENTITY).send({
-          error: "Invalid request body. Request can not be processed"
-        });
-      }
-
-      field.name = req.body.field.name;
-      field.description = req.body.field.description;
-      field.email = req.body.field.email;
-      field.address = req.body.field.address;
-      field.city = req.body.field.city;
-      field.state = req.body.field.state;
-      field.postalCode = req.body.field.postalCode;
-      field.client = req.body.field.client;
-      field.events = req.body.field.events;
+      const field = createFieldFromRequestBody(req.body.field);
 
       fieldController
         .addField(field)
@@ -243,7 +249,7 @@ const fieldApi = function fieldApi(fieldController) {
 
       log.debug(`Request body: ${stringify(req.body, null, 2)}`);
 
-      field.id = getObjectId(req.body.field);
+      field.id = guid.getObjectId(req.body.field);
       field.name = req.body.field.name;
       field.description = req.body.field.description;
       field.email = req.body.field.email;

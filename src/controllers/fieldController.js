@@ -78,33 +78,6 @@ const fieldController = {
     const fieldToAdd = field;
     const currentDateTime = new Date();
 
-    const eventsAddedCollection = [];
-    let errorWhileSavingEvent = null;
-    fieldToAdd.events.forEach(event => {
-      if (!errorWhileSavingEvent) {
-        log.info(`Creating new event: ${event._id}`);
-        const eventToAdd = event;
-        eventToAdd.createdAt = currentDateTime;
-        eventToAdd.updatedAt = currentDateTime;
-        eventToAdd.active = true;
-        eventToAdd.save(async (err, eventAdded) => {
-          if (err) {
-            errorWhileSavingEvent = err;
-          }
-          eventsAddedCollection.push(eventAdded);
-        });
-      }
-    });
-
-    if (errorWhileSavingEvent) {
-      log.error(
-        `Error while creating new event: ${JSON.stringify(
-          errorWhileSavingEvent
-        )}`
-      );
-      return new Promise(async (_, reject) => reject(errorWhileSavingEvent));
-    }
-
     fieldToAdd.createdAt = currentDateTime;
     fieldToAdd.updatedAt = currentDateTime;
     fieldToAdd.active = true;
@@ -135,34 +108,6 @@ const fieldController = {
 
       if (foundField == null) {
         return reject(new Error("Field not found"));
-      }
-
-      const currentDateTime = new Date();
-      const eventsAddedCollection = [];
-      let errorWhileSavingEvent = null;
-      field.events.forEach(event => {
-        if (!errorWhileSavingEvent) {
-          log.info(`Updating event: ${event._id}`);
-          const eventToAdd = event;
-          eventToAdd.createdAt = currentDateTime;
-          eventToAdd.updatedAt = currentDateTime;
-          eventToAdd.active = true;
-          eventToAdd.save(async (err, eventAdded) => {
-            if (err) {
-              errorWhileSavingEvent = err;
-            }
-            eventsAddedCollection.push(eventAdded);
-          });
-        }
-      });
-
-      if (errorWhileSavingEvent) {
-        log.error(
-          `Error while creating new event: ${JSON.stringify(
-            errorWhileSavingEvent
-          )}`
-        );
-        return reject(errorWhileSavingEvent);
       }
 
       const fieldToBeUpdated = foundField;
