@@ -189,6 +189,54 @@ const fieldApi = function fieldApi(fieldController) {
     },
 
     /**
+     * (PUT) Updates field.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     * @param {Object} next Method to be called next.
+     */
+    async updateField(req, res, next) {
+      log.info("Update Field started");
+      const field = new Field();
+
+      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
+
+      field.id = guid.getObjectId(req.body.field);
+      field.name = req.body.field.name;
+      field.description = req.body.field.description;
+      field.email = req.body.field.email;
+      field.address = req.body.field.address;
+      field.city = req.body.field.city;
+      field.state = req.body.field.state;
+      field.postalCode = req.body.field.postalCode;
+      field.client = req.body.field.client;
+      field.events = getEvents(req.body.field.events);
+      field.active = req.body.field.active;
+
+      await fieldController
+        .updateField(field)
+        .then(() => {
+          log.info(`Field updated. Returning ${httpStatus.SUCCESS}.`);
+          res.json({ field: field.toAuthJSON() });
+        })
+        .catch(err => {
+          if (err.message === "Field not found") {
+            log.info(`Field not found. Returning ${httpStatus.UNAUTHORIZED}.`);
+            return res
+              .status(httpStatus.UNAUTHORIZED)
+              .send({ error: "No field found" });
+          }
+          log.error(
+            `Unexpected error in Update Field. Err: ${stringify(
+              err,
+              null,
+              2
+            )}.<br/>Callind next()`
+          );
+          return next(err);
+        });
+    },
+
+    /**
      * (PATCH) Updates field's status (active|inactive).
      * @param {Object} req Request object.
      * @param {Object} res Response object.
@@ -235,54 +283,6 @@ const fieldApi = function fieldApi(fieldController) {
 
       log.info(`Field updated. Returning ${httpStatus.SUCCESS}.`);
       return res.status(httpStatus.SUCCESS).json({ field: field.toAuthJSON() });
-    },
-
-    /**
-     * (PUT) Updates field.
-     * @param {Object} req Request object.
-     * @param {Object} res Response object.
-     * @param {Object} next Method to be called next.
-     */
-    async updateField(req, res, next) {
-      log.info("Update Field started");
-      const field = new Field();
-
-      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
-
-      field.id = guid.getObjectId(req.body.field);
-      field.name = req.body.field.name;
-      field.description = req.body.field.description;
-      field.email = req.body.field.email;
-      field.address = req.body.field.address;
-      field.city = req.body.field.city;
-      field.state = req.body.field.state;
-      field.postalCode = req.body.field.postalCode;
-      field.client = req.body.field.client;
-      field.events = getEvents(req.body.field.events);
-      field.active = req.body.field.active;
-
-      await fieldController
-        .updateField(field)
-        .then(() => {
-          log.info(`Field updated. Returning ${httpStatus.SUCCESS}.`);
-          res.json({ field: field.toAuthJSON() });
-        })
-        .catch(err => {
-          if (err.message === "Field not found") {
-            log.info(`Field not found. Returning ${httpStatus.UNAUTHORIZED}.`);
-            return res
-              .status(httpStatus.UNAUTHORIZED)
-              .send({ error: "No field found" });
-          }
-          log.error(
-            `Unexpected error in Update Field. Err: ${stringify(
-              err,
-              null,
-              2
-            )}.<br/>Callind next()`
-          );
-          return next(err);
-        });
     }
   };
 };
