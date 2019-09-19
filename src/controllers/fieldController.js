@@ -8,6 +8,109 @@ const Field = mongoose.model("Field");
 const Event = mongoose.model("Event");
 
 /**
+ * Checks if an event exists in the field.
+ * @param {Event[]} eventsCollection Collection of Event objects.
+ * @param {Event} event Event object.
+ */
+function isEventPreExistent(eventsCollection, event) {
+  return eventsCollection.indexOf(event._id) !== -1;
+}
+
+/**
+ * Get an event mark to be deleted.
+ * @param {Event} event Event to be deleted.
+ */
+function getEventToDelete(event) {
+  const eventToDelete = event;
+  eventToDelete.active = false;
+  eventToDelete.updatedAt = new Date();
+  return eventToDelete;
+}
+
+function commitEventUpdate(eventId, eventToBeUpdated) {
+  Event.updateOne({ _id: eventId }, eventToBeUpdated, err => {
+    if (err) throw err;
+  });
+}
+
+function commitEventCreate(eventToBeCreated) {
+  Event.create(eventToBeCreated);
+}
+
+/**
+ * Mark as deleted events that were removed from the field.
+ * @param {Event[]} existingEvents Events which were removed from the field.
+ */
+function deleteRemainingPreExistingEvents(existingEvents) {
+  existingEvents.forEach(event => {
+    const eventToDelete = getEventToDelete(event);
+    commitEventUpdate(eventToDelete._id, eventToDelete);
+  });
+}
+
+function addOrUpdateEvents(events, eventsToBeProcessed) {
+  function getEventToBeCreated(event) {
+    const eventToBeCreated = event;
+    eventToBeCreated.active = event.active;
+    const currentDateTime = new Date();
+    eventToBeCreated.createdAt = currentDateTime;
+    eventToBeCreated.updatedAt = currentDateTime;
+    return eventToBeCreated;
+  }
+
+  async function getEventToBeUpdated(event) {
+    const eventToBeUpdated = await Event.findById(event._id);
+    eventToBeUpdated.date = event.date;
+    eventToBeUpdated.eventType = event.eventType;
+    eventToBeUpdated.active = event.active;
+    eventToBeUpdated.updatedAt = new Date();
+    return eventToBeUpdated;
+  }
+
+  function createEvent(event) {
+    const eventToBeCreated = getEventToBeCreated(event);
+    commitEventCreate(eventToBeCreated);
+  }
+
+  async function updateEvent(event) {
+    const eventToBeUpdated = await getEventToBeUpdated(event);
+    commitEventUpdate(event._id, eventToBeUpdated);
+  }
+
+  function markEventAsProcessed(event) {
+    eventsToBeProcessed.splice(eventsToBeProcessed.indexOf(event._id), 1);
+  }
+
+  events.forEach(event => {
+    if (isEventPreExistent(eventsToBeProcessed, event)) {
+      updateEvent(event);
+    } else {
+      createEvent(event);
+    }
+    markEventAsProcessed(event);
+  });
+}
+
+function getFieldToUpdate(foundField, field) {
+  const fieldToBeUpdated = foundField;
+  fieldToBeUpdated.name = field.name;
+  fieldToBeUpdated.email = field.email;
+  fieldToBeUpdated.description = field.description;
+  fieldToBeUpdated.address = field.address;
+  fieldToBeUpdated.city = field.city;
+  fieldToBeUpdated.state = field.state;
+  fieldToBeUpdated.postalCode = field.postalCode;
+  fieldToBeUpdated.events = field.events;
+  fieldToBeUpdated.client = field.client;
+  fieldToBeUpdated.active = field.active;
+
+  // updatedAt must always be updated when the model is modified
+  fieldToBeUpdated.updatedAt = new Date();
+
+  return fieldToBeUpdated;
+}
+
+/**
  * Orchestrates operations related to fields
  */
 const fieldController = {
@@ -109,21 +212,13 @@ const fieldController = {
       if (foundField == null) {
         return reject(new Error("Field not found"));
       }
+      const existingEvents = foundField.events;
 
-      const fieldToBeUpdated = foundField;
-      fieldToBeUpdated.name = field.name;
-      fieldToBeUpdated.email = field.email;
-      fieldToBeUpdated.description = field.description;
-      fieldToBeUpdated.address = field.address;
-      fieldToBeUpdated.city = field.city;
-      fieldToBeUpdated.state = field.state;
-      fieldToBeUpdated.postalCode = field.postalCode;
-      fieldToBeUpdated.events = field.events;
-      fieldToBeUpdated.client = field.client;
-      fieldToBeUpdated.active = field.active;
+      addOrUpdateEvents(field.events, existingEvents);
 
-      // updatedAt must always be updated when the model is modified
-      fieldToBeUpdated.updatedAt = new Date();
+      deleteRemainingPreExistingEvents(existingEvents);
+
+      const fieldToBeUpdated = getFieldToUpdate(foundField, field);
 
       const result = await Field.updateOne(
         { _id: fieldToBeUpdated.id },

@@ -63,6 +63,22 @@ function createFieldFromRequestBody(fieldFromBody) {
   return field;
 }
 
+function updateFieldFromRequestBody(fieldFromBody) {
+  const field = new Field();
+  field.id = guid.getObjectId(fieldFromBody);
+  field.name = fieldFromBody.name;
+  field.description = fieldFromBody.description;
+  field.email = fieldFromBody.email;
+  field.address = fieldFromBody.address;
+  field.city = fieldFromBody.city;
+  field.state = fieldFromBody.state;
+  field.postalCode = fieldFromBody.postalCode;
+  field.client = fieldFromBody.client;
+  field.events = getEvents(fieldFromBody.events, field.id);
+  field.active = fieldFromBody.active;
+  return field;
+}
+
 /**
  * Represents the field API with it's methods.
  */
@@ -196,21 +212,10 @@ const fieldApi = function fieldApi(fieldController) {
      */
     async updateField(req, res, next) {
       log.info("Update Field started");
-      const field = new Field();
 
-      log.debug(`Request body: ${stringify(req.body, null, 2)}`);
+      validateCreateRequest(req, res);
 
-      field.id = guid.getObjectId(req.body.field);
-      field.name = req.body.field.name;
-      field.description = req.body.field.description;
-      field.email = req.body.field.email;
-      field.address = req.body.field.address;
-      field.city = req.body.field.city;
-      field.state = req.body.field.state;
-      field.postalCode = req.body.field.postalCode;
-      field.client = req.body.field.client;
-      field.events = getEvents(req.body.field.events);
-      field.active = req.body.field.active;
+      const field = updateFieldFromRequestBody(req.body.field);
 
       await fieldController
         .updateField(field)
