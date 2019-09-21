@@ -10,6 +10,9 @@ const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/EventType");
 require("../models/EventWarning");
+require("../models/AlertType");
+require("../models/Client");
+require("../models/Field");
 const { alertTypeController } = require("../config/bootstrap");
 const eventTypeController = require("./eventTypeController");
 
