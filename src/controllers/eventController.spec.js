@@ -10,11 +10,10 @@ const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
 require("../models/Field");
 require("../models/Event");
-const fieldController = require("./fieldController");
+require("../models/EventType");
 const eventController = require("./eventController");
 const { guid } = require("../util/guid");
 
-const Field = mongoose.model("Field");
 const Event = mongoose.model("Event");
 let mongoServer;
 
@@ -86,65 +85,6 @@ describe("Event controller", () => {
     expect(eventAdded.active).to.be.true;
     expect(eventAdded.createdAt).to.be.an("date");
     expect(eventAdded.updatedAt).to.be.an("date");
-  });
-
-  it("addAndAttach - Valid event and field - Must attach event to field", async () => {
-    await Field.deleteMany({}, () => {});
-    let cntEvent = await Event.countDocuments();
-    let cntField = await Field.countDocuments();
-
-    // Dataset must be empty
-    expect(cntEvent).to.equal(1);
-    expect(cntField).to.equal(0);
-
-    // adds a sample field to the repository
-    const field = new Field();
-
-    field.name = "Big field of the north";
-    field.email = "north@email.com";
-    field.description = "Big field of north";
-    field.address = "Street 1";
-    field.city = "FieldVille";
-    field.state = "Sergipe";
-    field.postalCode = "10000-000";
-    field.client = guid.new();
-    field.events = [];
-
-    await fieldController.addField(field);
-
-    cntField = await Field.countDocuments();
-
-    // Dataset must have exactly one item
-    expect(cntField).to.equal(1);
-
-    const event = new Event();
-
-    event.date = new Date();
-    event.eventType = guid.new();
-    event.field = field.id;
-
-    const eventAdded = await eventController.addAndAttach(event);
-
-    cntEvent = await Event.countDocuments();
-
-    // Dataset must have exactly two items
-    expect(cntEvent).to.equal(2, "Should have added the second event");
-
-    expect(eventAdded).to.not.be.null;
-    expect(eventAdded.date).to.be.an("date");
-    expect(eventAdded.eventType).to.not.be.null;
-    expect(eventAdded.field.toString()).to.equal(field.id.toString());
-    expect(eventAdded.active).to.be.true;
-    expect(eventAdded.createdAt).to.be.an("date");
-    expect(eventAdded.updatedAt).to.be.an("date");
-
-    const fieldFound = await fieldController.getFieldById(field.id);
-    expect(fieldFound).to.not.be.null;
-    expect(fieldFound.events.length).to.equal(
-      1,
-      "Should have attached the event to the field"
-    );
-    expect(fieldFound.events[0].id.toString()).to.equal(event.id.toString());
   });
 
   it("getAllActiveEvents - Exists 1 event - Must return 1 event", async () => {
