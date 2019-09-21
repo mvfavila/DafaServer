@@ -110,6 +110,15 @@ function getFieldToUpdate(foundField, field) {
   return fieldToBeUpdated;
 }
 
+function validateUpdateField(currentField, newField) {
+  if (currentField.client.toString() !== newField.client.toString()) {
+    log.info("Invalid update field body: Owner of the field must never change");
+    throw new Error("Owner of the field must never change");
+  } else {
+    log.info("Valid update field body");
+  }
+}
+
 /**
  * Orchestrates operations related to fields
  */
@@ -212,6 +221,13 @@ const fieldController = {
       if (foundField == null) {
         return reject(new Error("Field not found"));
       }
+
+      try {
+        validateUpdateField(foundField, field);
+      } catch (error) {
+        return reject(error);
+      }
+
       const existingEvents = foundField.events;
 
       addOrUpdateEvents(field.events, existingEvents);

@@ -5,6 +5,7 @@ const { use, expect } = require("chai");
 const chaiHttp = require("chai-http");
 
 use(chaiHttp);
+use(require("chai-as-promised"));
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");
@@ -142,7 +143,7 @@ describe("Field controller", () => {
     expect(field.active).to.equal(fieldFound.active);
   });
 
-  it("updateField - Updates all attributes - Must succeed", async () => {
+  it("updateField - Valid update - Must succeed", async () => {
     let cnt = await Field.countDocuments();
 
     expect(cnt).to.equal(1);
@@ -159,7 +160,6 @@ describe("Field controller", () => {
     field.state = "Alagoas";
     field.postalCode = "20000-123";
     field.events = [];
-    field.client = guid.new();
     field.active = false;
 
     const updatedField = await fieldController.updateField(field);
@@ -176,14 +176,23 @@ describe("Field controller", () => {
     expect(updatedField.events.length).to.equal(field.events.length);
     expect(updatedField.active).to.equal(field.active);
 
-    // must have not received new values
-    expect(updatedField.client.toString()).to.not.equal(
-      field.client.toString(),
-      "Owner of the field must never change"
-    );
-
     cnt = await Field.countDocuments();
     expect(cnt).to.equal(1);
+  });
+
+  it("updateField - Try to change client - Must be rejected", async () => {
+    const cnt = await Field.countDocuments();
+
+    expect(cnt).to.equal(1);
+
+    const fields = await fieldController.getFields();
+
+    const field = fields[0];
+    field.client = guid.new();
+
+    await expect(
+      fieldController.updateField(field)
+    ).to.be.eventually.rejectedWith("Owner of the field must never change");
   });
 
   it("updateFieldStatus - Tries to update all attributes - Must update status only", async () => {
