@@ -1,10 +1,11 @@
 // During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
-const { use, expect, request } = require("chai");
+const { use, expect } = require("chai");
 const chaiHttp = require("chai-http");
 
 use(chaiHttp);
+const { request } = require("chai");
 
 const mongoose = require("mongoose");
 const MongoMemoryServer = require("mongodb-memory-server");

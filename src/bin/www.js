@@ -70,5 +70,5 @@ function onListening() {
 httpServer.on("error", onError);
 httpServer.on("listening", onListening);
 
-module.exports = httpServer; // for testing
+module.exports.httpServer = httpServer; // for testing
 module.exports.handler = serverless(server);
