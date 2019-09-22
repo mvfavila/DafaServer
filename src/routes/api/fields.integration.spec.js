@@ -1,144 +1,144 @@
-// During the test the env variable is set to test
-process.env.NODE_ENV = "test";
+// // During the test the env variable is set to test
+// process.env.NODE_ENV = "test";
 
-const { use, expect, request } = require("chai");
-const chaiHttp = require("chai-http");
+// const { use, expect, request } = require("chai");
+// const chaiHttp = require("chai-http");
 
-use(chaiHttp);
+// use(chaiHttp);
 
-const mongoose = require("mongoose");
-const MongoMemoryServer = require("mongodb-memory-server");
-require("../../bin/www");
-require("../../models/Field");
-require("../../models/Event");
-const { baseUrl, httpStatus } = require("../../util/util");
+// const mongoose = require("mongoose");
+// const MongoMemoryServer = require("mongodb-memory-server");
+// require("../../bin/www");
+// require("../../models/Field");
+// require("../../models/Event");
+// const { baseUrl, httpStatus } = require("../../util/util");
 
-const Field = mongoose.model("Field");
-const Event = mongoose.model("Event");
-const { fieldController, eventController } = require("../../config/bootstrap");
-const { guid } = require("../../util/guid");
+// const Field = mongoose.model("Field");
+// const Event = mongoose.model("Event");
+// const { fieldController, eventController } = require("../../config/bootstrap");
+// const { guid } = require("../../util/guid");
 
-let mongoServer;
-let field;
+// let mongoServer;
+// let field;
 
-before(done => {
-  mongoServer = new MongoMemoryServer.default({
-    /* debug: true, */
-  });
-  mongoServer
-    .getConnectionString()
-    .then(mongoUri =>
-      mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
-        if (err) done(err);
-      })
-    )
-    .then(() => done());
-});
+// before(done => {
+//   mongoServer = new MongoMemoryServer.default({
+//     /* debug: true, */
+//   });
+//   mongoServer
+//     .getConnectionString()
+//     .then(mongoUri =>
+//       mongoose.connect(mongoUri, { useNewUrlParser: true }, err => {
+//         if (err) done(err);
+//       })
+//     )
+//     .then(() => done());
+// });
 
-after(() => {
-  mongoose.disconnect();
-  mongoServer.stop();
-});
+// after(() => {
+//   mongoose.disconnect();
+//   mongoServer.stop();
+// });
 
-beforeEach(async () => {
-  // Setup
+// beforeEach(async () => {
+//   // Setup
 
-  // removes all existing fields from repository
-  await Field.deleteMany({}, () => {});
+//   // removes all existing fields from repository
+//   await Field.deleteMany({}, () => {});
 
-  // adds a sample field to the repository
-  field = new Field();
+//   // adds a sample field to the repository
+//   field = new Field();
 
-  field.name = "Big Field of the north SA";
-  field.email = "john@email.com";
-  field.description = "1st Big field of the north";
-  field.address = "Street 1";
-  field.city = "FieldVille";
-  field.state = "Sergipe";
-  field.postalCode = "10000-000";
-  field.events = [];
-  field.client = guid.new();
+//   field.name = "Big Field of the north SA";
+//   field.email = "john@email.com";
+//   field.description = "1st Big field of the north";
+//   field.address = "Street 1";
+//   field.city = "FieldVille";
+//   field.state = "Sergipe";
+//   field.postalCode = "10000-000";
+//   field.events = [];
+//   field.client = guid.new();
 
-  fieldId = field.id.toString();
+//   fieldId = field.id.toString();
 
-  await fieldController.addField(field);
+//   await fieldController.addField(field);
 
-  // removes all existing events from repository
-  await Event.deleteMany({}, () => {});
+//   // removes all existing events from repository
+//   await Event.deleteMany({}, () => {});
 
-  // adds a sample event to the repository
-  const event = new Event();
+//   // adds a sample event to the repository
+//   const event = new Event();
 
-  event.date = new Date();
-  event.eventType = guid.new();
-  event.field = field.id;
+//   event.date = new Date();
+//   event.eventType = guid.new();
+//   event.field = field.id;
 
-  await eventController.addEvent(event);
-});
+//   await eventController.addEvent(event);
+// });
 
-describe("fields API - Integration", () => {
-  it("getHealthCheck - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get("api/fields/healthcheck");
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(200, "Response status should be 200");
-  });
+// describe("fields API - Integration", () => {
+//   it("getHealthCheck - Make request - Should return ok", async () => {
+//     const res = await request(baseUrl).get("api/fields/healthcheck");
+//     expect(res).to.not.be.null;
+//     expect(res.status).to.equal(200, "Response status should be 200");
+//   });
 
-  it("getFieldById - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get(`api/fields/${fieldId}`);
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(
-      httpStatus.SUCCESS,
-      `Response status should be ${httpStatus.SUCCESS}`
-    );
-    const responseField = res.body.field;
-    expect(responseField.name).to.equal(field.name);
-  });
+//   it("getFieldById - Make request - Should return ok", async () => {
+//     const res = await request(baseUrl).get(`api/fields/${fieldId}`);
+//     expect(res).to.not.be.null;
+//     expect(res.status).to.equal(
+//       httpStatus.SUCCESS,
+//       `Response status should be ${httpStatus.SUCCESS}`
+//     );
+//     const responseField = res.body.field;
+//     expect(responseField.name).to.equal(field.name);
+//   });
 
-  it("getEventsByField - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get(`api/fields/${fieldId}/events`);
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(
-      httpStatus.SUCCESS,
-      `Response status should be ${httpStatus.SUCCESS}`
-    );
-    const responseEvents = res.body.events;
-    expect(responseEvents.length).to.equal(1);
-    expect(responseEvents[0].field).to.not.be.null;
-    expect(responseEvents[0].field.date).to.be.not.null;
-  });
+//   it("getEventsByField - Make request - Should return ok", async () => {
+//     const res = await request(baseUrl).get(`api/fields/${fieldId}/events`);
+//     expect(res).to.not.be.null;
+//     expect(res.status).to.equal(
+//       httpStatus.SUCCESS,
+//       `Response status should be ${httpStatus.SUCCESS}`
+//     );
+//     const responseEvents = res.body.events;
+//     expect(responseEvents.length).to.equal(1);
+//     expect(responseEvents[0].field).to.not.be.null;
+//     expect(responseEvents[0].field.date).to.be.not.null;
+//   });
 
-  it("getFields - Make request - Should return ok", async () => {
-    const res = await request(baseUrl).get(`api/fields`);
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(
-      httpStatus.SUCCESS,
-      `Response status should be ${httpStatus.SUCCESS}`
-    );
-    const responseFields = res.body.fields;
-    expect(responseFields.length).to.equal(1);
-  });
+//   it("getFields - Make request - Should return ok", async () => {
+//     const res = await request(baseUrl).get(`api/fields`);
+//     expect(res).to.not.be.null;
+//     expect(res.status).to.equal(
+//       httpStatus.SUCCESS,
+//       `Response status should be ${httpStatus.SUCCESS}`
+//     );
+//     const responseFields = res.body.fields;
+//     expect(responseFields.length).to.equal(1);
+//   });
 
-  it("createField - Make request - Should return ok", async () => {
-    // Arrange
-    field.active = false;
-    let res;
+//   it("createField - Make request - Should return ok", async () => {
+//     // Arrange
+//     field.active = false;
+//     let res;
 
-    // Act
-    try {
-      res = await request(baseUrl)
-        .post(`api/fields`)
-        .send({ field: field.toAuthJSON() });
-    } catch (error) {
-      expect(false);
-    }
+//     // Act
+//     try {
+//       res = await request(baseUrl)
+//         .post(`api/fields`)
+//         .send({ field: field.toAuthJSON() });
+//     } catch (error) {
+//       expect(false);
+//     }
 
-    // Assert
-    expect(res).to.not.be.null;
-    expect(res.status).to.equal(
-      httpStatus.SUCCESS,
-      `Response status should be ${httpStatus.SUCCESS}`
-    );
-    const responseField = res.body.field;
-    expect(responseField.active).to.be.true;
-  });
-});
+//     // Assert
+//     expect(res).to.not.be.null;
+//     expect(res.status).to.equal(
+//       httpStatus.SUCCESS,
+//       `Response status should be ${httpStatus.SUCCESS}`
+//     );
+//     const responseField = res.body.field;
+//     expect(responseField.active).to.be.true;
+//   });
+// });
