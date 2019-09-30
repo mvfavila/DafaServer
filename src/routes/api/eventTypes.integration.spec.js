@@ -74,7 +74,7 @@
 //     expect(responseEventType.name).to.equal(eventType.name);
 //   });
 
-//   it("getAllActiveEventTypes - Make request - Should return ok", async () => {
+//   it("getActiveEventTypes - Make request - Should return ok", async () => {
 //     const res = await request(baseUrl).get(`api/eventTypes`);
 //     expect(res).to.not.be.null;
 //     expect(res.status).to.equal(

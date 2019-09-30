@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const EventType = mongoose.model("EventType");
+const log = require("../util/log");
 
 /**
  * Orchestrates operations related to eventTypes
@@ -11,6 +12,7 @@ const eventTypeController = {
    * @param {ObjectId} eventTypeId
    */
   async getEventTypeById(eventTypeId) {
+    log.info(`About to getEventTypeById. Id: ${eventTypeId.toString()}`);
     let eventType;
     return new Promise(async (resolve, reject) => {
       try {
@@ -18,6 +20,7 @@ const eventTypeController = {
       } catch (err) {
         return reject(err);
       }
+      log.info(`Found event type. Name: ${eventType.name}.`);
       return resolve(eventType);
     });
   },
@@ -25,7 +28,8 @@ const eventTypeController = {
   /**
    * Gets all active eventTypes
    */
-  async getAllActiveEventTypes() {
+  async getActiveEventTypes() {
+    log.info(`About to getActiveEventTypes.`);
     return new Promise(async (resolve, reject) => {
       let eventTypes;
       try {
@@ -33,6 +37,7 @@ const eventTypeController = {
       } catch (err) {
         return reject(err);
       }
+      log.info(`Found [${eventTypes.length}] active event types.`);
       return resolve(eventTypes);
     });
   },

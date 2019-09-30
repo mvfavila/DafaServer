@@ -43,8 +43,8 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
      * @param {Object} req Request object.
      * @param {Object} res Response object.
      */
-    async getAllActiveEventTypes(req, res) {
-      const eventTypes = await eventTypeController.getAllActiveEventTypes();
+    async getActiveEventTypes(req, res) {
+      const eventTypes = await eventTypeController.getActiveEventTypes();
 
       if (!eventTypes) {
         return res
@@ -92,7 +92,7 @@ module.exports = eventTypeController => {
 
   router
     .route("/eventTypes", auth.required)
-    .get(api.getAllActiveEventTypes)
+    .get(api.getActiveEventTypes)
     .post(api.createEventType);
 
   return router;

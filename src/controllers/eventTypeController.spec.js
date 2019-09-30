@@ -98,12 +98,12 @@ describe("EventType controller", () => {
     expect(eventTypeAdded.updatedAt).to.be.an("date");
   });
 
-  it("getAllActiveEventTypes - Exists 1 eventType - Must return 1 eventType", async () => {
+  it("getActiveEventTypes - Exists 1 eventType - Must return 1 eventType", async () => {
     const cnt = await EventType.countDocuments();
 
     expect(cnt).to.equal(1);
 
-    const eventTypes = await eventTypeController.getAllActiveEventTypes();
+    const eventTypes = await eventTypeController.getActiveEventTypes();
 
     // Must return exactly one eventType
     expect(eventTypes.length).to.equal(1);
@@ -114,7 +114,7 @@ describe("EventType controller", () => {
 
     expect(cnt).to.equal(1);
 
-    const eventTypes = await eventTypeController.getAllActiveEventTypes();
+    const eventTypes = await eventTypeController.getActiveEventTypes();
 
     const eventType = eventTypes[0];
 
@@ -137,7 +137,7 @@ describe("EventType controller", () => {
 
     expect(cnt).to.equal(1);
 
-    const eventTypes = await eventTypeController.getAllActiveEventTypes();
+    const eventTypes = await eventTypeController.getActiveEventTypes();
 
     const eventType = eventTypes[0];
 
