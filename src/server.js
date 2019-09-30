@@ -10,7 +10,6 @@ const errorhandler = require("errorhandler"); // development-only error handler 
 const passport = require("passport");
 const compression = require("compression");
 const mongoose = require("mongoose"); // mongoose for mongodb
-const { stringify } = require("flatted");
 
 const { presentableErrorCodes, httpStatus } = require("./util/util");
 const log = require("./util/log");
@@ -35,12 +34,6 @@ log.info(`
 
 // Create global app object
 const app = express();
-
-// logging request
-app.use((req, res, next) => {
-  log.info(`Request: ${stringify(req, null, 2)}`);
-  next();
-});
 
 app.use(compression());
 

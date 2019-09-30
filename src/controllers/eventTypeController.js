@@ -33,7 +33,9 @@ const eventTypeController = {
     return new Promise(async (resolve, reject) => {
       let eventTypes;
       try {
-        eventTypes = await EventType.find({}, () => {});
+        eventTypes = await EventType.find({ active: true }).populate({
+          path: "alertTypes"
+        });
       } catch (err) {
         return reject(err);
       }
