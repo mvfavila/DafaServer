@@ -1,9 +1,28 @@
 const mongoose = require("mongoose");
 const router = require("express").Router();
+const { stringify } = require("flatted");
 
 const AlertType = mongoose.model("AlertType");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
+const { guid } = require("../../util/guid");
+const { validate } = require("../../util/validate");
+const log = require("../../util/log");
+
+function validateCreateUpdateRequest(req, res) {
+  validate.hasId(req.body.alertType, res, "AlertType");
+}
+
+function getModelFromUpdateRequestBody(alertTypeFromBody) {
+  const alertType = new AlertType();
+
+  alertType.id = guid.getObjectId(alertTypeFromBody);
+  alertType.name = alertTypeFromBody.name;
+  alertType.numberOfDaysToWarning = alertTypeFromBody.numberOfDaysToWarning;
+  alertType.active = alertTypeFromBody.active;
+
+  return alertType;
+}
 
 /**
  * Represents the alertType API with it's methods.
@@ -84,6 +103,45 @@ const alertTypeApi = function alertTypeApi(alertTypeController) {
         .addAlertType(alertType)
         .then(() => res.json({ alertType: alertType.toAuthJSON() }))
         .catch(next);
+    },
+
+    /**
+     * (PUT) Updates AlertType.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     * @param {Object} next Method to be called next.
+     */
+    async updateAlertType(req, res, next) {
+      log.info("Update AlertType started");
+
+      validateCreateUpdateRequest(req, res);
+
+      const alertType = getModelFromUpdateRequestBody(req.body.alertType);
+
+      await alertTypeController
+        .updateAlertType(alertType)
+        .then(() => {
+          log.info(`AlertType updated. Returning ${httpStatus.SUCCESS}.`);
+          res.json({ alertType: alertType.toAuthJSON() });
+        })
+        .catch(err => {
+          if (err.message === "AlertType not found") {
+            log.info(
+              `AlertType not found. Returning ${httpStatus.UNAUTHORIZED}.`
+            );
+            return res
+              .status(httpStatus.UNAUTHORIZED)
+              .send({ error: "No Alert Type found" });
+          }
+          log.error(
+            `Unexpected error in Update AlertType. Err: ${stringify(
+              err,
+              null,
+              2
+            )}.<br/>Callind next()`
+          );
+          return next(err);
+        });
     }
   };
 };
@@ -101,7 +159,8 @@ module.exports = alertTypeController => {
   router
     .route("/alertTypes", auth.required)
     .get(api.getActiveAlertTypes)
-    .post(api.createAlertType);
+    .post(api.createAlertType)
+    .put(api.updateAlertType);
 
   return router;
 };
