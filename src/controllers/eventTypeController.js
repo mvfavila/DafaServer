@@ -1,7 +1,32 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require("mongoose");
 
 const EventType = mongoose.model("EventType");
 const log = require("../util/log");
+
+function getEventTypeToUpdate(foundEventType, eventType) {
+  function getAlertTypeId(alertTypes) {
+    const alertTypeIds = [];
+
+    alertTypes.forEach(alertType => {
+      alertTypeIds.push(alertType._id);
+    });
+
+    return alertTypeIds;
+  }
+
+  const eventTypeToBeUpdated = foundEventType;
+
+  eventTypeToBeUpdated.name = eventType.name;
+  eventTypeToBeUpdated.description = eventType.description;
+  eventTypeToBeUpdated.alertTypes = getAlertTypeId(eventType.alertTypes);
+  eventTypeToBeUpdated.active = eventType.active;
+
+  // updatedAt must always be updated when the model is modified
+  eventTypeToBeUpdated.updatedAt = new Date();
+
+  return eventTypeToBeUpdated;
+}
 
 /**
  * Orchestrates operations related to eventTypes
@@ -76,15 +101,10 @@ const eventTypeController = {
         return reject(new Error("EventType not found"));
       }
 
-      const eventTypeToBeUpdated = foundEventType;
-
-      eventTypeToBeUpdated.name = eventType.name;
-      eventTypeToBeUpdated.description = eventType.description;
-      eventTypeToBeUpdated.alertTypes = eventType.alertTypes;
-      eventTypeToBeUpdated.active = eventType.active;
-
-      // updatedAt must always be updated when the model is modified
-      eventTypeToBeUpdated.updatedAt = new Date();
+      const eventTypeToBeUpdated = getEventTypeToUpdate(
+        foundEventType,
+        eventType
+      );
 
       await EventType.updateOne(
         { _id: eventTypeToBeUpdated.id },

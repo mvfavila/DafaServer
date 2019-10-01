@@ -33,7 +33,7 @@ function getEvents(events, fieldId) {
 
   events.forEach(event => {
     const formattedEvent = new Event();
-    formattedEvent._id = event._id;
+    formattedEvent._id = guid.getObjectId(event);
     formattedEvent.date = event.date;
     formattedEvent.eventType = event.eventType;
     formattedEvent.field = fieldId;
@@ -43,12 +43,12 @@ function getEvents(events, fieldId) {
   return formattedEvents;
 }
 
-function validateCreateRequest(req, res) {
+function validateCreateUpdateRequest(req, res) {
   validate.hasId(req.body.field, res, "Field");
   validate.isId(req.body.field.client, res, "Client");
 }
 
-function createFieldFromRequestBody(fieldFromBody) {
+function getFieldFromCreateRequestBody(fieldFromBody) {
   const field = new Field();
   field.id = guid.getObjectId(fieldFromBody);
   field.name = fieldFromBody.name;
@@ -63,7 +63,7 @@ function createFieldFromRequestBody(fieldFromBody) {
   return field;
 }
 
-function updateFieldFromRequestBody(fieldFromBody) {
+function getFieldFromUpdateRequestBody(fieldFromBody) {
   const field = new Field();
   field.id = guid.getObjectId(fieldFromBody);
   field.name = fieldFromBody.name;
@@ -181,9 +181,9 @@ const fieldApi = function fieldApi(fieldController) {
     createField(req, res, next) {
       log.info("Create Field started");
 
-      validateCreateRequest(req, res);
+      validateCreateUpdateRequest(req, res);
 
-      const field = createFieldFromRequestBody(req.body.field);
+      const field = getFieldFromCreateRequestBody(req.body.field);
 
       fieldController
         .addField(field)
@@ -213,9 +213,9 @@ const fieldApi = function fieldApi(fieldController) {
     async updateField(req, res, next) {
       log.info("Update Field started");
 
-      validateCreateRequest(req, res);
+      validateCreateUpdateRequest(req, res);
 
-      const field = updateFieldFromRequestBody(req.body.field);
+      const field = getFieldFromUpdateRequestBody(req.body.field);
 
       await fieldController
         .updateField(field)

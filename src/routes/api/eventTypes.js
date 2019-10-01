@@ -1,9 +1,45 @@
 const mongoose = require("mongoose");
 const router = require("express").Router();
+const { stringify } = require("flatted");
 
 const EventType = mongoose.model("EventType");
 const auth = require("../auth");
+const log = require("../../util/log");
 const { httpStatus } = require("../../util/util");
+const { guid } = require("../../util/guid");
+const { validate } = require("../../util/validate");
+
+function validateCreateUpdateRequest(req, res) {
+  const { eventType } = req.body;
+  validate.hasId(eventType, res, "EventType");
+  if (eventType.alertTypes) {
+    eventType.alertTypes.forEach(alertType => {
+      validate.hasId(alertType, res, "AlertType");
+    });
+  }
+}
+
+function getAlertTypeIds(alertTypes) {
+  const alertTypeIds = [];
+
+  alertTypes.forEach(alertType => {
+    alertTypeIds.push(guid.getObjectId(alertType));
+  });
+
+  return alertTypeIds;
+}
+
+function getEventTypeFromUpdateRequestBody(eventTypeFromBody) {
+  const eventType = new EventType();
+
+  eventType.id = guid.getObjectId(eventTypeFromBody);
+  eventType.name = eventTypeFromBody.name;
+  eventType.description = eventTypeFromBody.description;
+  eventType.alertTypes = getAlertTypeIds(eventTypeFromBody.alertTypes);
+  eventType.active = eventTypeFromBody.active;
+
+  return eventType;
+}
 
 /**
  * Represents the eventType API with it's methods.
@@ -76,6 +112,45 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
       await eventTypeController.addEventType(eventType);
 
       return res.json({ eventType: eventType.toAuthJSON() });
+    },
+
+    /**
+     * (PUT) Updates eventType.
+     * @param {Object} req Request object.
+     * @param {Object} res Response object.
+     * @param {Object} next Method to be called next.
+     */
+    async updateEventType(req, res, next) {
+      log.info("Update EventType started");
+
+      validateCreateUpdateRequest(req, res);
+
+      const eventType = getEventTypeFromUpdateRequestBody(req.body.eventType);
+
+      await eventTypeController
+        .updateEventType(eventType)
+        .then(() => {
+          log.info(`EventType updated. Returning ${httpStatus.SUCCESS}.`);
+          res.json({ eventType: eventType.toAuthJSON() });
+        })
+        .catch(err => {
+          if (err.message === "EventType not found") {
+            log.info(
+              `EventType not found. Returning ${httpStatus.UNAUTHORIZED}.`
+            );
+            return res
+              .status(httpStatus.UNAUTHORIZED)
+              .send({ error: "No eventType found" });
+          }
+          log.error(
+            `Unexpected error in Update EventType. Err: ${stringify(
+              err,
+              null,
+              2
+            )}.<br/>Callind next()`
+          );
+          return next(err);
+        });
     }
   };
 };
@@ -93,7 +168,8 @@ module.exports = eventTypeController => {
   router
     .route("/eventTypes", auth.required)
     .get(api.getActiveEventTypes)
-    .post(api.createEventType);
+    .post(api.createEventType)
+    .put(api.updateEventType);
 
   return router;
 };
