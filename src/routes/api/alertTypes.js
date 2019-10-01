@@ -13,13 +13,25 @@ function validateCreateUpdateRequest(req, res) {
   validate.hasId(req.body.alertType, res, "AlertType");
 }
 
-function getModelFromUpdateRequestBody(alertTypeFromBody) {
+function getModelFromUpdateRequest(req) {
   const alertType = new AlertType();
+  const alertTypeFromBody = req.body.alertType;
 
   alertType.id = guid.getObjectId(alertTypeFromBody);
-  alertType.name = alertTypeFromBody.name;
+  alertType.name = alertTypeFromBody.name.trim();
   alertType.numberOfDaysToWarning = alertTypeFromBody.numberOfDaysToWarning;
   alertType.active = alertTypeFromBody.active;
+
+  return alertType;
+}
+
+function getModelFromCreateRequest(req) {
+  const alertType = new AlertType();
+  const alertTypeFromBody = req.body.alertType;
+
+  alertType.name = alertTypeFromBody.name.trim();
+  alertType.numberOfDaysToWarning = alertTypeFromBody.numberOfDaysToWarning;
+  alertType.active = true;
 
   return alertType;
 }
@@ -92,12 +104,7 @@ const alertTypeApi = function alertTypeApi(alertTypeController) {
      * @param {Object} next Method to be called next.
      */
     createAlertType(req, res, next) {
-      const alertType = new AlertType();
-
-      alertType.name = req.body.alertType.name;
-      alertType.numberOfDaysToWarning =
-        req.body.alertType.numberOfDaysToWarning;
-      alertType.active = true;
+      const alertType = getModelFromCreateRequest(req);
 
       alertTypeController
         .addAlertType(alertType)
@@ -116,7 +123,7 @@ const alertTypeApi = function alertTypeApi(alertTypeController) {
 
       validateCreateUpdateRequest(req, res);
 
-      const alertType = getModelFromUpdateRequestBody(req.body.alertType);
+      const alertType = getModelFromUpdateRequest(req);
 
       await alertTypeController
         .updateAlertType(alertType)

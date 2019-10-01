@@ -48,34 +48,40 @@ function validateCreateUpdateRequest(req, res) {
   validate.isId(req.body.field.client, res, "Client");
 }
 
-function getFieldFromCreateRequestBody(fieldFromBody) {
+function getFieldFromCreateRequestBody(req) {
   const field = new Field();
+  const fieldFromBody = req.body.field;
+
   field.id = guid.getObjectId(fieldFromBody);
-  field.name = fieldFromBody.name;
-  field.description = fieldFromBody.description;
-  field.email = fieldFromBody.email;
-  field.address = fieldFromBody.address;
-  field.city = fieldFromBody.city;
+  field.name = fieldFromBody.name.trim();
+  field.description = fieldFromBody.description.trim();
+  field.email = fieldFromBody.email.trim();
+  field.address = fieldFromBody.address.trim();
+  field.city = fieldFromBody.city.trim();
   field.state = fieldFromBody.state;
-  field.postalCode = fieldFromBody.postalCode;
+  field.postalCode = fieldFromBody.postalCode.trim();
   field.client = fieldFromBody.client;
   field.events = getArrayOfIds(fieldFromBody.events);
+
   return field;
 }
 
-function getFieldFromUpdateRequestBody(fieldFromBody) {
+function getModelFromUpdateRequest(req) {
   const field = new Field();
+  const fieldFromBody = req.body.field;
+
   field.id = guid.getObjectId(fieldFromBody);
-  field.name = fieldFromBody.name;
-  field.description = fieldFromBody.description;
-  field.email = fieldFromBody.email;
-  field.address = fieldFromBody.address;
-  field.city = fieldFromBody.city;
+  field.name = fieldFromBody.name.trim();
+  field.description = fieldFromBody.description.trim();
+  field.email = fieldFromBody.email.trim();
+  field.address = fieldFromBody.address.trim();
+  field.city = fieldFromBody.city.trim();
   field.state = fieldFromBody.state;
-  field.postalCode = fieldFromBody.postalCode;
+  field.postalCode = fieldFromBody.postalCode.trim();
   field.client = fieldFromBody.client;
   field.events = getEvents(fieldFromBody.events, field.id);
   field.active = fieldFromBody.active;
+
   return field;
 }
 
@@ -183,7 +189,7 @@ const fieldApi = function fieldApi(fieldController) {
 
       validateCreateUpdateRequest(req, res);
 
-      const field = getFieldFromCreateRequestBody(req.body.field);
+      const field = getFieldFromCreateRequestBody(req);
 
       fieldController
         .addField(field)
@@ -215,7 +221,7 @@ const fieldApi = function fieldApi(fieldController) {
 
       validateCreateUpdateRequest(req, res);
 
-      const field = getFieldFromUpdateRequestBody(req.body.field);
+      const field = getModelFromUpdateRequest(req);
 
       await fieldController
         .updateField(field)

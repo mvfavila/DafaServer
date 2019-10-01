@@ -171,9 +171,9 @@ const userApi = function userApi(userController) {
           .json({ errors: { password: "can't be blank" } });
       }
 
-      user.username = req.body.user.username;
-      user.email = req.body.user.email;
-      user.setPassword(req.body.user.password);
+      user.username = req.body.user.username.trim();
+      user.email = req.body.user.email.trim();
+      user.setPassword(req.body.user.password.trim());
 
       await userController.createUser(user);
 

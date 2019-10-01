@@ -5,6 +5,15 @@ const EventWarning = mongoose.model("EventWarning");
 const auth = require("../auth");
 const { httpStatus } = require("../../util/util");
 
+function getModelFromCreateRequest(req) {
+  const eventWarning = new EventWarning();
+  const eventWarningFromBody = req.body.eventWarning;
+
+  eventWarning.event = eventWarningFromBody.eventId;
+
+  return eventWarning;
+}
+
 /**
  * Represents the eventWarning API with it's methods.
  */
@@ -47,9 +56,7 @@ const eventWarningApi = function eventWarningApi(eventWarningController) {
      * @param {Object} res Response object.
      */
     async createEventWarning(req, res) {
-      const eventWarning = new EventWarning();
-
-      eventWarning.event = req.body.eventWarning.eventId;
+      const eventWarning = getModelFromCreateRequest(req);
 
       await eventWarningController.addEventWarning(eventWarning);
 

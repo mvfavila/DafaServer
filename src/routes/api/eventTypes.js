@@ -29,12 +29,25 @@ function getAlertTypeIds(alertTypes) {
   return alertTypeIds;
 }
 
-function getEventTypeFromUpdateRequestBody(eventTypeFromBody) {
+function getModelFromCreateRequest(req) {
   const eventType = new EventType();
+  const eventTypeFromBody = req.body.eventType;
+
+  eventType.name = eventTypeFromBody.name.trim();
+  eventType.description = eventTypeFromBody.description.trim();
+  eventType.alertTypes = eventTypeFromBody.alertTypes;
+  eventType.active = true;
+
+  return eventType;
+}
+
+function getModelFromUpdateRequest(req) {
+  const eventType = new EventType();
+  const eventTypeFromBody = req.body.eventType;
 
   eventType.id = guid.getObjectId(eventTypeFromBody);
-  eventType.name = eventTypeFromBody.name;
-  eventType.description = eventTypeFromBody.description;
+  eventType.name = eventTypeFromBody.name.trim();
+  eventType.description = eventTypeFromBody.description.trim();
   eventType.alertTypes = getAlertTypeIds(eventTypeFromBody.alertTypes);
   eventType.active = eventTypeFromBody.active;
 
@@ -102,12 +115,7 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
      * @param {Object} res Response object.
      */
     async createEventType(req, res) {
-      const eventType = new EventType();
-
-      eventType.name = req.body.eventType.name;
-      eventType.description = req.body.eventType.description;
-      eventType.alertTypes = req.body.eventType.alertTypes;
-      eventType.active = true;
+      const eventType = getModelFromCreateRequest(req);
 
       await eventTypeController.addEventType(eventType);
 
@@ -125,7 +133,7 @@ const eventTypeApi = function eventTypeApi(eventTypeController) {
 
       validateCreateUpdateRequest(req, res);
 
-      const eventType = getEventTypeFromUpdateRequestBody(req.body.eventType);
+      const eventType = getModelFromUpdateRequest(req);
 
       await eventTypeController
         .updateEventType(eventType)

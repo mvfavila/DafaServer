@@ -16,6 +16,40 @@ function getObjectId(client) {
   return client.id || client._id;
 }
 
+function getModelFromUpdateRequest(req) {
+  const client = new Client();
+  const clientFromReq = req.body.client;
+
+  client.id = getObjectId(clientFromReq);
+  client.firstName = clientFromReq.firstName.trim();
+  client.lastName = clientFromReq.lastName.trim();
+  client.company = clientFromReq.company.trim();
+  client.address = clientFromReq.address.trim();
+  client.city = clientFromReq.city.trim();
+  client.state = clientFromReq.state;
+  client.postalCode = clientFromReq.postalCode.trim();
+  client.email = clientFromReq.email.trim();
+  client.active = clientFromReq.active;
+
+  return client;
+}
+
+function getModelFromCreateRequest(req) {
+  const client = new Client();
+  const clientFromReq = req.body.client;
+
+  client.firstName = clientFromReq.firstName.trim();
+  client.lastName = clientFromReq.lastName.trim();
+  client.company = clientFromReq.company.trim();
+  client.address = clientFromReq.address.trim();
+  client.city = clientFromReq.city.trim();
+  client.state = clientFromReq.state;
+  client.postalCode = clientFromReq.postalCode.trim();
+  client.email = clientFromReq.email.trim();
+
+  return client;
+}
+
 /**
  * Represents the client API with it's methods.
  */
@@ -162,18 +196,9 @@ const clientApi = function clientApi(clientController) {
      */
     createClient(req, res, next) {
       log.info("Create Client started");
-      const client = new Client();
-
       log.debug(`Request body: ${stringify(req.body, null, 2)}`);
 
-      client.firstName = req.body.client.firstName;
-      client.lastName = req.body.client.lastName;
-      client.company = req.body.client.company;
-      client.address = req.body.client.address;
-      client.city = req.body.client.city;
-      client.state = req.body.client.state;
-      client.postalCode = req.body.client.postalCode;
-      client.email = req.body.client.email;
+      const client = getModelFromCreateRequest(req);
 
       clientController
         .addClient(client)
@@ -253,20 +278,9 @@ const clientApi = function clientApi(clientController) {
      */
     async updateClient(req, res, next) {
       log.info("Update Client started");
-      const client = new Client();
-
       log.debug(`Request body: ${stringify(req.body, null, 2)}`);
 
-      client.id = getObjectId(req.body.client);
-      client.firstName = req.body.client.firstName;
-      client.lastName = req.body.client.lastName;
-      client.company = req.body.client.company;
-      client.address = req.body.client.address;
-      client.city = req.body.client.city;
-      client.state = req.body.client.state;
-      client.postalCode = req.body.client.postalCode;
-      client.email = req.body.client.email;
-      client.active = req.body.client.active;
+      const client = getModelFromUpdateRequest(req);
 
       await clientController
         .updateClient(client)

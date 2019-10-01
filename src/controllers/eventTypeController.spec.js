@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 // During the test the env variable is set to test
 process.env.NODE_ENV = "test";
 
@@ -126,7 +127,7 @@ describe("EventType controller", () => {
     expect(eventType.id.toString()).to.equal(eventTypeFound.id.toString());
     expect(eventType.name).to.equal(eventTypeFound.name);
     expect(eventType.description).to.equal(eventTypeFound.description);
-    expect(eventType.alertTypes.toString()).to.equal(
+    expect(eventType.alertTypes.map(at => at._id).toString()).to.equal(
       eventTypeFound.alertTypes.toString()
     );
     expect(eventType.active).to.equal(eventTypeFound.active);

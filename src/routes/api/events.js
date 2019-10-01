@@ -15,12 +15,14 @@ function validateCreateRequest(req, res) {
   validate.isId(req.body.event.field, res, "Field");
 }
 
-function createEventFromBody(eventBody) {
+function getModelFromCreateRequest(req) {
   const event = new Event();
-  event.id = guid.getObjectId(eventBody);
-  event.date = eventBody.date;
-  event.eventType = eventBody.eventType;
-  event.field = eventBody.field;
+  const eventFromBody = req.body.event;
+
+  event.id = guid.getObjectId(eventFromBody);
+  event.date = eventFromBody.date;
+  event.eventType = eventFromBody.eventType;
+  event.field = eventFromBody.field;
   event.active = true;
   return event;
 }
@@ -71,7 +73,7 @@ const eventApi = function eventApi(eventController) {
 
       validateCreateRequest(req, res);
 
-      const event = createEventFromBody(req.body.event);
+      const event = getModelFromCreateRequest(req);
 
       await eventController.addEvent(event);
 
