@@ -15,6 +15,15 @@ Unit tests and integration tests were created using Mocha, Chai and mongodb-memo
 Run `npm test` to execute all unit and integration tests.<br/>
 Run `npm run testDebug` to execute all unit and integration tests in debug mode.
 
+### Debugging tests
+
+To debug the code while running tests you will need to:
+1. Place a `debugger` reserved word where you want your code to break
+2. Run `npm run testDebug` command
+3. In Chrome go to `chrome://inspect`, click on `Configure` and ensure your target host and port are listed (e.g. localhost:1234)
+4. You should see your application running under `Remote Target`. Click on `inspect`
+5. Under the `Source` tab, you should see your code running and you can continue until your breakpoints are hit
+
 ## Running Locally
 
 Execute `npm start` command to start the dev server. Navigate to `http://localhost:3000/`.
