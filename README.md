@@ -50,13 +50,13 @@ Serverless npm package should be installed both globally and as a dev requiremen
 Environment variables json files are required for the deploy.<br/>
 Add a file named `<environment>.env.json` to the folder `/src/config/environment` following the model:
 
-> {
-> "MONGODB_URI": "mongodb://<user>:<password>@ds346006.mlab.com:28216/<db_name>",
-> "SECRET": "<secret>",
-> "CLIENT_SIDE_URL": "<client_side_url>",
-> "NODE_ENV": "<dev|qa|test|production>",
-> "PORT": "<port>"
-> }
+> {<br/>
+> "MONGODB_URI": "mongodb://<user>:<password>@ds346006.mlab.com:28216/<db_name>",<br/>
+> "SECRET": "<secret>",<br/>
+> "CLIENT_SIDE_URL": "<client_side_url>",<br/>
+> "NODE_ENV": "<dev|qa|test|production>",<br/>
+> "PORT": "<port>"<br/>
+> }<br/>
 
 ## Deploy
 
