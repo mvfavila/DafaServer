@@ -7,14 +7,14 @@ custom:
 provider:
   name: aws
   runtime: nodejs10.x
-  stage: dev
+  stage: ${opt:stage, 'dev'}
   region: us-east-1
   memorySize: 128
   environment:
-    NODE_ENV: ${env:NODE_ENV}
-    SECRET: ${env:SECRET}
-    CLIENT_SIDE_URL: ${env:CLIENT_SIDE_URL}
-    MONGODB_URI: ${env:MONGODB_URI}
+    NODE_ENV: ${file(src/config/environment/${self:provider.stage}.env.json):NODE_ENV}
+    SECRET: ${file(src/config/environment/${self:provider.stage}.env.json):SECRET}
+    CLIENT_SIDE_URL: ${file(src/config/environment/${self:provider.stage}.env.json):CLIENT_SIDE_URL}
+    MONGODB_URI: ${file(src/config/environment/${self:provider.stage}.env.json):MONGODB_URI}
 
 functions:
   authorizer:
@@ -36,7 +36,7 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: ${env:CLIENT_SIDE_URL}
+            origin: ${file(src/config/environment/${self:provider.stage}.env.json):CLIENT_SIDE_URL}
             headers:
               - Content-Type
               - X-Amz-Date
@@ -50,7 +50,7 @@ functions:
           method: ANY
           authorizer: authorizer
           cors:
-            origin: ${env:CLIENT_SIDE_URL}
+            origin: ${file(src/config/environment/${self:provider.stage}.env.json):CLIENT_SIDE_URL}
             headers:
               - Content-Type
               - X-Amz-Date

@@ -45,14 +45,27 @@ Serverless npm package should be installed both globally and as a dev requiremen
 1. Globally: for executing in dev and not making the deployment package increase in size
 2. Dev requirement: to be able to debug the code
 
+### Environment file
+
+Environment variables json files are required for the deploy.<br/>
+Add a file named `<environment>.env.json` to the folder `/src/config/environment` following the model:
+
+> {
+> "MONGODB_URI": "mongodb://<user>:<password>@ds346006.mlab.com:28216/<db_name>",
+> "SECRET": "<secret>",
+> "CLIENT_SIDE_URL": "<client_side_url>",
+> "NODE_ENV": "<dev|qa|test|production>",
+> "PORT": "<port>"
+> }
+
 ## Deploy
 
 If the configuration above has already been completed, the only thing you need to do to deploy to the dev/qa/prod environment is:<br/>
 
-1. If 'serverless.yml' file has not been changed (quicker deployment):
-   > serverless deploy function -f dafa-server
-2. If 'serverless.yml' file has not been changed:
-   > serverless deploy
+1. Run the command below to deploy to dev environment:
+   > npm run deployToDev
+2. Run the command below to deploy to prod environment:
+   > npm run deployToProd
 
 ## Teardown
 

@@ -70,3 +70,4 @@ typings/
 
 # Environment files
 src/config/environment/*.env
+src/config/environment/*.env.*
