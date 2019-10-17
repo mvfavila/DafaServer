@@ -116,11 +116,11 @@ const userApi = function userApi(userController) {
         "local",
         { session: false },
         (err, user, info) => {
-          if (err) {
+          if (info && info.error) {
             log.warn(
               `Login can't be processed. Error: ${stringify(info, null, 2)}`
             );
-            return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(err);
+            return res.status(httpStatus.UNPROCESSABLE_ENTITY).json(info);
           }
 
           if (user) {
@@ -139,41 +139,55 @@ const userApi = function userApi(userController) {
       )(req, res);
     },
 
-    /**
-     * (POST) Creates a new user.
-     * @param {Object} req Request object.
-     * @param {Object} res Response object.
-     */
     async createUser(req, res) {
       const user = new User();
 
       if (!req.body.user) {
         return res
           .status(httpStatus.BAD_REQUEST)
-          .json({ errors: { message: "Bad request" } });
+          .json({ error: { message: "Bad request" } });
       }
 
       if (!req.body.user.email) {
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
-          .json({ errors: { email: "can't be blank" } });
+          .json({ error: { message: "E-mail can't be blank" } });
       }
 
       if (!req.body.user.username) {
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
-          .json({ errors: { username: "can't be blank" } });
+          .json({ error: { message: "Username can't be blank" } });
       }
 
       if (!req.body.user.password) {
         return res
           .status(httpStatus.UNPROCESSABLE_ENTITY)
-          .json({ errors: { password: "can't be blank" } });
+          .json({ error: { message: "Password can't be blank" } });
       }
+
+      /**
+       * Expected errors
+       *   EMAIL_NOT_FOUND
+       *   INVALID_PASSWORD
+       *   USER_DISABLED
+       *   EMAIL_EXISTS
+       *   OPERATION_NOT_ALLOWED
+       *   TOO_MANY_ATTEMPTS_TRY_LATER
+       */
 
       user.username = req.body.user.username.trim();
       user.email = req.body.user.email.trim();
       user.setPassword(req.body.user.password.trim());
+
+      const foundUser = await userController.getUserByEmail(user.email);
+      const isEmailAlreadyRegistered = foundUser !== null;
+
+      if (isEmailAlreadyRegistered) {
+        return res
+          .status(httpStatus.UNPROCESSABLE_ENTITY)
+          .json({ error: { message: "EMAIL_EXISTS" } });
+      }
 
       await userController.createUser(user);
 

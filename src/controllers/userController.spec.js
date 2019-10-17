@@ -96,6 +96,30 @@ describe("User controller", () => {
     expect(userFound.updatedAt).to.be.an("date");
   });
 
+  it("getUserByEmail - Gets user by e-mail - Must return exact user", async () => {
+    const cnt = await User.countDocuments();
+
+    expect(cnt).to.equal(1);
+
+    const users = await userController.getUsers();
+
+    const user = users[0];
+
+    // const aaa = await User.find({ email: user.email });
+
+    const userFound = await userController.getUserByEmail(user.email);
+
+    // returned user must be exactly the existing one
+    expect(user.id.toString()).to.equal(userFound.id.toString());
+    expect(user.email).to.equal(userFound.email);
+    expect(user.username).to.equal(userFound.username);
+    expect(userFound.password).to.be.undefined;
+    expect(user.roles.length).to.equal(1);
+    expect(userFound.active).to.be.true;
+    expect(userFound.createdAt).to.be.an("date");
+    expect(userFound.updatedAt).to.be.an("date");
+  });
+
   it("updateUser - Updates all attributes - Must succeed", async () => {
     let cnt = await User.countDocuments();
 

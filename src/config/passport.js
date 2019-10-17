@@ -17,9 +17,18 @@ module.exports = (app, p) => {
       (email, password, done) => {
         User.findOne({ email })
           .then(user => {
-            if (!user || !user.validPassword(password)) {
+            if (!user) {
               return done(null, false, {
-                errors: { "email or password": "is invalid" }
+                error: {
+                  message: "EMAIL_NOT_FOUND"
+                }
+              });
+            }
+            if (!user.validPassword(password)) {
+              return done(null, false, {
+                error: {
+                  message: "INVALID_PASSWORD"
+                }
               });
             }
 

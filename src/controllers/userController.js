@@ -4,14 +4,7 @@ const { dafaRoles } = require("../config");
 
 const User = mongoose.model("User");
 
-/**
- * Orchestrates operations related to users
- */
 const userController = {
-  /**
-   * Gets a single user by it's id
-   * @param {ObjectId} userId
-   */
   async getUserById(userId) {
     return new Promise(async (resolve, reject) => {
       let user;
@@ -24,9 +17,18 @@ const userController = {
     });
   },
 
-  /**
-   * Gets all existing users
-   */
+  async getUserByEmail(email) {
+    return new Promise(async (resolve, reject) => {
+      let user;
+      try {
+        user = await User.findOne({ email });
+      } catch (err) {
+        return reject(err);
+      }
+      return resolve(user);
+    });
+  },
+
   async getUsers() {
     return new Promise(async (resolve, reject) => {
       let users;
@@ -39,10 +41,6 @@ const userController = {
     });
   },
 
-  /**
-   * Gets all users of a user
-   * @param {User} user
-   */
   async getUsersByUser(user) {
     return new Promise(async (resolve, reject) => {
       let events;
@@ -64,10 +62,6 @@ const userController = {
     });
   },
 
-  /**
-   * Adds a new user to the repository
-   * @param {User} user
-   */
   async createUser(user) {
     const userToAdd = user;
     userToAdd.roles = [dafaRoles.BASIC];
@@ -80,10 +74,6 @@ const userController = {
     });
   },
 
-  /**
-   * Updates a user's status
-   * @param {User} user
-   */
   async updateUserStatus(user) {
     return new Promise(async (resolve, reject) => {
       if (!user || !user.id) {
@@ -111,10 +101,6 @@ const userController = {
     });
   },
 
-  /**
-   * Updates an existing user
-   * @param {User} user
-   */
   async updateUser(user) {
     // TODO: this can be improved. I don't think I need to fetch the user before trying to update it
     return new Promise(async (resolve, reject) => {
