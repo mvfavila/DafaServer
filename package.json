@@ -22,7 +22,7 @@
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",
     "flatted": "^2.0.1",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "log-to-file": "^2.0.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.4.0",
